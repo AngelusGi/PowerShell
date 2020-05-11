@@ -1,5 +1,8 @@
 #Rev3
 
+Install-Module Azure
+Install-Module MSOnline
+
 $AdUser = "ADMIN TENANT"
 $AdPswd = ConvertTo-SecureString 'ADMIN PSWD' -AsPlainText -Force
 $AdminCred = New-Object System.Management.Automation.PSCredential $AdUser, $AdPswd
