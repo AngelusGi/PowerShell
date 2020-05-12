@@ -1,6 +1,5 @@
 #Rev3
 
-Install-Module Azure
 Install-Module MSOnline
 
 $AdUser = "ADMIN TENANT"
