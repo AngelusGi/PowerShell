@@ -1,5 +1,7 @@
 #1.1.0
 
+Install-Module MSOnline
+
 $AdUser = "ADMIN USERNAME"
 $AdPswd = ConvertTo-SecureString 'ADMIN PSWD' -AsPlainText -Force
 $AdminCred = New-Object System.Management.Automation.PSCredential $AdUser, $AdPswd

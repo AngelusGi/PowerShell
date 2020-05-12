@@ -1,5 +1,8 @@
 # Inspired by https://devblogs.microsoft.com/premier-developer/how-to-shrink-a-managed-disk/
 
+Install-Module Az
+Install-Module Azure
+
 # Variables
 # Disk -> Properties -> Resource ID - eg. /subscriptions/SubscriptionID/resourceGroups/ResourceGroupName/providers/Microsoft.Compute/disks/DiskName
 $DiskID = "" 
