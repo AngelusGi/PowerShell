@@ -6,7 +6,7 @@ $Delimiter = "<YOUR DELIMITER IN THE CSV FILE>" # ex. ';' # Delimitatore del fil
 
 $LabName = "<LAB NAME>" # ex. "Contoso" # Nome del laboratorio di Azure Lab Services
 
-$SubId = "<YOUR AZURE SUBSCRIPTION ID>" # Azure Subscription Id # Per ottenerlo, usare il comando Connect-AzAccount -> Get-AzSubscription
+$SubId = "<YOUR AZURE SUBSCRIPTION ID>" # ex. "1234-abcd-5678-xxxx-00yyyy" # Azure Subscription Id # Per ottenerlo, usare il comando Connect-AzAccount -> Get-AzSubscription
 
 # END PARAMETERS #
 
