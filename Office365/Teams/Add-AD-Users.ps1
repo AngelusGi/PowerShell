@@ -6,7 +6,7 @@ $Delimiter = "<YOUR DELIMITER IN THE CSV FILE>" # ex. ';' # Delimitatore del fil
 
 $TeamName = "<TEAM NAME>" # ex. "Team Contoso"
 
-$Role = "Member" # the deafult member type is "Member", isted of this, you can set it as "Owner"
+$Role = "Member" # the deafult member type is "Member", istead of this you can set this parameter as "Owner"
 
 # END PARAMETERS #
 
