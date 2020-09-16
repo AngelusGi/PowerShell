@@ -23,11 +23,10 @@ try {
 
     $Users | ForEach-Object {
 
-    Add-TeamUser -GroupId $Team.GroupId -User $_.Email -Role $Role
+        Add-TeamUser -GroupId $Team.GroupId -User $_.Email -Role $Role
 
-    Write-Warning("*** Operazione compeltata su '$($_.Email)' nel team '$($Team.DisplayName)' ***")
-
-}
+        Write-Warning("*** Operazione compeltata su '$($_.Email)' nel team '$($Team.DisplayName)' ***")
+    }
 }
 catch {
     Write-Error("Errore, verificare i parametri immessi!")
