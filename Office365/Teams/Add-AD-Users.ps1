@@ -1,3 +1,5 @@
+# Expeting those mandatory headers in the CSV file: email | channel
+
 # PARAMETERS #
 
 $PathCSV = "<YOUR CSV PATH>" # ex. ".\csv_test.CSV" # Modificare inserendo la path e il nome del file CSV che contiene gli utenti da inserire
@@ -19,16 +21,25 @@ Connect-MicrosoftTeams
 try {
     $Team = Get-Team -DisplayName $TeamName
 
-    $Users = Import-Csv $PathCSV -Delimiter $Delimiter
+    try {
+        $Users = Import-Csv $PathCSV -Delimiter $Delimiter
 
-    $Users | ForEach-Object {
+        $Users | ForEach-Object {
+            
+            # Add-TeamUser -GroupId $Team.GroupId -User $_.Email -Role $Role
 
-        Add-TeamUser -GroupId $Team.GroupId -User $_.Email -Role $Role
-
-        Write-Warning("*** Operazione compeltata su '$($_.Email)' nel team '$($Team.DisplayName)' ***")
+            Add-TeamChannelUser -GroupId $Team.GroupId -DisplayName $_.Channel -User $_.Email -Role $Role
+        
+            Write-Warning("*** Operazione compeltata su '$($_.Email)' nel team '$($Team.DisplayName)' ***")
+        }
     }
+    catch {
+        Write-Error("Errore durante l'aggiunta del membro al canale!")
+        
+    }
+    
 }
 catch {
-    Write-Error("Errore, verificare i parametri immessi!")
+    Write-Error("Errore: il team non esiste!")
 }
 
