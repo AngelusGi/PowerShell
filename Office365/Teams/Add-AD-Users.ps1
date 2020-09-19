@@ -1,4 +1,7 @@
-# Expeting those mandatory headers in the CSV file: email | channel
+# We are using the preview module of Teams for PowerShell in order to use this method Add-TeamChannelUser - Ref. https://docs.microsoft.com/en-us/powershell/module/teams/Add-TeamChannelUser?view=teams-ps
+# Install Teams PowerShell public preview - Ref. https://docs.microsoft.com/en-us/microsoftteams/teams-powershell-install#install-teams-powershell-public-preview
+
+# Expeting those mandatory headers in the CSV file: "Email", "Channel"
 
 # PARAMETERS #
 
@@ -9,9 +12,21 @@ $Role = "Member" # the deafult member type is "Member", istead of this you can s
 
 # END PARAMETERS #
 
+$mod = Get-InstalledModule
+Write-Output("Preparazione dell'ambiente in corso, attendere...")
+
+foreach ($m in $mod) {
+    if (("MicrosoftTeams" -eq $m.Name) -And (-Not "1.1.5-preview" -eq $m.Version)) {
+        Uninstall-Module MicrosoftTeams -Force
+        Write-Warning("è necessario riavviare powershell e rilanciare lo script, premere un tasto per confermare.")
+        Read-Host 
+        Exit
+    }
+}
+
 Install-Module PowerShellGet -Force -AllowClobber
-Install-Module MicrosoftTeams -AllowPrerelease -RequiredVersion "1.1.3-preview" -Force
-Import-Module MicrosoftTeams -RequiredVersion 1.1.3 -Force
+Install-Module MicrosoftTeams -AllowPrerelease -RequiredVersion "1.1.5-preview" -Force
+Import-Module MicrosoftTeams
 
 Connect-MicrosoftTeams
 
@@ -34,11 +49,11 @@ try {
                 
                 foreach ($Ch in $Channels) {
                     if (-Not $Ch.DisplayName -eq $User.Channel) {
-                        Write-Error("Il canale indicato non esiste $($User.Channel)")
+                        Write-Error("Il canale $($User.Channel) non esiste")
                         
                         try {
                             New-TeamChannel -GroupId $Team.GroupId -DisplayName $User.Channel
-                            Write-Warning("Canale $($User.Channel) creato correttamente")
+                            Write-Warning("Canale $($User.Channel) creato")
                         }
                         catch {
                             Write-Error("Impossibile gestire il canale")
@@ -55,18 +70,34 @@ try {
             
 
             Add-TeamUser -GroupId $Team.GroupId -User $User.Email -Role $Role
+            Write-Output("$($User.Email) aggiunto al team $($Team.DisplayName)")
 
-            Add-TeamChannelUser -GroupId $Team.GroupId -DisplayName $User.Channel -User $User.Email
-
-            Write-Warning("*** Operazione compeltata su '$($_.Email)' nel team '$($Team.DisplayName)' del canale '$($Team.DisplayName)'  ***")
         }
     }
     catch {
-        Write-Error("Errore durante l'aggiunta del membro al canale!")
+        Write-Error("Errore durante l'aggiunta del membro al team!")
+    }
+
+    Write-Warning("Operazione in corso, attendere... L'operazione potrebbe richiedere fino a 15 minuti!")
+    Start-Sleep -Seconds 840
+
+    foreach ($User in $Users) {
+
+        try {
+            $Team = Get-Team -DisplayName $TeamName
+
+            Add-TeamChannelUser -GroupId $Team.GroupId -DisplayName $User.Channel -User $User.Email
+            Write-Output("$($User.Email) aggiunto al canale $($User.Channel) del team $($Team.DisplayName)")
+
+            Write-Warning("*** Operazione compeltata su $($User.Email) nel team $($Team.DisplayName) del canale $($User.Channel) ***")
+        }
+        catch {
+            Write-Error("Errore durante l'aggiunta del membro al canale! Verificare di essere loggati come creatore del canale.")
+
+        }
     }
     
 }
 catch {
     Write-Error("Errore: il team non esiste!")
 }
-
