@@ -15,38 +15,53 @@ $Role = "Member" # the deafult member type is "Member", istead of this you can s
 
 Write-Output("Preparazione e verifica dell'ambiente in corso, attendere...")
 
-
 try {
-    Get-InstalledModule -Name "PowerShellGet"    
+
+    $PSModule = "PowerShellGet"
+
+    $ModPS = Get-InstalledModule -Name $PSModule
+
+    if ($null -eq $ModPS) {
+        Install-Module -Name $PSModule -AllowClobber -AcceptLicense -Force
+    }
 }
 catch {
-    Write-Error("Moduli non trovati, installazione in corso...")
-    Install-Module PowerShellGet -AllowClobber -Force
+    Write-Error("Modulo $($PSModule) non trovati, installazione in corso...")
+    break
 }
 
 try {
-    $modTeams = Get-InstalledModule -Name "MicrosoftTeams"
+    $PSTeamsModule = "MicrosoftTeams"
+
+    $ModTeams = Get-InstalledModule -Name $PSTeamsModule
+
+    if ($null -eq $ModTeams) {
+        Install-Module -Name $PSTeamsModule -AllowPrerelease -RequiredVersion "1.1.5-preview" -Force
+    }
+    
+    if (-Not "1.1.5-preview" -eq $ModTeams.Version) {
+        Uninstall-Module -Name $PSTeamsModule -AllVersions -AcceptLicense -Force
+        Write-Warning("è necessario riavviare powershell e rilanciare lo script, premere un tasto per confermare.")
+        Read-Host
+        Exit
+    }
 }
 catch {
-    Write-Error("Moduli non trovati, installazione in corso...")
-    Install-Module MicrosoftTeams -AllowPrerelease -RequiredVersion "1.1.5-preview" -Force
+    Write-Error("Modulo $($PSTeamsModule) non trovato...")
+    break
 }
 
-if (-Not "1.1.5-preview" -eq $modTeams.Version) {
-    Uninstall-Module -Name MicrosoftTeams -AllVersions -Force
-    Write-Warning("è necessario riavviare powershell e rilanciare lo script, premere un tasto per confermare.")
-    Read-Host 
-    Exit
-} else {
-    Get-InstalledModule -Name "MicrosoftTeams"
-}
+Import-Module -Name $PSTeamsModule -Force
 
-Import-Module -Name MicrosoftTeams -Force
+Write-Output("Riepilogo moduli trovati")
+Get-InstalledModule -Name $PSTeamsModule
+Get-InstalledModule -Name $PSModule
+
+Connect-MicrosoftTeams
 
 
 try {
 
-    Connect-MicrosoftTeams
 
     $FoundUsers = New-Object -TypeName "System.Collections.ArrayList"
     $ErrorUser = $null
@@ -66,10 +81,15 @@ try {
     try {
         
         try {
+            
             Write-Output("Verifica del CSV in corso...")
             $Users = Import-Csv $PathCSV -Delimiter $Delimiter
 
-            $ChannelsCSV = $Users.Channel | Select-Object -Unique
+            if (-not ($Users.Email.Count -gt 0) -and ($Users.Channel.Count -gt 0)) {
+                Write-Error("Il CSV non è formattato correttamente, verificare i campi 'Email' e 'Channel' e verificare che non siano vuoti")
+                exit
+            }
+
         }
         catch {
             Write-Error("Impossibile accedere al CSV, verificare il path e i campi")
@@ -78,20 +98,13 @@ try {
         
         Write-Output("Ricerca dei canali del Team $($TeamName) in corso, attendere...")
 
+        $ChannelsCSV = $Users.Channel | Select-Object -Unique
         $Channels = Get-TeamChannel -GroupId $Team.GroupId
 
-
         foreach ($ChCSV in $ChannelsCSV) {
-            $NotFound = $true
 
-            foreach ($Ch in $Channels) {
-                if ($Ch.DisplayName -eq $ChCSV) {
-                    $NotFound = $false
-                    break
-                }            
-            }
+            if (-not $Channels.DisplayName.Contains($ChCSV)) {
 
-            if ($NotFound) {
                 try {
                     Write-Warning("Il canale $($ChCSV) non esiste, creazione in corso, attendere...")
                     New-TeamChannel -GroupId $Team.GroupId -DisplayName $ChCSV -MembershipType "Private"
@@ -99,69 +112,90 @@ try {
                     Write-Warning("Canale $($ChCSV) creato")
                 }
                 catch {
-                    Write-Error("Impossibile gestire il canale")
+                    Write-Error("Impossibile gestire il canale $($ChCSV)")
                     exit
                 }
             }
+            
         }
 
-        $Channels = Get-TeamChannel -GroupId $Team.GroupId
-        Write-Output("Canali trovati: $($Channels)")
-
-        Write-Output("Ricerca dei membri gia presenti in corso...")
+        Write-Output("Ricerca dei membri gia presenti nel team $($Team.DisplayName) in corso...")
         $TeamUsers = Get-TeamUser -GroupId $Team.GroupId -Role $Role
 
         foreach ($User in $Users) {
 
             try {
-                
-                $NotFound = $true
 
-                foreach ($TeamUser in $TeamUsers) {
-                    if ($TeamUser.User -eq $User.Email) {
-                        $NotFound = $false
-                        break
-                    }
-
-                }
-            
-                if ($NotFound) {
+                if (-not $TeamUsers.User.Contains($User.Email)) {
                     try {
                         $ErrorUser = $User
                         Write-Output("Aggiunta dell'utente $($User.Email) al team $($Team.DisplayName) in corso, attendere...")
                         Add-TeamUser -GroupId $Team.GroupId -User $User.Email
-                        Start-Sleep -Seconds 30
+                        Start-Sleep -Seconds 45
                         Write-Output("$($User.Email) aggiunto al team $($Team.DisplayName)")
-                        
                     }
                     catch {
                         Write-Error("L'utente $($User.Email) non presente in Microsoft Teams!")
                         $ErrorUser | Out-File .\NotFoundAAD_$($OutputName) -Append
                         continue
                     }
-                
                 }
-                else {
-                    $FoundUsers.Add($User)
-                }
+                $FoundUsers.Add($User)
             
-                Write-Output("")
-
             }
             catch {
                 Write-Error("Errore nell'aggiunta al Team $($Team.DisplayName) dell'utente $($User.Email)")
                 continue
             }
         }
-    
 
-        Write-Warning("Operazione in corso, attendere... L'operazione potrebbe richiedere circa a 30 minuti!")
-        # Start-Sleep -Seconds 1800
-
-        Write-Output("Preparazione in corso, attendere...")
         $Team = Get-Team -DisplayName $TeamName
 
-        
+        $IsNotSpread = $True
+
+        do {
+
+            Write-Warning("La propagazione delle modifiche potrebbe richiedere del tempo, attendere...")
+            
+            $SpreadUsers = Get-TeamUser -GroupId $Team.GroupId -Role $Role
+
+            foreach ($FoundUserEmail in $FoundUsers.Email) {
+                if (-not $SpreadUsers.User.Contains($FoundUserEmail)) {
+                    $IsNotSpread = $true
+                    break
+                }
+                else {
+                    $IsNotSpread = $false
+                }
+            }
+
+            $SpreadChannels = Get-TeamChannel -GroupId $Team.GroupId
+            
+            $ChannelsCSV = $Users.Channel | Select-Object -Unique
+
+            foreach ($ChannelCSV in $ChannelsCSV) {
+                if (-not $SpreadChannels.DisplayName.Contains($ChannelCSV)) {
+                    $IsNotSpread = $true
+                    break
+                }
+                else {
+                    $IsNotSpread = $false
+                }
+            }
+
+            Start-Sleep -Seconds 90
+
+        } while ($IsNotSpread)
+    
+
+        Write-Output("Modifiche propagate. Raccolta delle informazioni necessarie in corso, attendere...")
+
+        $Channels = Get-TeamChannel -GroupId $Team.GroupId
+        Write-Output("Canali trovati:")
+        Write-Output("$($Channels.DisplayName)")
+
+        $Team = Get-Team -DisplayName $TeamName
+
 
         foreach ($User in $FoundUsers) {
 
@@ -169,33 +203,37 @@ try {
 
                 $ChannelUsers = Get-TeamChannelUser -GroupId $Team.GroupId -DisplayName $User.Channel
 
-                $NotFound = $true
-
                 if (-not $null -eq $ChannelUsers) {
-                    foreach ($ChUser in $ChannelUsers) {
-                        if ($ChUser.User -eq $User.Email) {
-                            $NotFound = $false
-                            break
+                    if ($ChannelUsers.User.Contains($User.Email)) {
+                        try {
+                            $ErrorUser = $User
+                            Write-Output("Aggiunta dell'utente $($User.Email) al canale $($User.Channel) del team $($Team.DisplayName) in corso, attendere...")
+                            Add-TeamChannelUser -GroupId $Team.GroupId -DisplayName $User.Channel -User $User.Email
+                            Start-Sleep -Seconds 45
+                            Write-Output("$($User.Email) aggiunto al canale $($User.Channel) del team $($Team.DisplayName)")
                         }
-    
+                        catch {
+                            Write-Error("Impossibile aggiungere l'utente al canale!")
+                            $ErrorUser | Out-File .\NotAddedChannel_$($OutputName) -Append
+                    
+                            continue
+                        }
                     }
-                }
-
-                if ($NotFound) {
-                    try {
-                        $ErrorUser = $User
-                        Write-Output("Aggiunta dell'utente $($User.Email) al canale $($Team.DisplayName) in corso, attendere...")
-                        Add-TeamChannelUser -GroupId $Team.GroupId -DisplayName $User.Channel -User $User.Email
-                        Start-Sleep -Seconds 30
-                        Write-Output("$($User.Email) aggiunto al canale $($User.Channel) del team $($Team.DisplayName)")
+                    else {
+                        try {
+                            $ErrorUser = $User
+                            Write-Output("Aggiunta dell'utente $($User.Email) al canale $($User.Channel) del team $($Team.DisplayName) in corso, attendere...")
+                            Add-TeamChannelUser -GroupId $Team.GroupId -DisplayName $User.Channel -User $User.Email
+                            Start-Sleep -Seconds 45
+                            Write-Output("$($User.Email) aggiunto al canale $($User.Channel) del team $($Team.DisplayName)")
+                        }
+                        catch {
+                            Write-Error("Impossibile aggiungere l'utente al canale!")
+                            $ErrorUser | Out-File .\NotAddedChannel_$($OutputName) -Append
+                    
+                            continue
+                        }
                     }
-                    catch {
-                        Write-Error("Impossibile aggiungere l'utente al canale!")
-                        $ErrorUser | Out-File .\NotAddedChannel_$($OutputName) -Append
-                
-                        continue
-                    }
-                
                 }
 
                 Write-Warning("*** Operazione compeltata su $($User.Email) nel team $($Team.DisplayName) del canale $($User.Channel) ***")
@@ -205,7 +243,11 @@ try {
 
             }
         }
-    
+        
+        Write-Warning("*** Potrebbero essere necessari alcuni minuti affiché le modifiche diventino visibile nell'applicazione. ***")
+        Write-Output("*** Operazione compeltata. Premere un tasto per uscire. ***")
+        Read-Host 
+
     }
     catch {
         Write-Error("Errore.")
@@ -213,5 +255,4 @@ try {
 }
 catch {
     Write-Error("Errore: il team non esiste")
-
 }
