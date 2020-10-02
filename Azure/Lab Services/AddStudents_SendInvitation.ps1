@@ -1,11 +1,8 @@
 # PARAMETERS #
 
 $PathCSV = "<YOUR CSV PATH>" # ex. ".\csv_test.CSV" # Modificare inserendo la path e il nome del file CSV che contiene gli utenti da inserire
-
 $Delimiter = "<YOUR DELIMITER IN THE CSV FILE>" # ex. ';' # Delimitatore del file CSV
-
 $LabName = "<LAB NAME>" # ex. "Contoso" # Nome del laboratorio di Azure Lab Services
-
 $SubId = "<YOUR AZURE SUBSCRIPTION ID>" # ex. "1234-abcd-5678-xxxx-00yyyy" # Azure Subscription Id # Per ottenerlo, usare il comando Connect-AzAccount -> Get-AzSubscription
 
 # END PARAMETERS #

@@ -1,26 +1,23 @@
 ﻿# PARAMETRI DA MODIFICARE #
 
-$tenant = "<Tenant_Domain_Name>" # ex. "contoso.onmicrosoft.com"
-$csv = "<CSV PATH>" # ex. ".\csv_test.CSV"
-$delimiter = '<YOUR DELIMITER IN THE CSV FILE>' # ex. ';' or ','
+$DomainName = "<DomainName_Domain_Name>" # ex. "contoso.onmicrosoft.com"
+$PathCSV = "<CSV PATH>" # ex. ".\csv_test.CSV"
+$Delimiter = '<YOUR Delimiter IN THE CSV FILE>' # ex. ';' or ','
 
 # FINE PARAMETRI DA MODIFICARE #
 
 
 Install-Module AzureADPreview -Force -Verbose
 
-Connect-AzureAD -TenantDomain $tenant
+Connect-AzureAD -DomainNameDomain $DomainName
 
-$PathCSV = $csv
+$GuestUsers = Import-Csv $PathCSV -Delimiter $Delimiter
 
-$guestUsers = Import-Csv $PathCSV -Delimiter $delimiter
+$GuestUsers | ForEach-Object {
 
-$guestUsers | ForEach-Object {
-
-    $email = $_.Email
-    New-AzureADMSInvitation -InvitedUserDisplayName $_.FullName -InvitedUserEmailAddress $email -InviteRedirectURL https://portal.office.com -SendInvitationMessage $true
+    New-AzureADMSInvitation -InvitedUserDisplayName $_.FullName -InvitedUserEmailAddress $_.Email -InviteRedirectURL https://portal.office.com -SendInvitationMessage $true
    
-    Write-Host("*** Operazione compeltata su '" + $email + "' ***")
+    Write-Host("*** Operazione compeltata su '" + $_.Email + "' ***")
     Write-Host("")
     Write-Host("")
 }
