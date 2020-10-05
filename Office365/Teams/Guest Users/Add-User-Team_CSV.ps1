@@ -9,20 +9,20 @@
 
 Param
 (
-    [parameter(Mandatory=$true, ValueFromPipeline=$true)]
+    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
     [String]
     $PathCSV,
 
-    [parameter(ValueFromPipeline=$true)]
+    [parameter(ValueFromPipeline = $true)]
     [String]
     $TeamName,
     
-    [parameter(ValueFromPipeline=$true)]
+    [parameter(ValueFromPipeline = $true)]
     [String]
     $Delimiter
 )
 
-if([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)){
+if ([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)) {
     $Delimiter = ";"
 }
 
@@ -30,13 +30,16 @@ if([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimit
 if ([string]::IsNullOrWhiteSpace($Delimiter)) {
     Write-Error("Il parametro Delimiter non può essere vuoto")
     exit
-} elseif ([string]::IsNullOrWhiteSpace($TeamName)) {
+}
+elseif ([string]::IsNullOrWhiteSpace($TeamName)) {
     Write-Error("Il parametro TeamName non può essere vuoto")
     exit
-}elseif ([string]::IsNullOrWhiteSpace($PathCSV)) {
+}
+elseif ([string]::IsNullOrWhiteSpace($PathCSV)) {
     Write-Error("Il parametro PathCSV non può essere vuoto")
     exit
-}else {
+}
+else {
     Write-host("Parametri:")
     Write-host("Path CSV: $($PathCSV)")
     Write-host("Delimitatore del file CSV: $($Delimiter)")
@@ -70,29 +73,54 @@ try {
     if ( [string]::IsNullOrWhiteSpace($team) -or [string]::IsNullOrWhiteSpace($team) ) {
         Write-Warning("*** IL TEAM NON ESISTE ***")
 
-    } else {
-        Write-Warning("*** IL TEAM ESISTE, CARICAMENTO UTENTI IN CORSO... ***")
-    
-        $guestUsers = Import-Csv $PathCSV -Delimiter ';'
+        New-Team -DisplayName $TeamName
 
-        $guestUsers | ForEach-Object {
+        $IsNotSpread = $True
 
-            $email = $_.Email
+        do {
 
-            if ($_.Team.Equals($team.DisplayName)) {
-                # $group = Get-Team -MailNickName $TeamName
-                
-                Add-TeamUser -GroupId $team.GroupId -User $email
-                Write-Warning("*** Operazione compeltata su '" + $email + "' nel team '" + $team.DisplayName + "' ***")
+            Write-Warning("La propagazione delle modifiche potrebbe richiedere del tempo, attendere...")
             
-            } else {
-                Write-Error("Errore, nessun team riconosciuto. Il nome team del CSV non è un nome valido.")
+            $team = Get-Team -DisplayName $TeamName
+
+
+            if ([string]::IsNullOrEmpty($team) -or [string]::IsNullOrWhiteSpace($team)) {
+                $IsNotSpread = $true
+                Start-Sleep -Seconds 90   
             }
 
-            Write-Host("")
-            Write-Host("")
-        }
+            $IsNotSpread = $false
+
+            
+        } while ($IsNotSpread)
+    
     }
+
+    Write-Warning("*** TEAM TROVATO, CARICAMENTO UTENTI IN CORSO... ***")
+
+    Write-Output($team)
+    
+    $guestUsers = Import-Csv $PathCSV -Delimiter ';'
+
+    $guestUsers | ForEach-Object {
+
+        $email = $_.Email
+
+        if ($_.Team.Equals($team.DisplayName)) {
+            # $group = Get-Team -MailNickName $TeamName
+                
+            Add-TeamUser -GroupId $team.GroupId -User $email
+            Write-Warning("*** Operazione compeltata su '" + $email + "' nel team '" + $team.DisplayName + "' ***")
+            
+        }
+        else {
+            Write-Error("Errore, nessun team riconosciuto. Il nome team del CSV non è un nome valido.")
+        }
+
+        Write-Host("")
+        Write-Host("")
+    }
+
 }
 catch {
     Write-Error("*** ERRORE ***")
