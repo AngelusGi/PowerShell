@@ -1,26 +1,75 @@
-# PARAMETRI DA MODIFICARE #
+# PARAMETERS DESCRIPTION #
 
-$teamNameA = "Test Teams CSV 1" #Modificare insierendo il nome del team (lo stesso prensente anche nel CSV
-$teamNameB = "Test Teams CSV 2" #Modificare insierendo il nome del team (lo stesso prensente anche nel CSV
+# $TeamName = "Test Teams CSV 1" # Inserire il nome del team (lo stesso prensente anche nel CSV
 
-$PathCSV = ".\csv_test.CSV" #Modificare inserendo la path e il nome del file CSV che contiene gli utenti da inserire
+# $PathCSV = ".\csv_test.CSV" #Modificare inserendo la path e il nome del file CSV che contiene gli utenti da inserire
 
-# FINE PARAMETRI DA MODIFICARE #
+# END PARAMETERS #
 
-Install-Module MicrosoftTeams -Force -Verbose
+
+Param
+(
+    [parameter(Mandatory=$true, ValueFromPipeline=$true)]
+    [String]
+    $PathCSV,
+
+    [parameter(ValueFromPipeline=$true)]
+    [String]
+    $TeamName,
+    
+    [parameter(ValueFromPipeline=$true)]
+    [String]
+    $Delimiter
+)
+
+if([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)){
+    $Delimiter = ";"
+}
+
+
+if ([string]::IsNullOrWhiteSpace($Delimiter)) {
+    Write-Error("Il parametro Delimiter non può essere vuoto")
+    exit
+} elseif ([string]::IsNullOrWhiteSpace($TeamName)) {
+    Write-Error("Il parametro TeamName non può essere vuoto")
+    exit
+}elseif ([string]::IsNullOrWhiteSpace($PathCSV)) {
+    Write-Error("Il parametro PathCSV non può essere vuoto")
+    exit
+}else {
+    Write-host("Parametri:")
+    Write-host("Path CSV: $($PathCSV)")
+    Write-host("Delimitatore del file CSV: $($Delimiter)")
+    Write-host("Nome del primo team: $($TeamName)")
+    Write-Host("***")
+}
+
+Write-Output("Preparazione e verifica dell'ambiente in corso, attendere...")
+
+try {
+    $PSTeamsModule = "MicrosoftTeams"
+
+    $ModTeams = Get-InstalledModule -Name $PSTeamsModule
+
+    if ($null -eq $ModTeams) {
+        Install-Module -Name $PSTeamsModule -Force
+    }
+}
+catch {
+    Write-Error("Modulo $($PSTeamsModule) non trovato...")
+    exit
+}
 
 Connect-MicrosoftTeams
 
-$teamA = Get-Team -DisplayName $teamNameA
-$teamB = Get-Team -DisplayName $teamNameB
+$team = Get-Team -DisplayName $TeamName
 
 try {
-    if ( ($null -eq $teamA) -or ($null -eq $teamB) ) {
-        Write-Error("*** NON TUTTI I TEAM ESISTONO ***")
-        Write-Warning("*** CREARE PRIMA ENTRAMBI I TEAM ***")
+    if ( [string]::IsNullOrWhiteSpace($team) -or [string]::IsNullOrWhiteSpace($team) ) {
+        Write-Warning("*** IL TEAM NON ESISTE ***")
 
     } else {
-        Write-Warning("*** I TEAM EISTONO, CARICAMENTO UTENTI IN CORSO... ***")
+        Write-Warning("*** IL TEAM ESISTE, CARICAMENTO UTENTI IN CORSO... ***")
     
         $guestUsers = Import-Csv $PathCSV -Delimiter ';'
 
@@ -28,20 +77,14 @@ try {
 
             $email = $_.Email
 
-            if ($_.Team.Equals($teamA.DisplayName)) {
-                # $group = Get-Team -MailNickName $teamNameA
+            if ($_.Team.Equals($team.DisplayName)) {
+                # $group = Get-Team -MailNickName $TeamName
                 
-                Add-TeamUser -GroupId $teamA.GroupId -User $email
-                Write-Warning("*** Operazione compeltata su '" + $email + "' nel team '" + $teamA.DisplayName + "' ***")
-            
-            } elseif ($_.Team.Equals($teamB.DisplayName)) {
-                # $group = Get-Team -MailNickName $teamNameB
-
-                Add-TeamUser -GroupId $teamB.GroupId -User $email
-                Write-Warning("*** Operazione compeltata su '" + $email + "' nel team '" + $teamB.DisplayName + "' ***")
+                Add-TeamUser -GroupId $team.GroupId -User $email
+                Write-Warning("*** Operazione compeltata su '" + $email + "' nel team '" + $team.DisplayName + "' ***")
             
             } else {
-                Write-Error("Errore, nessun team riconosciuto. Il nome team del CSV non � un nome valido.")
+                Write-Error("Errore, nessun team riconosciuto. Il nome team del CSV non è un nome valido.")
             }
 
             Write-Host("")
@@ -50,6 +93,6 @@ try {
     }
 }
 catch {
-    Write-Error("*** I TEAM NON EISTONO ***")
+    Write-Error("*** ERRORE ***")
     break
 }

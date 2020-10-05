@@ -6,29 +6,63 @@
 
 # PARAMETERS #
 
-$PathCSV = "<YOUR CSV PATH>" # ex. ".\csv_test.CSV" # Modificare inserendo la path e il nome del file CSV che contiene gli utenti da inserire
-$Delimiter = "<YOUR DELIMITER IN THE CSV FILE>" # ex. ';' # Delimitatore del file CSV
-$TeamName = "<TEAM NAME>" # ex. "Team Contoso"
-$Role = "Member" # the deafult member type is "Member", istead of this you can set this parameter as "Owner"
+# $PathCSV = "<YOUR CSV PATH>" # ex. ".\csv_test.CSV" # Modificare inserendo la path e il nome del file CSV che contiene gli utenti da inserire
+# $Delimiter = "<YOUR DELIMITER IN THE CSV FILE>" # ex. ';' # Delimitatore del file CSV
+# $TeamName = "<TEAM NAME>" # ex. "Team Contoso"
+# $Role = "Member" # the deafult member type is "Member", istead of this you can set this parameter as "Owner"
 
 # END PARAMETERS #
 
+
+Param
+(
+    [parameter(Mandatory=$true, ValueFromPipeline=$true)]
+    [String]
+    $PathCSV,
+
+    [parameter(Mandatory=$true, ValueFromPipeline=$true)]
+    [String]
+    $TeamName,
+
+    [parameter(ValueFromPipeline=$true)]
+    [String]
+    $Delimiter,
+
+    [parameter(ValueFromPipeline=$true)]
+    [String]
+    $Role
+)
+
+if([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)){
+    $Delimiter = ";"
+}
+
+if([string]::IsNullOrEmpty($Role) -or [string]::IsNullOrWhiteSpace($Role)){
+    $Role = "Member"
+}
+
+
+if ([string]::IsNullOrWhiteSpace($Delimiter)) {
+    Write-Error("Il parametro Delimiter non può essere vuoto")
+    exit
+} elseif ([string]::IsNullOrWhiteSpace($TeamName)) {
+    Write-Error("Il parametro TeamName non può essere vuoto")
+    exit
+}elseif ([string]::IsNullOrWhiteSpace($PathCSV)) {
+    Write-Error("Il parametro PathCSV non può essere vuoto")
+    exit
+}else {
+    Write-host("Riepilogo parametri:")
+    Write-host("Path CSV: $($PathCSV)")
+    Write-host("Delimitatore del file CSV: $($Delimiter)")
+    Write-host("Nome del team: $($TeamName)")
+    Write-host("Ruolo nel team: $($Role)")
+    Write-host("***")
+
+}
+
+
 Write-Output("Preparazione e verifica dell'ambiente in corso, attendere...")
-
-try {
-
-    $PSModule = "PowerShellGet"
-
-    $ModPS = Get-InstalledModule -Name $PSModule
-
-    if ($null -eq $ModPS) {
-        Install-Module -Name $PSModule -AllowClobber -AcceptLicense -Force
-    }
-}
-catch {
-    Write-Error("Modulo $($PSModule) non trovati, installazione in corso...")
-    break
-}
 
 try {
     $PSTeamsModule = "MicrosoftTeams"
@@ -51,11 +85,10 @@ catch {
     break
 }
 
-Import-Module -Name $PSTeamsModule -Force
+Import-Module -Name $PSTeamsModule
 
 Write-Output("Riepilogo moduli trovati")
 Get-InstalledModule -Name $PSTeamsModule
-Get-InstalledModule -Name $PSModule
 
 Connect-MicrosoftTeams
 
