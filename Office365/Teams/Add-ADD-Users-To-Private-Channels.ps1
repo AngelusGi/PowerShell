@@ -51,6 +51,9 @@ if ([string]::IsNullOrWhiteSpace($Delimiter)) {
 }elseif ([string]::IsNullOrWhiteSpace($PathCSV)) {
     Write-Error("Il parametro PathCSV non può essere vuoto")
     exit
+}elseif ([string]::IsNullOrWhiteSpace($Role)) {
+    Write-Error("Il parametro Role non può essere vuoto")
+    exit    
 }else {
     Write-host("Riepilogo parametri:")
     Write-host("Path CSV: $($PathCSV)")

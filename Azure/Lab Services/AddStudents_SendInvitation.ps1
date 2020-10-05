@@ -40,12 +40,16 @@ if ([string]::IsNullOrWhiteSpace($Delimiter)) {
 }elseif ([string]::IsNullOrEmpty($PathCSV) -or [string]::IsNullOrWhiteSpace($PathCSV)) {
     Write-Error("Il parametro PathCSV non può essere vuoto")
     break
+}elseif ([string]::IsNullOrEmpty($AzureSubId) -or [string]::IsNullOrWhiteSpace($AzureSubId)) {
+    Write-Error("Il parametro AzureSubId non può essere vuoto")
+    break
 }else {
     Write-host("Parametri:")
     Write-host("Path CSV: $($PathCSV)")
     Write-host("Delimitatore del file CSV: $($Delimiter)")
     Write-host("Nome del laboratorio: $($LabName)")
     Write-host("Subscription di Azure: $($AzSubId)")
+    Write-Host("***")
 }
 
 Write-Warning("Verifica dell'ambiente in corso...")

@@ -40,7 +40,7 @@ if ([string]::IsNullOrWhiteSpace($Delimiter)) {
     Write-host("Parametri:")
     Write-host("Path CSV: $($PathCSV)")
     Write-host("Delimitatore del file CSV: $($Delimiter)")
-    Write-host("Nome del primo team: $($TeamName)")
+    Write-host("Nome del team: $($TeamName)")
     Write-Host("***")
 }
 
@@ -59,6 +59,8 @@ catch {
     Write-Error("Modulo $($PSTeamsModule) non trovato...")
     exit
 }
+
+Import-Module -Name $PSTeamsModule
 
 Connect-MicrosoftTeams
 
