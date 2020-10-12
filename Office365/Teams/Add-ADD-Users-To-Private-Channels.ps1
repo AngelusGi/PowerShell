@@ -121,8 +121,8 @@ try {
             Write-Output("Verifica del CSV in corso...")
             $Users = Import-Csv $PathCSV -Delimiter $Delimiter
 
-            if (-not ($Users.Email.Count -gt 0) -and ($Users.Channel.Count -gt 0)) {
-                Write-Error("Il CSV non è formattato correttamente, verificare i campi 'Email' e 'Channel' e verificare che non siano vuoti")
+            if (-not ($Users.Email.Count -gt 0) -and ($Users.LabName.Count -gt 0)) {
+                Write-Error("Il CSV non è formattato correttamente, verificare i campi 'Email' e 'LabName' e verificare che non siano vuoti")
                 exit
             }
 
