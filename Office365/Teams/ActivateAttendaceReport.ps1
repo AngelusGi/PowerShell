@@ -40,5 +40,5 @@ if ($OrganizerOnly -eq $response) {
     Set-CsTeamsMeetingPolicy -Identity Global AllowEngagementReport Enabled
 
 } else {
-    Write-Error("Valore non corretto.")
+    Write-Error("Valore non corretto. Nessuna modifica apportata al sistema.")
 }

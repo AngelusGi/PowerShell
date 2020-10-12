@@ -126,6 +126,20 @@ try {
                 exit
             }
 
+            ForEach ($email in $Users.Email) {
+                if ( [string]::IsNullOrEmpty($email) -or [string]::IsNullOrWhiteSpace($email) ) {
+                    Write-Error("Il CSV non è formattato correttamente, verificare il campo 'Email' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
+                    exit
+                }
+            }
+        
+            ForEach ($ch in $Users.Channel) {
+                if ( [string]::IsNullOrEmpty($ch) -or [string]::IsNullOrWhiteSpace($ch) ) {
+                    Write-Error("Il CSV non è formattato correttamente, verificare il campo 'Channel' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
+                    exit
+                }
+            }
+
         }
         catch {
             Write-Error("Impossibile accedere al CSV, verificare il path e i campi")
@@ -176,6 +190,7 @@ try {
                         continue
                     }
                 }
+                
                 $FoundUsers.Add($User)
             
             }

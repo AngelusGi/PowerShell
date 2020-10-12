@@ -13,7 +13,7 @@ Param
     [String]
     $PathCSV,
 
-    [parameter(ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
     [String]
     $TeamName,
     
@@ -71,7 +71,7 @@ $team = Get-Team -DisplayName $TeamName
 
 try {
     if ( [string]::IsNullOrWhiteSpace($team) -or [string]::IsNullOrWhiteSpace($team) ) {
-        Write-Warning("*** IL TEAM NON ESISTE ***")
+        Write-Warning("Il team $($TeamName) non esiste, creazione in corso...")
 
         New-Team -DisplayName $TeamName
 
@@ -96,11 +96,11 @@ try {
     
     }
 
-    Write-Warning("*** TEAM TROVATO, CARICAMENTO UTENTI IN CORSO... ***")
+    Write-Warning("Team trovato:")
 
     Write-Output($team)
     
-    $guestUsers = Import-Csv $PathCSV -Delimiter ';'
+    $guestUsers = Import-Csv $PathCSV -Delimiter $Delimiter
 
     $guestUsers | ForEach-Object {
 
@@ -110,7 +110,7 @@ try {
             # $group = Get-Team -MailNickName $TeamName
                 
             Add-TeamUser -GroupId $team.GroupId -User $email
-            Write-Warning("*** Operazione compeltata su '" + $email + "' nel team '" + $team.DisplayName + "' ***")
+            Write-Warning("*** Operazione compeltata su $($email) nel team $($team.DisplayName) ***")
             
         }
         else {
@@ -124,5 +124,4 @@ try {
 }
 catch {
     Write-Error("*** ERRORE ***")
-    break
 }
