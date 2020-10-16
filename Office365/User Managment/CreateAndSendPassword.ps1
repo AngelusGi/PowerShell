@@ -37,12 +37,21 @@ Param
 
     [parameter(ValueFromPipeline = $true)]
     [String]
-    $DataLocation
+    $DataLocation,
+
+    [parameter(ValueFromPipeline = $true)]
+    [String]
+    $SMTPServer,
+
+    [parameter(ValueFromPipeline = $true)]
+    [int]
+    $SMTPPort
 )
 
 $PathCSV = ".\csv_test.csv"
 $DomainName = "eduscuola.cloud"
 $Pswd = "Ciao1234#"
+
 
 if ([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)) {
     $Delimiter = ";"
@@ -54,6 +63,14 @@ if ([string]::IsNullOrEmpty($DataLocation) -or [string]::IsNullOrWhiteSpace($Dat
 
 if ([string]::IsNullOrEmpty($CountryCode) -or [string]::IsNullOrWhiteSpace($CountryCode)) {
     $CountryCode = "IT"
+}
+
+if ([string]::IsNullOrEmpty($SMTPServer) -or [string]::IsNullOrWhiteSpace($SMTPServer)) {
+    $SMTPServer = "smtp.office365.com"
+}
+
+if ($SMTPPort -eq 0) {
+    $SMTPPort = 587
 }
 
 
@@ -86,25 +103,16 @@ Write-host("Path CSV: $($PathCSV)")
 Write-host("Delimitatore del file CSV: $($Delimiter)")
 Write-host("Nome dominio: $($DomainName)")
 Write-host("Password statica (comune per tutti al primo accesso): $($StaticPswd)")
-Write-host("Country code: $($Pswd)")
 
-# if ($StaticPswd) {
-#     $SecurePassword = $Pswd | ConvertTo-SecureString -AsPlainText -Force
-#     $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecurePassword)
-#     $Pswd = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+if ($StaticPswd) {
         
-#     Write-host("Country code: $($Pswd)")
-# }
+    Write-host("Passowrd predefinita: $($Pswd)")
+}
 
 Write-host("Country code: $($CountryCode)")
+Write-host("Server SMTP: $($SMTPServer)")
+Write-host("Porta SMTP: $($SMTPPort)")
 Write-Host("***")
-
-
-# email settings
-# $SMTPServer = "smtp.office365.com"
-$SMTPServer = "smtp-mail.outlook.com"
-
-$SMTPPort = 587
 
 Write-Warning("Verifica dell'ambiente in corso...")
 
@@ -168,6 +176,7 @@ catch {
 
 
 Write-Warning("Preparazione dell'ambiente in corso...")
+Set-TransportConfig -SmtpClientAuthenticationDisabled $false
 Set-CASMailbox -Identity $Auth.UserName -SmtpClientAuthenticationDisabled $true
 Start-Sleep -Seconds 45
 
@@ -214,6 +223,8 @@ foreach ($User in $Users) {
 
 }
 
+
+Set-TransportConfig -SmtpClientAuthenticationDisabled $false
 Set-CASMailbox -Identity $Auth.UserName -SmtpClientAuthenticationDisabled $false
 
 Write-Warning("Operazione completata.")
