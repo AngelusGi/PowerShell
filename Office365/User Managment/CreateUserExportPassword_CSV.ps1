@@ -1,40 +1,182 @@
-#1.1.0
+# PARAMETERS DESCRIPTION #
 
-Install-Module MSOnline
+# $PathCSV # ex. ".\csv_test.CSV" # Modificare inserendo la path e il nome del file CSV che contiene gli utenti da inserire
+# $Delimiter # ex. ';' # Delimitatore del file CSV - valore di default ";" 
+# $DomainName # ex. "Contoso.onmicrosoft.com" or "Constoso.com" # tenant domain
+# $StaticPswd # $true or $false # ex. if $true all the users will use the same password at the first login, otherwise the script will generate a new password
+# $Pswd # ex. "Contoso1234@" # if $StaticPswd = $true insert here your password 
+# $CountryCode # default -> "IT" # User's country code 
 
-$AdUser = "ADMIN USERNAME"
-$AdPswd = ConvertTo-SecureString 'ADMIN PSWD' -AsPlainText -Force
-$AdminCred = New-Object System.Management.Automation.PSCredential $AdUser, $AdPswd
+# END PARAMETERS #
 
-#tenant connection
-Connect-MsolService -Credential $AdminCred
+Param
+(
+    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [String]
+    $PathCSV,
 
-# CSV Header Template
-# UserPrincipalName,FirstName,LastName,DisplayName,JobTitle,Department,OfficeNumber,OfficePhone,MobilePhone,Fax,Address,City,Province,ZIP,Country
+    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [String]
+    $DomainName,
 
-# "INPUT CSV PATH, NAME.CSV"
-$InputCsvFile = "CSV PATH"
+    [parameter(Mandatory = $true)]
+    [bool]
+    $StaticPswd,   
 
-# "OUTPUT CSV PATH, NAME.CSV"
-$OutputCsvFile = "CSV PATH"
+    [parameter(ValueFromPipeline = $true)]
+    [string]
+    $Pswd,
 
-# "LICENSE SKU OR $null"
-$LicenseSKU = "LICENSE SKU"
+    [parameter(ValueFromPipeline = $true)]
+    [String]
+    $CountryCode,
 
-$CountryCode = "IT"
+    [parameter(ValueFromPipeline = $true)]
+    [String]
+    $Delimiter,
 
-$ChangePassword = $true
+    [parameter(ValueFromPipeline = $true)]
+    [String]
+    $DataLocation
+)
 
-# Get-MSOLUser | Where-Object { $_.isLicensed -eq "True"} | Select-Object DisplayName, UserPrincipalName, isLicensed | Export-Csv C:\Temp\LicensedUsers.csv
 
-Import-Csv -Path $InputCsvFile | ForEach-Object {
+if ([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)) {
+    $Delimiter = ";"
+}
 
-    Write-Host ("Processing user: " + $_.UserPrincipalName); 
+if ([string]::IsNullOrEmpty($DataLocation) -or [string]::IsNullOrWhiteSpace($DataLocation)) {
+    $DataLocation = "EUR"
+}
 
-    New-MsolUser -UserPrincipalName $_.UserPrincipalName -DisplayName $_.DisplayName -FirstName $_.FirstName -LastName $_.LastName -UsageLocation $CountryCode -MobilePhone $_.MobilePhone -Fax $_.Fax -City $_.City -Country $_.Country -PostalCode $_.ZIP -State $_.Province -Office $_.OfficeNumber -StreetAddress $_.Address  -Department $_.Department -PhoneNumber $_.OfficePhone -Title $_.JobTitle -ForceChangePassword $ChangePassword -LicenseAssignment $LicenseSKU
+if ([string]::IsNullOrEmpty($CountryCode) -or [string]::IsNullOrWhiteSpace($CountryCode)) {
+    $CountryCode = "IT"
+}
 
-    Write-Host("")
 
-} | Export-Csv -Path $OutputCsvFile
+if ([string]::IsNullOrWhiteSpace($Delimiter)) {
+    Write-Error("Il parametro Delimiter non può essere vuoto")
+    break
 
-Write-Host " *** OPERAZIONE COMPLETATA *** "
+}
+elseif ([string]::IsNullOrEmpty($PathCSV) -or [string]::IsNullOrWhiteSpace($PathCSV)) {
+    Write-Error("Il parametro PathCSV non può essere vuoto")
+    break
+
+}
+elseif ($StaticPswd) {
+    if ([string]::IsNullOrEmpty($Pswd) -or [string]::IsNullOrWhiteSpace($Pswd)) {
+        Write-Error("Il parametro Pswd non può essere vuoto avendo impostato una password statica (uguale per tutti al primo accesso)")
+        break
+    
+    }
+}
+elseif ([string]::IsNullOrEmpty($DomainName) -or [string]::IsNullOrWhiteSpace($DomainName)) {
+    Write-Error("Il parametro DomainName non può essere vuoto")
+    break
+
+}
+
+
+Write-Warning("Parametri immessi:")
+Write-host("Path CSV: $($PathCSV)")
+Write-host("Delimitatore del file CSV: $($Delimiter)")
+Write-host("Nome dominio: $($DomainName)")
+Write-host("Password statica (comune per tutti al primo accesso): $($StaticPswd)")
+
+if ($StaticPswd) {
+        
+    Write-host("Passowrd predefinita: $($Pswd)")
+}
+
+Write-host("Country code: $($CountryCode)")
+Write-Host("***")
+
+Write-Warning("Verifica dell'ambiente in corso...")
+
+Install-Module MSOnline -Scope CurrentUser
+
+Get-InstalledModule -Name MSOnline
+
+Import-Module MSOnline
+
+try {
+    #tenant connection
+    $Auth = Get-Credential 
+    Connect-MsolService -Credential $Auth
+}
+catch {
+    Write-Error("Credenziali errate. Riprovare")
+    exit
+}
+
+
+try {
+            
+    Write-Warning("Verifica del CSV in corso...")
+    $Users = Import-Csv $PathCSV -Delimiter $Delimiter
+    
+    ForEach ($User in $Users) {
+
+        if ( [string]::IsNullOrEmpty($User.FirstName) -or [string]::IsNullOrWhiteSpace($User.FirstName) ) {
+            Write-Error("Il CSV non è formattato correttamente, verificare il campo 'FirstName' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
+            exit
+        }
+
+        if ( [string]::IsNullOrEmpty($User.LastName) -or [string]::IsNullOrWhiteSpace($User.LastName) ) {
+            Write-Error("Il CSV non è formattato correttamente, verificare il campo 'LastName' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
+            exit
+        }
+
+        if ( [string]::IsNullOrEmpty($User.LinceseSKU) -or [string]::IsNullOrWhiteSpace($Users.LinceseSKU) ) {
+            Write-Error("Il CSV non è formattato correttamente, verificare il campo 'LinceseSKU' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
+            exit
+        }
+
+    }
+
+}
+catch {
+    Write-Error("Impossibile accedere al CSV, verificare il path e i campi")
+    exit
+}
+
+
+Write-Warning("Preparazione dell'ambiente in corso...")
+
+foreach ($User in $Users) {
+
+    try {
+        $ErrorUser = $User
+
+        $DisplayName = $User.FirstName + " " + $User.LastName
+
+        $_firstName = $User.FirstName -replace '[^\p{L}]', ''
+        $_lastName = $User.LastName -replace '[^\p{L}]', ''
+
+        $_upn = $_firstName + "." + $_lastName
+    
+        $Upn = $_upn + "@" + $DomainName
+
+        if (-not $StaticPswd) {
+            # generate random password using these characters -> !”#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_abcdefghijklmnopqrstuvwxyz{|}~0123456789
+            $Pswd = ([char[]]([char]33..[char]95) + ([char[]]([char]97..[char]126)) + 0..12 | Sort-Object { Get-Random })[0..12] -join ''
+        }
+
+        #create user
+        New-MsolUser -DisplayName $DisplayName -FirstName $User.FirstName -LastName $User.LastName -UserPrincipalName $Upn -Password $Pswd -UsageLocation $CountryCode -LicenseAssignment $User.LinceseSKU -PreferredDataLocation $DataLocation | Export-Csv -Path ".\ReportUtentiCorrettamenteCreati" -Append
+
+        Write-Warning("Utente creato: $($DisplayName) | $($Upn)")
+
+    } 
+    catch {
+        Write-Error("Impossibile aggiungere creare l'utente $($ErrorUser)")
+        $ErrorUser | Out-File .\ReportUtentiNonCreati.txt -Append
+
+        continue
+    }
+
+} 
+
+
+Write-Warning("Operazione completata.")

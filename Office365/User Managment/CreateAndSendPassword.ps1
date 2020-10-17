@@ -6,6 +6,8 @@
 # $StaticPswd # $true or $false # ex. if $true all the users will use the same password at the first login, otherwise the script will generate a new password
 # $Pswd # ex. "Contoso1234@" # if $StaticPswd = $true insert here your password 
 # $CountryCode # default -> "IT" # User's country code 
+# $SMTPServer # Server SMTP from which send emails # default -> "smtp.office365.com"
+# $SMTPPort # Port of the SMTP server # default -> 587
 
 # END PARAMETERS #
 
@@ -154,11 +156,6 @@ try {
 
         if ( [string]::IsNullOrEmpty($User.LinceseSKU) -or [string]::IsNullOrWhiteSpace($Users.LinceseSKU) ) {
             Write-Error("Il CSV non è formattato correttamente, verificare il campo 'LinceseSKU' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
-            exit
-        }
-
-        if ( [string]::IsNullOrEmpty($User.BackUpEmail) -or [string]::IsNullOrWhiteSpace($Users.BackUpEmail) ) {
-            Write-Error("Il CSV non è formattato correttamente, verificare il campo 'BackUpEmail' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
             exit
         }
 
