@@ -48,10 +48,6 @@ Param
     $SMTPPort
 )
 
-$PathCSV = ".\csv_test.csv"
-$DomainName = "eduscuola.cloud"
-$Pswd = "Ciao1234#"
-
 
 if ([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)) {
     $Delimiter = ";"
