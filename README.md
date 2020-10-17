@@ -19,4 +19,6 @@
 ---
 
 ## Office365/Microsoft365
-*
+* Creare gli utenti a partire da un CSV e le password vengono inviate ad una email di backup <br> [link script]() | [link csv]()
+* Creare gli utenti a partire da un CSV e le password vengono esportate in un file <br> [link script]() | [link csv]()
+* Importare utenti guest in Azure Active Directory <br> [link script]() | [link csv]()

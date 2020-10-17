@@ -54,24 +54,25 @@ Write-Warning("Verifica dell'ambiente in corso...")
 try {
             
     Write-Warning("Verifica del CSV in corso...")
+
     $GuestUsers = Import-Csv $PathCSV -Delimiter $Delimiter
         
-    
-        
-    ForEach ($email in $GuestUsers.Email) {
-        if ( [string]::IsNullOrEmpty($email) -or [string]::IsNullOrWhiteSpace($email) ) {
+    ForEach ($guest in $GuestUsers) {
+        if ( [string]::IsNullOrEmpty($guest.Email) -or [string]::IsNullOrWhiteSpace($guest.Email) ) {
             Write-Error("Il CSV non è formattato correttamente, verificare il campo 'Email' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
             exit
         }
-    }
 
-    ForEach ($name in $GuestUsers.FullName) {
-        if ( [string]::IsNullOrEmpty($name) -or [string]::IsNullOrWhiteSpace($name) ) {
-            Write-Error("Il CSV non è formattato correttamente, verificare il campo 'name' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
+        if ( [string]::IsNullOrEmpty($guest.FirstName) -or [string]::IsNullOrWhiteSpace($guest.FirstName) ) {
+            Write-Error("Il CSV non è formattato correttamente, verificare il campo 'FirstName' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
+            exit
+        }
+
+        if ( [string]::IsNullOrEmpty($guest.LastName) -or [string]::IsNullOrWhiteSpace($guest.LastName) ) {
+            Write-Error("Il CSV non è formattato correttamente, verificare il campo 'LastName' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
             exit
         }
     }
-
 
 }
 catch {
@@ -86,9 +87,11 @@ Install-Module AzureADPreview -Force -Verbose -Scope CurrentUser
 
 Connect-AzureAD -DomainNameDomain $DomainName
 
-$GuestGuestUsers | ForEach-Object {
+$GuestUsers | ForEach-Object {
 
-    New-AzureADMSInvitation -InvitedUserDisplayName $_.FullName -InvitedUserEmailAddress $_.Email -InviteRedirectURL https://portal.office.com -SendInvitationMessage $true
+    $DisplayName = $_.FirstName + " " + $_.LastName
+
+    New-AzureADMSInvitation -InvitedUserDisplayName $DisplayName -InvitedUserEmailAddress $_.Email -InviteRedirectURL https://portal.office.com -SendInvitationMessage $true
    
     Write-Host("*** Operazione compeltata su $($_.Email) ***")
     Write-Host("")
