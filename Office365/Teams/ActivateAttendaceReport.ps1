@@ -4,9 +4,9 @@
 $OrganizerOnly = 1
 $NotOnlyOrganizer = 2
 
-Write-Output("Inserisci il numero inerente la policy che vuoi applicare:")
-Write-Output("1. download report disponibile solo per chi ha programmato la riunione")
-Write-Output("2. download report disponibile solo per tutti i relatori e partecipanti")
+Write-Output("Inserisci il numero inerente la policy che vuoi applicare a livello di tenant:")
+Write-Output("$($OrganizerOnly). download attendance report disponibile solo per chi ha programmato la riunione")
+Write-Output("$($NotOnlyOrganizer). download attendance report disponibile per tutti i relatori e partecipanti nel meeting")
 
 $response = Read-Host("Inserisci 1 o 2 e premi INVIO")
 
@@ -40,5 +40,5 @@ if ($OrganizerOnly -eq $response) {
     Set-CsTeamsMeetingPolicy -Identity Global AllowEngagementReport Enabled
 
 } else {
-    Write-Error("Valore non corretto. Nessuna modifica apportata al sistema.")
+    Write-Error("Scelta corretta. Nessuna modifica apportata al sistema.")
 }
