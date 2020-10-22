@@ -9,12 +9,16 @@ Those parameters are <b>mandatory</b>:
 
 Those parameters are <b>optional</b>:
 * Delimiter -> the values' delimiter in the CSV file, if black, the default value is ","
+* Role -> the role of the current user, the default value is "Member"
 
 ## Example
 
-[How-to-run-the-script](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/Teams/Add%20users%20to%20a%20single%20team/Screenshots/How-to-run-the-script.png)
+### How to run the script
+![How-to-run-the-script](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/Teams/Add%20users%20to%20a%20single%20team/Screenshots/How-to-run-the-script.png)
 
-[Teams-Before-Script](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/Teams/Add%20users%20to%20a%20single%20team/Screenshots/Teams-Before-Script.png)
+### Teams before the script execution
+![Teams-Before-Script](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/Teams/Add%20users%20to%20a%20single%20team/Screenshots/Teams-Before-Script.png)
 
-[Teams-After-Script](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/Teams/Add%20users%20to%20a%20single%20team/Screenshots/Teams-After-Script.png)
+### Teams after the script execution
+![Teams-After-Script](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/Teams/Add%20users%20to%20a%20single%20team/Screenshots/Teams-After-Script.png)
 
