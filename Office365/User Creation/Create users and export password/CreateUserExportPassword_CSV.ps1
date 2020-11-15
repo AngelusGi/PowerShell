@@ -41,6 +41,11 @@ Param
 )
 
 
+if ($PSVersionTable.PSVersion.Major -ne 5) {
+    Write-Error("Questo script può essere eseguita solo con la versione 5 di Windows PowerShell")
+    exit
+}
+
 if ([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)) {
     $Delimiter = ";"
 }
@@ -164,7 +169,7 @@ foreach ($User in $Users) {
         }
 
         #create user
-        New-MsolUser -DisplayName $DisplayName -FirstName $User.FirstName -LastName $User.LastName -UserPrincipalName $Upn -Password $Pswd -UsageLocation $CountryCode -LicenseAssignment $User.LinceseSKU -PreferredDataLocation $DataLocation | Export-Csv -Path ".\ReportUtentiCorrettamenteCreati" -Append
+        New-MsolUser -DisplayName $DisplayName -FirstName $User.FirstName -LastName $User.LastName -UserPrincipalName $Upn -Password $Pswd -UsageLocation $CountryCode -LicenseAssignment $User.LinceseSKU -PreferredDataLocation $DataLocation | Export-Csv -Path ".\ReportUtentiCorrettamenteCreati.csv" -Append
 
         Write-Warning("Utente creato: $($DisplayName) | $($Upn)")
 
