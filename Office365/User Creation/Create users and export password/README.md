@@ -18,22 +18,22 @@ Those parameters are <b>optional</b>:
 
 ## Example
 
-### How to run the script - Script creates a unique complex passowrd for every single user
+### How to run the script - Step 1 A - Script creates a unique complex passowrd for every single user
 ![How-to-run-the-script](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/User%20Creation/Create%20users%20and%20export%20password/Screenshot/step1_autogenerate_pswd.png)
 
-### How to run the script - Script uses a single passowrd for all the users
+### How to run the script - Step 1 B - Script uses a single passowrd for all the users
 ![How-to-run-the-script](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/User%20Creation/Create%20users%20and%20export%20password/Screenshot/step1_static_pswd.png)
 
-### User admin credentials
+### User admin credentials - Step 2
 ![User-admin-credentials](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/User%20Creation/Create%20users%20and%20export%20password/Screenshot/step2_auth.png)
 
-### Report PowerShell
+### Report PowerShell - Step 3 A
 ![Report-PowerShell](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/User%20Creation/Create%20users%20and%20export%20password/Screenshot/step3.png)
 
-### Report CSV (file)
+### Report CSV (file) - Step 3 B
 [Example-Report-CSV-file](https://github.com/AngelusGi/PowerShell/blob/master/Office365/User%20Creation/Create%20users%20and%20export%20password/ReportUtentiCorrettamenteCreati.csv)
 
-### Report CSV (import in Excel)
+### Report CSV (import in Excel) - Step 3 C
 ![Example-Report-Excel-1](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/User%20Creation/Create%20users%20and%20export%20password/Screenshot/Report-Excel-1.png)
 
 ![Example-Report-Excel-2](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/User%20Creation/Create%20users%20and%20export%20password/Screenshot/Report-Excel-2.png)
