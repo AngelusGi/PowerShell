@@ -21,8 +21,8 @@
 ---
 
 ## Office365/Microsoft365
-* Creare gli utenti a partire da un CSV e le password vengono inviate ad una email di backup <br> [link script](https://github.com/AngelusGi/PowerShell/blob/master/Office365/User%20Creation/CreateAndSendPassword.ps1) | [link csv]()
-* Creare gli utenti a partire da un CSV e le password vengono esportate in un file <br> [link script](https://github.com/AngelusGi/PowerShell/blob/master/Office365/User%20Creation/CreateUserExportPassword_CSV.ps1) | [link csv]()
+* Creare gli utenti a partire da un CSV e le password vengono inviate ad una email di backup <br> [link script](https://github.com/AngelusGi/PowerShell/tree/master/Office365/User%20Creation/Create%20users%20and%20export%20password) | [link csv]()
+* Creare gli utenti a partire da un CSV e le password vengono esportate in un file <br> [link script](https://github.com/AngelusGi/PowerShell/blob/master/Office365/User%20Creation/CreateUserExportPassword_CSV.ps1) | [link csv](https://github.com/AngelusGi/PowerShell/blob/master/Office365/User%20Creation/Create%20users%20and%20export%20password/csv_test.CSV)
 * Importare utenti guest in Azure Active Directory <br> [link script](https://github.com/AngelusGi/PowerShell/blob/master/Office365/User%20Creation/AddGuests_FromCSV.ps1) | [link csv]()
 *
 
