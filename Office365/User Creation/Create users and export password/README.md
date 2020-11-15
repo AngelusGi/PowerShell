@@ -1,4 +1,4 @@
-# Add users to a single team of Microsoft Teams
+# Create users and export password
 
 
 ## How to use
