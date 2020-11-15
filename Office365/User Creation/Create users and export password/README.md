@@ -4,7 +4,7 @@
 ## How to use
 
 Those parameters are <b>mandatory</b>:
-* DomainName -> name of the domain | ex. "contoso.com" or "contoso.onmicrosoft.com"
+* DomainName -> domain name | ex. "contoso.com" or "contoso.onmicrosoft.com"
 * PathCSV -> path of the CSV | ex. ".\csv_test.CSV"
 * StaticPswd -> do you want to use the same password for all users at the first login? If yes insert $true and insert the password in "Pswd"
 * PathCSV -> path of the CSV | ex. ".\csv_test.CSV"
