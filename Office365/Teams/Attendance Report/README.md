@@ -1,5 +1,11 @@
 # Activate attendance report in Microsoft Teams
 
+## Table of contents
+* [References](https://github.com/AngelusGi/PowerShell/tree/master/Office365/Teams/Attendance%20Report#references)
+* [Examples](https://github.com/AngelusGi/PowerShell/tree/master/Office365/Teams/Attendance%20Report#example)
+* [Troubleshooting](https://github.com/AngelusGi/PowerShell/tree/master/Office365/Teams/Attendance%20Report#troubleshooting)
+
+
 ## References
 To get more informations about this topic, please refer to the official [Microsoft Docs](https://docs.microsoft.com/en-us/microsoftteams/teams-analytics-and-reports/meeting-attendance-report)
 
@@ -19,6 +25,8 @@ To get more informations about this topic, please refer to the official [Microso
 ### Report for meeting organizer only
 ![Report for organizer only](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/Teams/Attendance%20Report/Screenshot/Report-Organizer-Only.png)
 
+
+## Troubleshooting
 
 ### How to download the script
 Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20download%20single%20file%20from%20GitHub)
