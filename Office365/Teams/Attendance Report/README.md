@@ -7,15 +7,15 @@ Before running this script please install this module and reboot your PC:
 
 ## Example
 
-### Download the script
-Please click on the file "ActivateAttendaceReport.ps1", click con "Raw", right mouse click and "Save as" on your PC.
-![Download-P1]()
-
-![Download-P2]()
-
 ### Report for all the attendee
-![Report for all the attendee]()
+![Report for all the attendee](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/Teams/Attendance%20Report/Screenshot/Report-All.png)
 
 ### Report for meeting organizer only
-![Report for organizer only]()
+![Report for organizer only](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/Teams/Attendance%20Report/Screenshot/Report-Organizer-Only.png)
 
+
+### How to download the script
+Please, follow [this guide]()
+
+### How to change execution Policy
+Please, follow [this guide]()
