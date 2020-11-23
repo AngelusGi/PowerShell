@@ -1,6 +1,12 @@
 # Activate attendance report in Microsoft Teams
 
-## How to use
+## Expected result
+![How to download the report](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/Teams/Attendance%20Report/Screenshot/How%20to%20download%20the%20report.png)
+
+![How to open it in Microsoft Teams](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/Teams/Attendance%20Report/Screenshot/How%20to%20open%20it%20in%20Microsoft%20Teams.png)
+
+![Engagement report example](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/Teams/Attendance%20Report/Screenshot/Engagement%20report%20example.png)
+
 
 ## Example
 
