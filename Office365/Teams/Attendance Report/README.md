@@ -1,5 +1,8 @@
 # Activate attendance report in Microsoft Teams
 
+## References
+To get more informations about this topic, please refer to the official [Microsoft Docs](https://docs.microsoft.com/en-us/microsoftteams/teams-analytics-and-reports/meeting-attendance-report)
+
 ## Expected result
 ![How to download the report](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/Teams/Attendance%20Report/Screenshot/How%20to%20download%20the%20report.png)
 
