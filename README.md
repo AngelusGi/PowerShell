@@ -7,7 +7,7 @@
 ---
 
 ## Microsoft Teams
-* Applicare la policy per scaricare l'attendance report <br> [link script](https://github.com/AngelusGi/PowerShell/blob/master/Office365/Teams/ActivateAttendaceReport.ps1)
+* Applicare la policy per scaricare l'attendance report <br> [link script](https://github.com/AngelusGi/PowerShell/tree/master/Office365/Teams/Attendance%20Report)
 * Importare gli utenti in AAD <br> [link script]() | [link csv](https://github.com/AngelusGi/PowerShell/blob/master/Azure/Lab%20Services/AddStudents_SendInvitation.ps1)
 * Aggiungere utenti ad un canale privato <br> [link script](https://github.com/AngelusGi/PowerShell/blob/master/Office365/Teams/Add-ADD-Users-To-Private-Channels.ps1) | [link csv](https://github.com/AngelusGi/PowerShell/blob/master/Office365/Teams/Guest%20Users/Add-User-Team_CSV.ps1)
 *

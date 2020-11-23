@@ -14,4 +14,5 @@ follow this procedure:
 <code>Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser</code>
 <br>
 <br>
+
 ![Resolve-Execution-Policy](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Others/Resolve%20errors%20about%20Execution%20Policy/Resolve-Execution-Policy.gif)

@@ -2,9 +2,6 @@
 
 ## How to use
 
-Before running this script please install this module and reboot your PC:
-[Skype for business PowerShell Module](https://www.microsoft.com/download/details.aspx?id=39366)
-
 ## Example
 
 ### Report for all the attendee
