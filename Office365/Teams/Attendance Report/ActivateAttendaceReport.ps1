@@ -1,5 +1,18 @@
 # Required module to install -> https://www.microsoft.com/download/details.aspx?id=39366
 
+Write-Warning("Verifica dell'ambiente in corso, attendere...")
+
+if ($PSVersionTable.PSVersion.Major -ne 5) {
+    Write-Error("Questo script può essere eseguito solo con la versione 5 di Windows PowerShell")
+    exit
+}
+
+$mod = Get-InstalledModule -Name "SkypeOnlineConnector"
+
+if ([string]::IsNullOrEmpty($mod) -or [string]::IsNullOrWhiteSpace($mod)){
+    Write-Error("Modulo non trovato. Installare il modulo da https://www.microsoft.com/download/details.aspx?id=39366 riavviare il computer e ripetere l'operazione.")
+    exit
+}
 
 $OrganizerOnly = 1
 $NotOnlyOrganizer = 2
@@ -14,14 +27,6 @@ if ([string]::IsNullOrEmpty($response) -or [string]::IsNullOrWhiteSpace($respons
     Write-Error("Valore non corretto.")
     exit
 }
-
-$mod = Get-InstalledModule -Name "SkypeOnlineConnector"
-
-if ([string]::IsNullOrEmpty($mod) -or [string]::IsNullOrWhiteSpace($mod)){
-    Write-Error("Modulo non trovato. Installare il modulo da https://www.microsoft.com/download/details.aspx?id=39366 riavviare il computer e ripetere l'operazione.")
-    exit
-}
-
 
 Import-Module SkypeOnlineConnector
 
