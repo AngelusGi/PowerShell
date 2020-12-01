@@ -58,4 +58,4 @@ Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/
 Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/Resolve%20errors%20about%20Execution%20Policy)
 
 ### How to get the SKU License Name
-Please, follow [this guide](https://github.com/AngelusGi/PowerShell/master/Others/How%20to%20get%20sku%20licenses/)
+Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20get%20sku%20licenses)
