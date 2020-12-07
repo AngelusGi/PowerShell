@@ -2,7 +2,8 @@
 
 Follow this procedure:
 * Open PowerShell (actually Windows Powershell aka v.5) as Administrator
-* Run the command <br>
+* Run the following commands <br>
+<br>
 <code>Install-Module MSOnline -Scope CurrentUser</code>
 <br>
 <code>Import-Module MSOnline</code>
