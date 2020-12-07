@@ -4,8 +4,11 @@ Follow this procedure:
 * Open PowerShell (actually Windows Powershell aka v.5) as Administrator
 * Run the command <br>
 <code>Install-Module MSOnline -Scope CurrentUser</code>
+<br>
 <code>Import-Module MSOnline</code>
+<br>
 <code>Connect-MSolservice</code>
+<br>
 <code>Get-MsolAccountSku</code>
 
 <br>
