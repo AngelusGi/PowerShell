@@ -1,0 +1,37 @@
+{
+    "subject": "Un viaggio inaspettato",
+    "body": {
+        "contentType": "HTML",
+        "content": "Test via GraphApi con solo utenti interni a EduScuola"
+    },
+    "start": {
+        "dateTime": "2020-12-14T12:00:00",
+        "timeZone": "W. Europe Standard Time"
+    },
+    "end": {
+        "dateTime": "2020-12-14T14:00:00",
+        "timeZone": "W. Europe Standard Time"
+    },
+    "location": {
+        "displayName": "La Contea"
+    },
+    "attendees": [
+        {
+            "emailAddress": {
+                "address": "studente@contoso.cloud",
+                "name": "Studente"
+            },
+            "type": "resource"
+        },
+        {
+            "emailAddress": {
+                "address": "gibar@contoso.cloud",
+                "name": "Giulia"
+            },
+            "type": "resource"
+        }
+    ],
+    "allowNewTimeProposals": true,
+    "isOnlineMeeting": true,
+    "onlineMeetingProvider": "teamsForBusiness"
+}
