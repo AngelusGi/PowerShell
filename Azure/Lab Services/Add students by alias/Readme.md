@@ -28,7 +28,7 @@ Using default values the script will only add students to the lab. If you want t
 ![How-it-works](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Add%20students%20by%20alias/Screenshots/How-it-works.gif)
 
 ### Faculty view after the script execution
-![Faculty-view](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Add%20students%20by%20alias/Screenshots/Faculty-view.gif)
+![Faculty-view-after](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Add%20students%20by%20alias/Screenshots/Faculty-view-after.gif)
 
 ### Student view after the script execution
 ![Student-view](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Add%20students%20by%20alias/Screenshots/Student-view.gif)
