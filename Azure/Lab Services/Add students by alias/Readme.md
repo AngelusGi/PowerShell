@@ -14,7 +14,12 @@ Using default values the script will only add students to the lab. If you want t
 * SendInvitation -> if its value is "$true" the script will invite users to ALS
 * WelcomeMessage -> you can use this parameter to send a custom message to users
 
-<b>This script has dependecies that require to use only Windows PowerShell 5.x<\b>
+In this folder you can find an example of the CSV used to run this script, the only <b>mandatory fields</b> are:
+* Email
+* LabName
+
+<b>This script has dependecies that require to use only Windows PowerShell 5.x</b>
+
 
 ## Example
 
