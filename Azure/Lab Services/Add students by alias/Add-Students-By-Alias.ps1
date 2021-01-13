@@ -9,22 +9,21 @@ $cred = New-Object System.Management.Automation.PSCredential ($userName, $secStr
 
 #>
 
-# Param
-# (
-#     [parameter(Mandatory = $true, ValueFromPipeline = $true)]
-#     [String]
-#     $PathCSV,
+Param
+(
+    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [String]
+    $PathCSV,
 
-#     [parameter(Mandatory = $true, ValueFromPipeline = $true)]
-#     [String]
-#     $AzureSubId,
+    [parameter(ValueFromPipeline = $true)]
+    [String]
+    $AzureSubId,
 
-#     [parameter(ValueFromPipeline = $true)]
-#     [String]
-#     $Delimiter
-# )
+    [parameter(ValueFromPipeline = $true)]
+    [String]
+    $Delimiter
+)
 
-$PathCSV = ".\Azure\Lab Services\Add students by alias\csv_test.CSV"
 
 # Region module manager
 
@@ -98,7 +97,7 @@ function InstallLocalModules {
 
         VerifyPsVersion
 
-        $Modules = "AzureAd", "MSOnline", "ExchangeOnlineManagement", "Az"
+        $Modules = "ExchangeOnlineManagement", "Az"
 
         CheckModules -Modules $Modules -Scope $Scope
         
@@ -111,7 +110,6 @@ function InstallLocalModules {
 
 # CSV Manager
 
-
 function SearchUsers {
     param (
         $UsersToSearchFromCsv,
@@ -121,20 +119,52 @@ function SearchUsers {
     process {
 
         $FoundUsers = New-Object -TypeName "System.Collections.ArrayList"
+        $NotFoundUsers = New-Object -TypeName "System.Collections.ArrayList"
+
 
         Write-Warning("Ricerca utenti in corso... Attendere.")
 
         foreach ($userToSearch in $UsersToSearchFromCsv) {
-            $found = $UsersFromExchange | Where-Object { $_.EmailAddresses -match $userToSearch }
+            $foundResult = $UsersFromExchange | Where-Object { $_.EmailAddresses -match $userToSearch.Email }
+            
+            
+            if ($null -eq $foundResult) {
+                $NotFoundUsers.Add($userToSearch)
+            }
+            else {
 
-            $FoundUsers.Add($found)
+                try {
+                
+                    if ($null -ne $foundResult.PrimarySmtpAddress) {
+                        $result = @{
+                            DisplayName        = $foundResult.DisplayName
+                            PrimarySmtpAddress = $foundResult.PrimarySmtpAddress
+                            EmailAddresses     = $foundResult.EmailAddresses
+                            LabName            = $userToSearch.LabName
+                        }
+        
+                        # Write-Host($result.Values)
+                        # Write-Host($result.Get_Item("DisplayName"))
+        
+                        $FoundUsers.Add($result)
+                    }
+                }
+                catch {
+                    
+                }
+
+            }
+
+            Write-Host("Utenti processati $($FoundUsers.Count) di $($UsersToSearchFromCsv.Count)")
+
         }
 
         # $FoundUsers | Format-List -Property DisplayName,PrimarySmtpAddress
         # $FoundUsers | Format-Table
 
+        Write-Host("Utenti trovati $($FoundUsers.Count) su $($UsersToSearchFromCsv.Count)")
 
-        Write-Output("Utenti trovati $($FoundUsers.Count) su $($UsersToSearchFromCsv.Count)")
+        ExportResults -SuccessUsers $FoundUsers -ErrorUsers $NotFoundUsers
 
         return $FoundUsers
 
@@ -153,12 +183,12 @@ function Get-UsersToSearch {
         
         $FoundUsers = SearchUsers -UsersToSearch $UsersFromCsv -UsersFromExchange $UsersFromExchange
 
-        return MatchUsers -FoundUsers $FoundUsers
+        # return MatchUsers -FoundUsers $FoundUsers
+        return $FoundUsers
 
     }
     
 }
-
 
 # .Des > verifica che le istanze del csv siano conformi
 function VerifyCsv {
@@ -188,8 +218,6 @@ function VerifyCsv {
     }
 }
 
-
-
 function CheckInputCsv {
 
     param (      
@@ -218,7 +246,6 @@ function CheckInputCsv {
     
 }
 
-
 function ProcessCsv {
 
     param (
@@ -238,7 +265,6 @@ function ProcessCsv {
             VerifyCsv -CsvUsers $CsvUsers
 
             return $CsvUsers
-
         
         }
         catch {
@@ -253,14 +279,12 @@ function ProcessCsv {
 function ExitSessions {
 
     process {
-        Disconnect-AzureAD -Confirm:$false
         Disconnect-ExchangeOnline -Confirm:$false
         Disconnect-AzAccount -Confirm:$false
         Get-PSSession | Disconnect-PSSession -Confirm:$false
     }
     
 }
-
 
 function Get-DataFromExchange {
 
@@ -277,87 +301,39 @@ function Get-DataFromExchange {
     
 }
 
-function MatchUsers {
-
-    param(
-        $FoundUsers,
-        $DomainName
-    )
-
-    process {
-
-        $SuccessUsers = New-Object -TypeName "System.Collections.ArrayList"
-        $ErrorUsers = New-Object -TypeName "System.Collections.ArrayList"
-        
-        foreach ($found in $FoundUsers) {
-            foreach ($item in $found) {
-        
-                $currentUser = $null
-
-                try {
-                    $search = $item.Identity + $DomainName
-                    Write-Warning("$($search)")
-                    $currentUser = Get-MsolUser -UserPrincipalName $search
-
-                    if ($null -eq $currentUser) {
-                        $dateTime = Get-Date
-                        $ErrorUsers.Add(
-                            "-----
-                    $($dateTime)
-                    *****
-                    $($item)
-                    *****
-                    $($search)
-                    -----")
-
-                        Write-Warning("Errore, verfificare il log.")
-
-                    }
-                    else {
-                        $currentUser | Format-List UserPrincipalName, SignInName, DisplayName, ObjectId, UserType, ValidationStatus
-                        $SuccessUsers.Add($currentUser)
-                
-                    }
-                    # $currentUser =  Get-AzureADUser -SearchString $search  | Format-List UserPrincipalName, SignInName, DisplayName, ObjectId, ObjectType, AccountEnabled
-                    Write-Output("")
-                }
-                catch [Microsoft.Online.Administration.Automation.MicrosoftOnlineException], [Microsoft.Online.Administration.Automation.GetUser] {
-                    $dateTime = Get-Date
-                    
-                    $ErrorUsers.Add(
-                        "$($dateTime)
-                        $($item)
-                        $($_.Exception.Message)")
-
-                    Write-Error("Errore, verfificare il log.")
-                }
-        
-            }
-        }
-
-        return $SuccessUsers
-    }
-}
-
-
 function AddStudentsToLab {
     param (
-        $UsersToInvite,
-        $CsvUsers
+        $UsersToInvite
     )
 
     process {
+        $LabsList = New-Object -TypeName "System.Collections.ArrayList"
 
         $UsersToInvite | ForEach-Object {
 
-            $Lab = Get-AzLabAccount | Get-AzLab -LabName $_.LabName
+            try {
+                # Write-Host($result.Values)
+                # Write-Host($result.Get_Item("DisplayName"))
 
-            Add-AzLabUser  -Lab $Lab -Emails $_.Email
-            Write-Warning("*** Aggiunta al laboratorio $($_.LabName) di $($_.Email) completata ***")
+                $labName = $_.Get_Item("LabName")
+                $userEmail = $_.Get_Item("PrimarySmtpAddress")
+            
+                if (($null -ne $labName) -and ($null -ne $userEmail)) {
+                    $Lab = Get-AzLabAccount | Get-AzLab -LabName $labName
 
+                    Add-AzLabUser  -Lab $Lab -Emails $userEmail
+                    Write-Warning("*** Aggiunta al laboratorio $($labName) di $($userEmail) completata ***")
+
+                    $LabsList.Add($labName)
+                }
+            }
+            catch {
+                
+            }
+            
         }
 
-        $Labs = $Users.LabName | Get-Unique
+        $Labs = $LabsList | Get-Unique
 
         foreach ($Lab in $Labs) {
             $CurrentLab = Get-AzLabAccount | Get-AzLab -LabName $Lab
@@ -365,7 +341,7 @@ function AddStudentsToLab {
             $LabUsers = Get-AzLabUser -Lab $CurrentLab
 
             foreach ($User in $LabUsers) {
-                Send-AzLabUserInvitationEmail -User $User -InvitationText $InvitationText -Lab $CurrentLab
+                Send-AzLabUserInvitationEmail -User $User -InvitationText "LabServices" -Lab $CurrentLab
                 Write-Warning("*** Invito al laboratorio $($CurrentLab.name) inviato a $($User.properties.email) ***")
             }
     
@@ -374,11 +350,32 @@ function AddStudentsToLab {
     
 }
 
+
+function ExportResults {
+    param (
+        $ErrorUsers,
+        $SuccessUsers
+    )
+
+    process {
+        $dateTime = Get-Date -Format "MMMM-dd-yyyy"
+
+        $FileNameError = ".\Error_" + "$($dateTime)" + ".txt"
+        $FileNameSuccess = ".\Success_" + "$($dateTime)" + ".txt"
+
+        $ErrorUsers | Out-File $FileNameError
+
+        $SuccessUsers | Out-File $FileNameSuccess
+
+    }
+}
+
+
 # BODY
 
 InstallLocalModules -Scope CurrentUser
 
-# $cred = Get-Credential
+$cred = Get-Credential
 
 Connect-ExchangeOnline -Credential $cred
 
@@ -386,27 +383,10 @@ $UserAlias = Get-DataFromExchange
 
 $FoundUsers = Get-UsersToSearch -PathCsv $PathCSV -UsersFromExchange $UserAlias
 
+Connect-AzAccount -Credential $cred
 
-# TODO IMPLEMENTARE FUNZIONE PER ESPORTARE ELENCO UTENTI NON TROVATI
-
-
-# Connect-AzureAD -Credential $cred
-
-# Connect-MsolService -Credential $cred
-
-# Connect-AzAccount -SubscriptionId $AzureSubId -Credential $Cred
-
-# AddStudentsToLab -UsersToInvite $FoundUsers -CsvUsers $csv
-
-# to do -> invite users
-
-$dateTime = Get-Date -Format "MMMM-dd-yyyy"
-
-$FileNameError = ".\Error_" + "$($dateTime)" + ".txt"
-$FileNameSuccess = ".\Success_" + "$($dateTime)" + ".txt"
-
-$ErrorUsers | Out-File $FileNameError
-
-$SuccessUsers | Out-File $FileNameSuccess
+AddStudentsToLab -UsersToInvite $FoundUsers
 
 ExitSessions
+
+Write-Host("***Esecuzione script completata ***")
