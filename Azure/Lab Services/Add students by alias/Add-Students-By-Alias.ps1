@@ -233,7 +233,8 @@ function CheckInputCsv {
     process {
 
         if ([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)) {
-            $Delimiter = ';'
+            $Delimiter = ','
+            Write-Warning("Si sta utilizzando il delimitatore di default, in quanto non fornito: $($Delimiter)")
         }
         
         if ([string]::IsNullOrEmpty($PathCSV) -or [string]::IsNullOrWhiteSpace($PathCSV)) {

@@ -1,3 +1,3 @@
-Nome;Cognome;Email;FullName;LabName
-Angelo;Uno;angelo@contoso.cloud;Angelo Uno;Contoso-Scripting-Linux
-Studente;Bis;studente@contoso.cloud;Angelo Bis;Contoso-Scripting-Linux
+Nome,Cognome,Email,FullName,LabName
+Studente,Contoso,405198@contosoSchool.cloud,Studente Contoso,MyJoinedLab
+Studente,Fabrikam,123456@contosoSchool.cloud,Studente Fabrikam,MyJoinedLab
