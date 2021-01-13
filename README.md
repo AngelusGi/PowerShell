@@ -1,4 +1,4 @@
-# Script PowerShell
+# Script PowerShell to manage Azure, Microsoft 365 and Teams
 
 ## Azure Lab Services
 * Importare gli utenti in un laboratorio già creato ed invitarli a partire da un file CSV <br> [link script](https://github.com/AngelusGi/PowerShell/blob/master/Azure/Lab%20Services/AddStudents_SendInvitation.ps1) | [link csv](https://github.com/AngelusGi/PowerShell/blob/master/Azure/Lab%20Services/csv_test.CSV)

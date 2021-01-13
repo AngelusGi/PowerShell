@@ -15,13 +15,13 @@ Those parameters are <b>optional</b>:
 ## Example
 
 ### How to run the script
-![How-to-run-the-script](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Add%20students%20by%20alias/Screenshots/How-to-run-the-script.GIF)
+![How-to-run-the-script](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Add%20students%20by%20alias/Screenshots/How-to-run-the-script.gif)
 
 ### Faculty view after the script execution
-![Faculty-view](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Add%20students%20by%20alias/Screenshots/Faculty-view.GIF)
+![Faculty-view](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Add%20students%20by%20alias/Screenshots/Faculty-view.gif)
 
 ### Student view after the script execution
-![Student-view](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Add%20students%20by%20alias/Screenshots/Student-view.GIF)
+![Student-view](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Add%20students%20by%20alias/Screenshots/Student-view.gif)
 
 
 ## Troubleshooting
