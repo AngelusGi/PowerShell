@@ -21,7 +21,15 @@ Param
 
     [parameter(ValueFromPipeline = $true)]
     [String]
-    $Delimiter
+    $Delimiter,
+
+    [parameter(ValueFromPipeline = $true)]
+    [bool]
+    $SendInvitation,
+
+    [parameter(ValueFromPipeline = $true)]
+    [String]
+    $WelcomeMessaege
 )
 
 
@@ -304,7 +312,9 @@ function Get-DataFromExchange {
 
 function AddStudentsToLab {
     param (
-        $UsersToInvite
+        $UsersToInvite,
+        $SendInvitation,
+        $WelcomeMessaege
     )
 
     process {
@@ -334,19 +344,30 @@ function AddStudentsToLab {
             
         }
 
-        $Labs = $LabsList | Get-Unique
 
-        foreach ($Lab in $Labs) {
-            $CurrentLab = Get-AzLabAccount | Get-AzLab -LabName $Lab
+        if ([bool]::IsNullOrEmpty($SendInvitation)) {
+            $Labs = $LabsList | Get-Unique
 
-            $LabUsers = Get-AzLabUser -Lab $CurrentLab
-
-            foreach ($User in $LabUsers) {
-                Send-AzLabUserInvitationEmail -User $User -InvitationText "LabServices" -Lab $CurrentLab
-                Write-Warning("*** Invito al laboratorio $($CurrentLab.name) inviato a $($User.properties.email) ***")
+            if ($null -eq $WelcomeMessaege) {
+                $WelcomeMessaege = "Benenuto su Azure LabServices"
             }
+
+            foreach ($Lab in $Labs) {
+                $CurrentLab = Get-AzLabAccount | Get-AzLab -LabName $Lab
+
+                $LabUsers = Get-AzLabUser -Lab $CurrentLab
+
+                foreach ($User in $LabUsers) {
+                    Send-AzLabUserInvitationEmail -User $User -InvitationText $WelcomeMessaege -Lab $CurrentLab
+                    Write-Warning("*** Invito al laboratorio $($CurrentLab.name) inviato a $($User.properties.email) ***")
+                }
     
+            }
+        } else {
+            Write-Warning("Non è stato abilitato l'invito automatico degli utenti. Sarà necessario recarsi su https://labs.azure.com e invitarli facendo click sul bottone 'Invita tutti'")
         }
+
+        
     }
     
 }
