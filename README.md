@@ -3,7 +3,8 @@
 ## Azure Lab Services
 * Importare gli utenti in un laboratorio già creato ed invitarli a partire da un file CSV <br> [link script](https://github.com/AngelusGi/PowerShell/blob/master/Azure/Lab%20Services/AddStudents_SendInvitation.ps1) | [link csv](https://github.com/AngelusGi/PowerShell/blob/master/Azure/Lab%20Services/csv_test.CSV)
 * Join delle macchine di ALS a dominio di AD/AAD con eventuale intragrazione con Intune [link-repo](https://github.com/AngelusGi/azure-devtestlab-activedirectoryjoin)
-* 
+* Importare gli utenti a partire da un alias email dell'UPN (attualmente non supportato) <br> [link script](https://github.com/AngelusGi/PowerShell/blob/master/Azure/Lab%20Services/Add%20students%20by%20alias/Add-Students-By-Alias.ps1) | [link csv](https://github.com/AngelusGi/PowerShell/blob/master/Azure/Lab%20Services/Add%20students%20by%20alias/Add-Students-By-Alias.CSV)
+*
 
 ---
 
@@ -28,3 +29,11 @@
 *
 
 ---
+
+
+## Troubleshooting
+
+* How to download a script from GitHub. Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20download%20single%20file%20from%20GitHub)
+* How to change PowerShell Execution Policy. Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/Resolve%20errors%20about%20Execution%20Policy)
+* How to get sku licenses of an Office365 or Microsoft365 tenant. Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20get%20sku%20licenses)
+*
