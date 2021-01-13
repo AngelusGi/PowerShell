@@ -10,12 +10,22 @@ Those parameters are <b>optional</b>:
 * Delimiter -> the values' delimiter in the CSV file, if black, the default value is ","
 * AzureSubId -> if you have multiple Azure Subscription, please insert the ID of the one wich contains the Lab Account
 
+Using default values the script will only add students to the lab. If you want to invite them using this script, consider to use those two optional parameters:
+* SendInvitation -> if its value is "$true" the script will invite users to ALS
+* WelcomeMessage -> you can use this parameter to send a custom message to users
+
 <b>This script has dependecies that require to use only Windows PowerShell 5.x<\b>
 
 ## Example
 
-### How to run the script
-![How-to-run-the-script](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Add%20students%20by%20alias/Screenshots/How-to-run-the-script.gif)
+### How to run the script (NO INVITATION)
+![How-to-run-the-script-no-invitation](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Add%20students%20by%20alias/Screenshots/How-to-run-the-script-no-invitation.png)
+
+### How to run the script (INVITATION WITHIN A CUSTOM MESSAGE)
+![How-to-run-the-script-no-invitation](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Add%20students%20by%20alias/Screenshots/How-to-run-the-script-invitation.png)
+
+### How it works
+![How-it-works](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Add%20students%20by%20alias/Screenshots/How-it-works.gif)
 
 ### Faculty view after the script execution
 ![Faculty-view](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Add%20students%20by%20alias/Screenshots/Faculty-view.gif)

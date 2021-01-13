@@ -345,10 +345,10 @@ function AddStudentsToLab {
         }
 
 
-        if ([bool]::IsNullOrEmpty($SendInvitation)) {
+        if ($false -ne $SendInvitation) {
             $Labs = $LabsList | Get-Unique
 
-            if ($null -eq $WelcomeMessaege) {
+            if ([string]::IsNullOrEmpty($WelcomeMessaege) -or [string]::IsNullOrWhiteSpace($WelcomeMessaege)) {
                 $WelcomeMessaege = "Benenuto su Azure LabServices"
             }
 
