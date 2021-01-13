@@ -1,4 +1,4 @@
-<# TEST PURPOSE #
+<# TEST PURPOSE
 
 $userName = 
 $userPassword = 
