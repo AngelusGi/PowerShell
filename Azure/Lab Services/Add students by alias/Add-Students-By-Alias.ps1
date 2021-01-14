@@ -24,14 +24,13 @@ Param
     $Delimiter,
 
     [parameter(ValueFromPipeline = $true)]
-    [bool]
+    [string]
     $SendInvitation,
 
     [parameter(ValueFromPipeline = $true)]
     [String]
     $WelcomeMessaege
 )
-
 
 # Region module manager
 
@@ -344,8 +343,11 @@ function AddStudentsToLab {
             
         }
 
-
-        if ($false -ne $SendInvitation) {
+            
+        if ([string]::IsNullOrEmpty($SendInvitation) -or [string]::IsNullOrWhiteSpace($SendInvitation)) {
+            Write-Warning("Non è stato abilitato l'invito automatico degli utenti. Sarà necessario recarsi su https://labs.azure.com e invitarli facendo click sul bottone 'Invita tutti'")
+           
+        } else {
             $Labs = $LabsList | Get-Unique
 
             if ([string]::IsNullOrEmpty($WelcomeMessaege) -or [string]::IsNullOrWhiteSpace($WelcomeMessaege)) {
@@ -363,8 +365,6 @@ function AddStudentsToLab {
                 }
     
             }
-        } else {
-            Write-Warning("Non è stato abilitato l'invito automatico degli utenti. Sarà necessario recarsi su https://labs.azure.com e invitarli facendo click sul bottone 'Invita tutti'")
         }
 
         
