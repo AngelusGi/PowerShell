@@ -36,7 +36,7 @@ else {
     Write-Host("***")
 }
 
-Write-Output("Preparazione e verifica dell'ambiente in corso, attendere...")
+Write-Host("Preparazione e verifica dell'ambiente in corso, attendere...")
 
 try {
     $PSTeamsModule = "MicrosoftTeams"
@@ -60,7 +60,7 @@ $team = Get-Team -DisplayName $TeamName
 
 try {
             
-    Write-Output("Verifica del CSV in corso...")
+    Write-Host("Verifica del CSV in corso...")
     $Teams = Import-Csv $PathCSV -Delimiter $Delimiter
 
     ForEach ($Team in $Teams) {
@@ -78,7 +78,7 @@ catch {
 
 try {
             
-    Write-Output("Creazione dei team in corso...")
+    Write-Host("Creazione dei team in corso...")
 
     ForEach ($Team in $Teams) {
         if ( [string]::IsNullOrEmpty($Team.TeamDisplayName) -or [string]::IsNullOrWhiteSpace($Team.TeamDisplayName) ) {
@@ -111,4 +111,4 @@ catch {
     exit
 }
 
-Write-Output("*** Operazione compeltata potrebbero essere necessari alcuni minuti affinché le modifiche diventino visibili ***")
+Write-Host("*** Operazione compeltata potrebbero essere necessari alcuni minuti affinché le modifiche diventino visibili ***")

@@ -47,7 +47,7 @@ else {
     Write-Host("***")
 }
 
-Write-Output("Preparazione e verifica dell'ambiente in corso, attendere...")
+Write-Host("Preparazione e verifica dell'ambiente in corso, attendere...")
 
 try {
     $PSTeamsModule = "MicrosoftTeams"
@@ -98,7 +98,7 @@ try {
 
     Write-Warning("Team trovato:")
 
-    Write-Output($team)
+    Write-Host($team)
     
     $guestUsers = Import-Csv $PathCSV -Delimiter $Delimiter
 

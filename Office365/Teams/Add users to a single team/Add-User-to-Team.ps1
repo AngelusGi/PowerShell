@@ -69,7 +69,7 @@ if ([string]::IsNullOrWhiteSpace($Delimiter)) {
 }
 
 
-Write-Output("Preparazione e verifica dell'ambiente in corso, attendere...")
+Write-Host("Preparazione e verifica dell'ambiente in corso, attendere...")
 
 try {
     $PSTeamsModule = "MicrosoftTeams"
@@ -88,7 +88,7 @@ catch {
 
 Import-Module -Name $PSTeamsModule
 
-Write-Output("Riepilogo moduli trovati")
+Write-Host("Riepilogo moduli trovati")
 Get-InstalledModule -Name $PSTeamsModule
 
 Connect-MicrosoftTeams
@@ -104,7 +104,7 @@ try {
     $FileName = $TempFileName.Replace(".CSV", "")
     $OutputName = "$($FileName).txt"
 
-    Write-Output("Ricerca del Team $($TeamName) in corso, attendere...")
+    Write-Host("Ricerca del Team $($TeamName) in corso, attendere...")
     $Team = Get-Team -DisplayName $TeamName
 
     if ($null -eq $Team) {
@@ -116,7 +116,7 @@ try {
         
         try {
             
-            Write-Output("Verifica del CSV in corso...")
+            Write-Host("Verifica del CSV in corso...")
             $Users = Import-Csv $PathCSV -Delimiter $Delimiter
 
             ForEach ($User in $Users) {
@@ -133,7 +133,7 @@ try {
         }
         
 
-        Write-Output("Ricerca dei membri gia presenti nel team $($Team.DisplayName) in corso...")
+        Write-Host("Ricerca dei membri gia presenti nel team $($Team.DisplayName) in corso...")
         $TeamUsers = Get-TeamUser -GroupId $Team.GroupId -Role $Role
 
         foreach ($User in $Users) {
@@ -143,10 +143,10 @@ try {
                 if ( ($null -eq $TeamUsers) -or (-not $TeamUsers.User.Contains($User.Email))) {
                     try {
                         $ErrorUser = $User
-                        Write-Output("Aggiunta dell'utente $($User.Email) al team $($Team.DisplayName) in corso, attendere...")
+                        Write-Host("Aggiunta dell'utente $($User.Email) al team $($Team.DisplayName) in corso, attendere...")
                         Add-TeamUser -GroupId $Team.GroupId -User $User.Email
                         Start-Sleep -Seconds 15
-                        Write-Output("$($User.Email) aggiunto al team $($Team.DisplayName)")
+                        Write-Host("$($User.Email) aggiunto al team $($Team.DisplayName)")
                     }
                     catch {
                         Write-Error("L'utente $($User.Email) non presente in Microsoft Teams!")
@@ -165,7 +165,7 @@ try {
         }
         
         Write-Warning("*** Potrebbero essere necessari alcuni minuti affiché le modifiche diventino visibile nell'applicazione. ***")
-        Write-Output("*** Operazione compeltata. Premere un tasto per uscire. ***")
+        Write-Host("*** Operazione compeltata. Premere un tasto per uscire. ***")
         Read-Host 
 
     }
