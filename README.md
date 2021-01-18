@@ -12,8 +12,9 @@
 
 ## Azure Lab Services
 * Add users and invite them to an existing Lab in bulk <br> [link](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Add%20students%20and%20send%20invitation)
-* Domain join in a lab's vm <br> [link](https://github.com/AngelusGi/azure-devtestlab-activedirectoryjoin)
 * Add users and (optionally) invite them to an existing Lab using an email alias of Exchange instead of the UPN <br> [link](https://github.com/AngelusGi/PowerShell/blob/master/Azure/Lab%20Services/Add%20students%20by%20alias/)
+* Domain join in a lab's vm <br> [link](https://github.com/AngelusGi/azure-devtestlab-activedirectoryjoin)
+
 
 ---
 
@@ -53,3 +54,8 @@
 * How to change PowerShell Execution Policy. Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/Resolve%20errors%20about%20Execution%20Policy)
 * How to get sku licenses of an Office365 or Microsoft365 tenant. Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20get%20sku%20licenses)
 * How to login using PowerShell Core [link](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20login%20using%20PowerShell%20Core)
+
+---
+
+## License
+All the scripts in this repo are licensed under the [MIT license](https://github.com/AngelusGi/PowerShell/blob/master/LICENSE).
