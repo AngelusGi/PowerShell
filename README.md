@@ -14,6 +14,7 @@
 * Aggiungere utenti ad un canale privato <br> [link script](https://github.com/AngelusGi/PowerShell/blob/master/Office365/Teams/Add-ADD-Users-To-Private-Channels.ps1) | [link csv](https://github.com/AngelusGi/PowerShell/blob/master/Office365/Teams/Guest%20Users/Add-User-Team_CSV.ps1)
 * Invite users as single message or BCC via GraphApi <br> [link script](https://github.com/AngelusGi/PowerShell/tree/master/Office365/Teams/Invite%20users%20as%20single%20message%20or%20BCC)
 * Get team members as CSV <br> [link script](https://github.com/AngelusGi/PowerShell/tree/master/Office365/Teams/Get%20team%20members%20as%20CSV)
+*
 
 ---
 
@@ -37,4 +38,5 @@
 * How to download a script from GitHub. Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20download%20single%20file%20from%20GitHub)
 * How to change PowerShell Execution Policy. Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/Resolve%20errors%20about%20Execution%20Policy)
 * How to get sku licenses of an Office365 or Microsoft365 tenant. Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20get%20sku%20licenses)
+* How to login using PowerShell Core [lik](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20login%20using%20PowerShell%20Core)
 *
