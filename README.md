@@ -50,10 +50,10 @@
 
 ## Troubleshooting
 
-* How to download a script from GitHub. Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20download%20single%20file%20from%20GitHub)
-* How to change PowerShell Execution Policy. Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/Resolve%20errors%20about%20Execution%20Policy)
-* How to get sku licenses of an Office365 or Microsoft365 tenant. Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20get%20sku%20licenses)
-* How to login using PowerShell Core [link](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20login%20using%20PowerShell%20Core)
+* How to download a script from GitHub. <br> Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20download%20single%20file%20from%20GitHub)
+* How to change PowerShell Execution Policy. <br> Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/Resolve%20errors%20about%20Execution%20Policy)
+* How to get sku licenses of an Office365 or Microsoft365 tenant. <br> Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20get%20sku%20licenses)
+* How to login using PowerShell Core. <br> Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20login%20using%20PowerShell%20Core)
 
 ---
 
