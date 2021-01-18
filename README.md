@@ -1,6 +1,6 @@
 # Script PowerShell to manage Azure, Microsoft 365 and Teams
 
-# Summary
+# Table of contents
 * [Azure Lab Services](https://github.com/AngelusGi/PowerShell#Azure-Lab-Services)
 * [Azure ARM Template](https://github.com/AngelusGi/PowerShell#Azure-ARM-Template)
 * [Azure IaaS](https://github.com/AngelusGi/PowerShell#Azure-IaaS)
@@ -12,7 +12,7 @@
 
 ## Azure Lab Services
 * Add users and invite them to an existing Lab in bulk <br> [link](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Add%20students%20and%20send%20invitation)
-* Domain join in a lab's vm [link](https://github.com/AngelusGi/azure-devtestlab-activedirectoryjoin)
+* Domain join in a lab's vm <br> [link](https://github.com/AngelusGi/azure-devtestlab-activedirectoryjoin)
 * Add users and (optionally) invite them to an existing Lab using an email alias of Exchange instead of the UPN <br> [link](https://github.com/AngelusGi/PowerShell/blob/master/Azure/Lab%20Services/Add%20students%20by%20alias/)
 
 ---
@@ -23,7 +23,7 @@
 ---
 
 ## Azure IaaS
-* Resize of managed disk <br> [link](https://github.com/AngelusGi/PowerShell/blob/master/Azure/VM/ResizeManagedDiskVM.ps1)
+* Resize of managed disk <br> [link](https://github.com/AngelusGi/PowerShell/tree/master/Azure/VM%20IaaS/Managed%20Disk%20Resize)
 
 ---
 
@@ -52,4 +52,4 @@
 * How to download a script from GitHub. Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20download%20single%20file%20from%20GitHub)
 * How to change PowerShell Execution Policy. Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/Resolve%20errors%20about%20Execution%20Policy)
 * How to get sku licenses of an Office365 or Microsoft365 tenant. Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20get%20sku%20licenses)
-* How to login using PowerShell Core [lik](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20login%20using%20PowerShell%20Core)
+* How to login using PowerShell Core [link](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20login%20using%20PowerShell%20Core)
