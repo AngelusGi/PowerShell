@@ -1,19 +1,19 @@
 # Script PowerShell to manage Azure, Microsoft 365 and Teams
 
 # Summary
-[Azure Lab Services](https://github.com/AngelusGi/PowerShell#Azure-Lab-Services)
-[Azure ARM Template](https://github.com/AngelusGi/PowerShell#Azure-ARM-Template)
-[Azure IaaS](https://github.com/AngelusGi/PowerShell#Azure-IaaS)
-[Microsoft Teams](https://github.com/AngelusGi/PowerShell#Microsoft-Teams)
-[Microsoft 365](https://github.com/AngelusGi/PowerShell#Office-365-Microsoft-365)
-[Troubleshooting](https://github.com/AngelusGi/PowerShell#Troubleshooting)
+* [Azure Lab Services](https://github.com/AngelusGi/PowerShell#Azure-Lab-Services)
+* [Azure ARM Template](https://github.com/AngelusGi/PowerShell#Azure-ARM-Template)
+* [Azure IaaS](https://github.com/AngelusGi/PowerShell#Azure-IaaS)
+* [Microsoft Teams](https://github.com/AngelusGi/PowerShell#Microsoft-Teams)
+* [Microsoft 365](https://github.com/AngelusGi/PowerShell#Office-365-Microsoft-365)
+* [Troubleshooting](https://github.com/AngelusGi/PowerShell#Troubleshooting)
 
 ---
 
 ## Azure Lab Services
-* Importare gli utenti in un laboratorio già creato ed invitarli a partire da un file CSV <br> [link](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Add%20students%20and%20send%20invitation)
-* Join delle macchine di ALS a dominio di AD/AAD con eventuale intragrazione con Intune [link](https://github.com/AngelusGi/azure-devtestlab-activedirectoryjoin)
-* Importare gli utenti a partire da un alias email dell'UPN (attualmente non supportato) <br> [link](https://github.com/AngelusGi/PowerShell/blob/master/Azure/Lab%20Services/Add%20students%20by%20alias/)
+* Add users and invite them to an existing Lab in bulk <br> [link](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Add%20students%20and%20send%20invitation)
+* Domain join in a lab's vm [link](https://github.com/AngelusGi/azure-devtestlab-activedirectoryjoin)
+* Add users and (optionally) invite them to an existing Lab using an email alias of Exchange instead of the UPN <br> [link](https://github.com/AngelusGi/PowerShell/blob/master/Azure/Lab%20Services/Add%20students%20by%20alias/)
 
 ---
 
@@ -53,4 +53,3 @@
 * How to change PowerShell Execution Policy. Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/Resolve%20errors%20about%20Execution%20Policy)
 * How to get sku licenses of an Office365 or Microsoft365 tenant. Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20get%20sku%20licenses)
 * How to login using PowerShell Core [lik](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20login%20using%20PowerShell%20Core)
-*
