@@ -8,9 +8,10 @@
 
 ## Examples
 
-### Expected result
+### How to run the script
 ![How to run the script](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/Teams/Only%20a%20group%20of%20users%20can%20create%20team%20of%20Microsoft%20Teams/Screenshot/How-to-run-the-script.gif)
 
+### Expected result
 ![Expected result](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Office365/Teams/Only%20a%20group%20of%20users%20can%20create%20team%20of%20Microsoft%20Teams/Screenshot/Expected-result.png)
 
 ## Troubleshooting
