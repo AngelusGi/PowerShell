@@ -1,0 +1,115 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "defaultValue": "[parameters('name')]",
+            "type": "String"
+        },
+        "regionId": {
+            "defaultValue": "[parameters('regionId')]",
+            "type": "String"
+        },
+        "identityType": {
+            "defaultValue": "SystemAssigned",
+            "type": "String"
+        },
+        "labIsolation": {
+            "defaultValue": "Disabled",
+            "type": "String"
+        },
+        "environment": {
+            "defaultValue": "[parameters('environment')]",
+            "type" : "string"
+        },
+        "autoShudownTime": {
+            "defaultValue": "[parameters('autoShudownTime')]",
+            "type" : "string"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.DevTestLab/labs",
+            "apiVersion": "2018-09-15",
+            "name": "[parameters('name')]",
+            "location": "[parameters('regionId')]",
+            "tags": {
+                "Enviornment": "[parameters('environment')]"
+            },
+            "identity": {
+                "type": "[parameters('identityType')]"
+            },
+            "properties": {
+                "labStorageType": "Premium",
+                "isolateLabResources": "[parameters('labIsolation')]"
+            },
+            "resources": [
+                {
+                    "type": "schedules",
+                    "apiVersion": "2018-09-15",
+                    "name": "LabVmsShutdown",
+                    "location": "[parameters('regionId')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.DevTestLab/labs', parameters('name'))]"
+                    ],
+                    "properties": {
+                        "status": "Enabled",
+                        "timeZoneId": "Central Europe Standard Time",
+                        "dailyRecurrence": {
+                            "time": "[parameters('autoShudownTime')]"
+                        },
+                        "taskType": "LabVmsShutdownTask",
+                        "notificationSettings": {
+                            "status": "Disabled",
+                            "timeInMinutes": 30
+                        }
+                    }
+                },
+                {
+                    "type": "virtualNetworks",
+                    "apiVersion": "2018-09-15",
+                    "name": "DevTestLab",
+                    "location": "[parameters('regionId')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.DevTestLab/labs', parameters('name'))]"
+                    ],
+                    "properties": {
+                        "externalProviderResourceId": "/subscriptions/a5f0e3d4-65c5-4391-acce-43f1753c137e/resourceGroups/DevTestLab/providers/Microsoft.Network/virtualNetworks/DevTestLab",
+                        "subnetOverrides": [
+                            {
+                                "labSubNetName": "DevTestLabSubnet",
+                                "resourceId": "/subscriptions/a5f0e3d4-65c5-4391-acce-43f1753c137e/resourceGroups/DevTestLab/providers/Microsoft.Network/virtualNetworks/DevTestLab/subnets/DevTestLabSubnet",
+                                "useInVmCreationPermission": "Allow",
+                                "usePublicIpAddressPermission": "Deny",
+                                "sharedPublicIpAddressConfiguration": {
+                                    "allowedPorts": [
+                                        {
+                                            "transportProtocol": "Tcp",
+                                            "backendPort": 3389
+                                        },
+                                        {
+                                            "transportProtocol": "Tcp",
+                                            "backendPort": 22
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": "artifactSources",
+                    "apiVersion": "2018-09-15",
+                    "name": "Public Environment Repo",
+                    "location": "[parameters('regionId')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.DevTestLab/labs', parameters('name'))]"
+                    ],
+                    "properties": {
+                        "status": "Enabled"
+                    }
+                }
+            ]
+        }
+    ]
+}
