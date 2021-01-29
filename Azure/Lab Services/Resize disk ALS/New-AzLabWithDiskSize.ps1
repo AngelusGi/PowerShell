@@ -66,11 +66,11 @@
 #>
 [CmdletBinding()]
 param(
-    [parameter(Mandatory = $true, HelpMessage = "Resource group name of Lab Account", ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true, HelpMessage = "Resource group name of Lab Account")]
     [ValidateNotNullOrEmpty()]
     $LabAccountResourceGroupName,
 
-    [parameter(Mandatory = $true, HelpMessage = "Name of Lab Account", ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true, HelpMessage = "Name of Lab Account")]
     [ValidateNotNullOrEmpty()]
     $LabAccountName,
   
@@ -78,11 +78,11 @@ param(
     [ValidateNotNullOrEmpty()]
     $LabName,
 
-    [parameter(Mandatory = $true, HelpMessage = "Resource group of the SIG attached to the Lab Account", ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true, HelpMessage = "Resource group of the SIG attached to the Lab Account")]
     [ValidateNotNullOrEmpty()]
     $SharedImageGalleryResourceGroupName,
 
-    [parameter(Mandatory = $true, HelpMessage = "Name of the SIG attached to the Lab Account", ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true, HelpMessage = "Name of the SIG attached to the Lab Account")]
     [ValidateNotNullOrEmpty()]
     $SharedImageGalleryName,
 
@@ -310,7 +310,7 @@ C:\Windows\System32\Sysprep\Sysprep.exe /generalize /oobe /shutdown /quiet
 catch {
     $message = $error[0].Exception.Message
     if ($message) {
-        Write-Host -Object "ERROR: $message" -ForegroundColor Red
+        Write-Output("ERROR: $($message)") -ForegroundColor Red
     }
 }
 finally {

@@ -1,65 +1,25 @@
 
 # Region module manager
+function PrepareEnvironment {
 
-function CheckModules {
-    param (
+    param(
+        [Parameter(Mandatory = $true)]
+        [String[]]
         $Modules,
-        [String]$Scope
+        [int16]
+        $Version
     )
-    process {
-
-        foreach ($module in $Modules) {
-            
-            $GalleryModule = Find-Module -Name $module
-
-            $mod = $installedModules | Where-Object { $_.Name -eq $module }
-        
-            if ([string]::IsNullOrEmpty($mod) -or [string]::IsNullOrWhiteSpace($mod)) {
-                Write-Warning("Modulo $($module) non trovato. Installazione in corso...")
-                Install-Module -Name $module -Scope $Scope
-            }
-            else {
-                Write-Warning("Modulo $($module) trovato.")
-
-                if ($GalleryModule.Version -ne $mod.Version) {
-                    Write-Warning("Aggionamento del modulo $($module) in corso...")
-
-                    Update-Module -Name $module -Force
-                }
-            }
-            Import-Module -Name $module
-
-        }
-
-        
-    }
-}
-
-function VerifyPsVersion {
     
     process {
-        
-        Write-Warning("Verifica dell'ambiente in corso, attendere...")
 
-        if ($PSVersionTable.PSVersion.Major -ne 5) {
-            Write-Error("Questo script può essere eseguito solo con la versione 5 di Windows PowerShell")
-            exit
-        }
-    }
-}
+        $LibraryURL = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/ModuleManager.ps1"
 
-function InstallLocalModules {
-    param (
-        [String]$Scope,
-        $Modules
-    )
+        $Client = New-Object System.Net.WebClient
+    
+        $Client.DownloadFile($LibraryURL, ".\ModuleManager.ps1")
 
-    process {
+        .\ModuleManager.ps1 -Modules $Modules -CompatibleVersion $Version 
 
-        VerifyPsVersion
-
-        CheckModules -Modules $Modules -Scope $Scope
-        
     }
     
 }
@@ -74,17 +34,15 @@ function ExitSessions {
 
 # EndRegion
 
-InstallLocalModules -Modules "MicrosoftTeams" -Scope "CurrentUser"
+PrepareEnvironment -Modules "MicrosoftTeams"
 
 Write-Warning("Inserire le credenziali dell'amministratore del tanant")
 
 try {
     $adminCred = Get-Credential
     $session = New-CsOnlineSession -Credential $adminCred
-    Connect-MicrosoftTeams -Credential $adminCred 
+    Connect-MicrosoftTeams -Credential $adminCred
     Import-PSSession $session -AllowClobber
-
-    
 }
 catch {
     Write-Warning("Autenticazione non riuscita, verificare le credenziali inserite.")
@@ -97,15 +55,12 @@ $NotOnlyOrganizer = 2
 do {
     Clear-Host
 
-    Write-Host("Inserisci il numero inerente la policy che vuoi applicare a livello di tenant:")
-    Write-Host("$($OrganizerOnly). download attendance report disponibile solo per chi ha programmato la riunione")
-    Write-Host("$($NotOnlyOrganizer). download attendance report disponibile per tutti i relatori e partecipanti nel meeting")
+    Write-Output("Inserisci il numero inerente la policy che vuoi applicare a livello di tenant:")
+    Write-Output("$($OrganizerOnly). download attendance report disponibile solo per chi ha programmato la riunione")
+    Write-Output("$($NotOnlyOrganizer). download attendance report disponibile per tutti i relatori e partecipanti nel meeting")
     
     $response = Read-Host("Inserisci 1 o 2 e premi INVIO")
-
-    Write-Host("")
-
-    
+    Write-Output("")
 } while (-not (($OrganizerOnly -eq $response) -or ($NotOnlyOrganizer -eq $response)))
 
 $msg = $null
@@ -129,4 +84,4 @@ Write-Warning($msg)
 
 ExitSessions
 
-Write-Host("*** Esecuzione completata ***")
+Write-Output("*** Esecuzione completata ***")

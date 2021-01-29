@@ -9,61 +9,72 @@
 
 Param
 (
-    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true)]
     [String]
     $PathCSV,
 
-    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true)]
     [String]
     $TeamName,
     
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [String]
-    $Delimiter
+    $Delimiter = ";"
 )
 
-if ([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)) {
-    $Delimiter = ";"
+function ExitSessions {
+
+    process {
+        Disconnect-MicrosoftTeams -Confirm:$false
+    }
+    
 }
 
+function PrepareEnvironment {
+
+    param(
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $Modules,
+        [int16]
+        $Version
+    )
+    
+    process {
+
+        $LibraryURL = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/ModuleManager.ps1"
+
+        $Client = New-Object System.Net.WebClient
+    
+        $Client.DownloadFile($LibraryURL, ".\ModuleManager.ps1")
+
+        .\ModuleManager.ps1 -Modules $Modules -CompatibleVersion $Version 
+
+    }
+    
+}
 
 if ([string]::IsNullOrWhiteSpace($Delimiter)) {
-    Write-Error("Il parametro Delimiter non può essere vuoto")
+    throw "Il parametro Delimiter non può essere vuoto"
     exit
-}
-elseif ([string]::IsNullOrWhiteSpace($TeamName)) {
-    Write-Error("Il parametro TeamName non può essere vuoto")
+} elseif ([string]::IsNullOrWhiteSpace($TeamName)) {
+    throw "Il parametro TeamName non può essere vuoto"
     exit
-}
-elseif ([string]::IsNullOrWhiteSpace($PathCSV)) {
-    Write-Error("Il parametro PathCSV non può essere vuoto")
+}elseif ([string]::IsNullOrWhiteSpace($PathCSV)) {
+    throw "Il parametro PathCSV non può essere vuoto"
     exit
 }
 else {
-    Write-host("Parametri:")
-    Write-host("Path CSV: $($PathCSV)")
-    Write-host("Delimitatore del file CSV: $($Delimiter)")
-    Write-host("Nome del team: $($TeamName)")
-    Write-Host("***")
+    Write-Output("Parametri:")
+    Write-Output("Path CSV: $($PathCSV)")
+    Write-Output("Delimitatore del file CSV: $($Delimiter)")
+    Write-Output("Nome del team: $($TeamName)")
+    Write-Output("***")
 }
 
-Write-Host("Preparazione e verifica dell'ambiente in corso, attendere...")
+Write-Output("Preparazione e verifica dell'ambiente in corso, attendere...")
 
-try {
-    $PSTeamsModule = "MicrosoftTeams"
-
-    $ModTeams = Get-InstalledModule -Name $PSTeamsModule
-
-    if ($null -eq $ModTeams) {
-        Install-Module -Name $PSTeamsModule -Force
-    }
-}
-catch {
-    Write-Error("Modulo $($PSTeamsModule) non trovato...")
-    exit
-}
-
-Import-Module -Name $PSTeamsModule
+PrepareEnvironment -Modules "MicrosoftTeams"
 
 Connect-MicrosoftTeams
 
@@ -98,7 +109,7 @@ try {
 
     Write-Warning("Team trovato:")
 
-    Write-Host($team)
+    Write-Output($team)
     
     $guestUsers = Import-Csv $PathCSV -Delimiter $Delimiter
 
@@ -117,11 +128,15 @@ try {
             Write-Error("Errore, nessun team riconosciuto. Il nome team del CSV non è un nome valido.")
         }
 
-        Write-Host("")
-        Write-Host("")
+        Write-Output("")
+        Write-Output("")
     }
 
 }
 catch {
     Write-Error("*** ERRORE ***")
 }
+
+ExitSessions
+
+Write-Output("Esecuzione script completata.")

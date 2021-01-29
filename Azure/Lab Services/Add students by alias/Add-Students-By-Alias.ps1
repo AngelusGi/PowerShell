@@ -11,103 +11,49 @@ $cred = New-Object System.Management.Automation.PSCredential ($userName, $secStr
 
 Param
 (
-    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true)]
     [String]
     $PathCSV,
 
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [String]
     $AzureSubId,
 
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [String]
     $Delimiter,
 
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [string]
     $SendInvitation,
 
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [String]
     $WelcomeMessaege
 )
 
 # Region module manager
 
-function CheckModules {
-    param (
+function PrepareEnvironment {
+
+    param(
+        [Parameter(Mandatory = $true)]
+        [String[]]
         $Modules,
-        [String]$Scope
+        [int16]
+        $Version
     )
-    process {
-
-        if ($PSVersionTable.PSEdition -eq 'Desktop' -and (Get-Module -Name AzureRM -ListAvailable)) {
-            Write-Error -Message ('Il modulo AzureRM è installato sulla macchina. Rimuoverlo prima di procedere.')
-            Break
-        }
-
-        $installedModules = Get-InstalledModule
-
-        foreach ($module in $Modules) {
-            
-            $GalleryModule = Find-Module -Name $module
-
-            $mod = $installedModules | Where-Object { $_.Name -eq $module }
-        
-            if ([string]::IsNullOrEmpty($mod) -or [string]::IsNullOrWhiteSpace($mod)) {
-                Write-Warning("Modulo $($module) non trovato. Installazione in corso...")
-                Install-Module -Name $module -Scope $Scope -AllowClobber
-            }
-            else {
-                Write-Warning("Modulo $($module) trovato.")
-
-                if ($GalleryModule.Version -ne $mod.Version) {
-                    Write-Warning("Aggionamento del modulo $($module) in corso...")
-
-                    Update-Module -Name $module
-                }
-            }
-        }
-
-        Write-Warning("Installazione del modulo Az.LabServices in corso...")
-
-        $LabServiceLibraryURL = "https://raw.githubusercontent.com/Azure/azure-devtestlab/master/samples/ClassroomLabs/Modules/Library/Az.LabServices.psm1"
-
-        $Client = New-Object System.Net.WebClient
-
-        $Client.DownloadFile($LabServiceLibraryURL, ".\Az.LabServices.psm1")
-
-        Import-Module .\Az.LabServices.psm1
-        
-    }
-}
-
-function VerifyPsVersion {
     
     process {
-        
-        Write-Warning("Verifica dell'ambiente in corso, attendere...")
 
-        if ($PSVersionTable.PSVersion.Major -ne 5) {
-            Write-Error("Questo script può essere eseguito solo con la versione 5 di Windows PowerShell")
-            exit
-        }
-    }
-}
+        $LibraryURL = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/ModuleManager.ps1"
 
-function InstallLocalModules {
-    param (
-        [String]$Scope
-    )
+        $Client = New-Object System.Net.WebClient
+    
+        $Client.DownloadFile($LibraryURL, ".\ModuleManager.ps1")
 
-    process {
+        .\ModuleManager.ps1 -Modules $Modules -CompatibleVersion $Version 
 
-        VerifyPsVersion
-
-        $Modules = "ExchangeOnlineManagement", "Az"
-
-        CheckModules -Modules $Modules -Scope $Scope
-        
     }
     
 }
@@ -150,8 +96,8 @@ function SearchUsers {
                             LabName            = $userToSearch.LabName
                         }
         
-                        # Write-Host($result.Values)
-                        # Write-Host($result.Get_Item("DisplayName"))
+                        # Write-Output($result.Values)
+                        # Write-Output($result.Get_Item("DisplayName"))
         
                         $FoundUsers.Add($result)
                     }
@@ -162,14 +108,14 @@ function SearchUsers {
 
             }
 
-            Write-Host("Utenti processati $($FoundUsers.Count) di $($UsersToSearchFromCsv.Count)")
+            Write-Output("Utenti processati $($FoundUsers.Count) di $($UsersToSearchFromCsv.Count)")
 
         }
 
         # $FoundUsers | Format-List -Property DisplayName,PrimarySmtpAddress
         # $FoundUsers | Format-Table
 
-        Write-Host("Utenti trovati $($FoundUsers.Count) su $($UsersToSearchFromCsv.Count)")
+        Write-Output("Utenti trovati $($FoundUsers.Count) su $($UsersToSearchFromCsv.Count)")
 
         ExportResults -SuccessUsers $FoundUsers -ErrorUsers $NotFoundUsers
 
@@ -228,11 +174,11 @@ function VerifyCsv {
 function CheckInputCsv {
 
     param (      
-        [parameter(ValueFromPipeline = $true)]
+        [parameter()]
         [String]
         $Delimiter,
 
-        [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [parameter(Mandatory = $true)]
         [String]
         $PathCSV
     )
@@ -322,8 +268,8 @@ function AddStudentsToLab {
         $UsersToInvite | ForEach-Object {
 
             try {
-                # Write-Host($result.Values)
-                # Write-Host($result.Get_Item("DisplayName"))
+                # Write-Output($result.Values)
+                # Write-Output($result.Get_Item("DisplayName"))
 
                 $labName = $_.Get_Item("LabName")
                 $userEmail = $_.Get_Item("PrimarySmtpAddress")
@@ -347,7 +293,8 @@ function AddStudentsToLab {
         if ([string]::IsNullOrEmpty($SendInvitation) -or [string]::IsNullOrWhiteSpace($SendInvitation)) {
             Write-Warning("Non è stato abilitato l'invito automatico degli utenti. Sarà necessario recarsi su https://labs.azure.com e invitarli facendo click sul bottone 'Invita tutti'")
            
-        } else {
+        }
+        else {
             $Labs = $LabsList | Get-Unique
 
             if ([string]::IsNullOrEmpty($WelcomeMessaege) -or [string]::IsNullOrWhiteSpace($WelcomeMessaege)) {
@@ -395,7 +342,7 @@ function ExportResults {
 
 # BODY
 
-InstallLocalModules -Scope CurrentUser
+PrepareEnvironment -Modules "ExchangeOnlineManagement", "Az", "Az.LabServices"
 
 $cred = Get-Credential
 
@@ -411,4 +358,4 @@ AddStudentsToLab -UsersToInvite $FoundUsers
 
 ExitSessions
 
-Write-Host("***Esecuzione script completata ***")
+Write-Output("***Esecuzione script completata ***")

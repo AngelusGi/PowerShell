@@ -7,52 +7,55 @@
 
 param
 (
-    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true)]
     [String]
     $PathCSV,
     
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [String]
-    $Delimiter
-)
-
-if ([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)) {
     $Delimiter = ";"
+)
+function PrepareEnvironment {
+
+    param(
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $Modules,
+        [int16]
+        $Version
+    )
+    
+    process {
+
+        $LibraryURL = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/ModuleManager.ps1"
+
+        $Client = New-Object System.Net.WebClient
+    
+        $Client.DownloadFile($LibraryURL, ".\ModuleManager.ps1")
+
+        .\ModuleManager.ps1 -Modules $Modules -CompatibleVersion $Version 
+
+    }
+    
 }
 
 
 if ([string]::IsNullOrWhiteSpace($Delimiter)) {
-    Write-Error("Il parametro Delimiter non può essere vuoto")
+    throw "Il parametro Delimiter non può essere vuoto"
     exit
-}
-elseif ([string]::IsNullOrWhiteSpace($PathCSV)) {
-    Write-Error("Il parametro PathCSV non può essere vuoto")
+}elseif ([string]::IsNullOrWhiteSpace($PathCSV)) {
+    throw "Il parametro PathCSV non può essere vuoto"
     exit
-}
+} 
 else {
-    Write-host("Parametri:")
-    Write-host("Path CSV: $($PathCSV)")
-    Write-host("Delimitatore del file CSV: $($Delimiter)")
-    Write-Host("***")
+    Write-Output("Parametri:")
+    Write-Output("Path CSV: $($PathCSV)")
+    Write-Output("Delimitatore del file CSV: $($Delimiter)")
+    Write-Output("***")
 }
 
-Write-Host("Preparazione e verifica dell'ambiente in corso, attendere...")
 
-try {
-    $PSTeamsModule = "MicrosoftTeams"
-
-    $ModTeams = Get-InstalledModule -Name $PSTeamsModule
-
-    if ($null -eq $ModTeams) {
-        Install-Module -Name $PSTeamsModule -Force
-    }
-}
-catch {
-    Write-Error("Modulo $($PSTeamsModule) non trovato...")
-    exit
-}
-
-Import-Module -Name $PSTeamsModule
+PrepareEnvironment -Modules "MicrosoftTeams"
 
 Connect-MicrosoftTeams
 
@@ -60,7 +63,7 @@ $team = Get-Team -DisplayName $TeamName
 
 try {
             
-    Write-Host("Verifica del CSV in corso...")
+    Write-Output("Verifica del CSV in corso...")
     $Teams = Import-Csv $PathCSV -Delimiter $Delimiter
 
     ForEach ($Team in $Teams) {
@@ -78,7 +81,7 @@ catch {
 
 try {
             
-    Write-Host("Creazione dei team in corso...")
+    Write-Output("Creazione dei team in corso...")
 
     ForEach ($Team in $Teams) {
         if ( [string]::IsNullOrEmpty($Team.TeamDisplayName) -or [string]::IsNullOrWhiteSpace($Team.TeamDisplayName) ) {
@@ -111,4 +114,4 @@ catch {
     exit
 }
 
-Write-Host("*** Operazione compeltata potrebbero essere necessari alcuni minuti affinché le modifiche diventino visibili ***")
+Write-Output("*** Operazione compeltata potrebbero essere necessari alcuni minuti affinché le modifiche diventino visibili ***")

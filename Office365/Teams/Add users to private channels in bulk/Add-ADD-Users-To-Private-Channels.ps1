@@ -16,82 +16,79 @@
 
 Param
 (
-    [parameter(Mandatory=$true, ValueFromPipeline=$true)]
+    [parameter(Mandatory=$true)]
     [String]
     $PathCSV,
 
-    [parameter(Mandatory=$true, ValueFromPipeline=$true)]
+    [parameter(Mandatory=$true)]
     [String]
     $TeamName,
 
-    [parameter(ValueFromPipeline=$true)]
+    [parameter()]
     [String]
-    $Delimiter,
+    $Delimiter = ";",
 
-    [parameter(ValueFromPipeline=$true)]
+    [parameter()]
     [String]
-    $Role
+    $Role = "Member"
 )
 
-if([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)){
-    $Delimiter = ";"
+function ExitSessions {
+
+    process {
+        Disconnect-MicrosoftTeams -Confirm:$false
+    }
+    
 }
 
-if([string]::IsNullOrEmpty($Role) -or [string]::IsNullOrWhiteSpace($Role)){
-    $Role = "Member"
+function PrepareEnvironment {
+
+    param(
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $Modules,
+        [int16]
+        $Version
+    )
+    
+    process {
+
+        $LibraryURL = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/ModuleManager.ps1"
+
+        $Client = New-Object System.Net.WebClient
+    
+        $Client.DownloadFile($LibraryURL, ".\ModuleManager.ps1")
+
+        .\ModuleManager.ps1 -Modules $Modules -CompatibleVersion $Version 
+
+    }
+    
 }
 
 
 if ([string]::IsNullOrWhiteSpace($Delimiter)) {
-    Write-Error("Il parametro Delimiter non può essere vuoto")
+    throw "Il parametro Delimiter non può essere vuoto"
     exit
 } elseif ([string]::IsNullOrWhiteSpace($TeamName)) {
-    Write-Error("Il parametro TeamName non può essere vuoto")
+    throw "Il parametro TeamName non può essere vuoto"
     exit
 }elseif ([string]::IsNullOrWhiteSpace($PathCSV)) {
-    Write-Error("Il parametro PathCSV non può essere vuoto")
+    throw "Il parametro PathCSV non può essere vuoto"
     exit
 }elseif ([string]::IsNullOrWhiteSpace($Role)) {
-    Write-Error("Il parametro Role non può essere vuoto")
-    exit    
+    throw "Il parametro Role non può essere vuoto"
+    exit
 }else {
-    Write-host("Riepilogo parametri:")
-    Write-host("Path CSV: $($PathCSV)")
-    Write-host("Delimitatore del file CSV: $($Delimiter)")
-    Write-host("Nome del team: $($TeamName)")
-    Write-host("Ruolo nel team: $($Role)")
-    Write-host("***")
+    Write-Output("Riepilogo parametri:")
+    Write-Output("Path CSV: $($PathCSV)")
+    Write-Output("Delimitatore del file CSV: $($Delimiter)")
+    Write-Output("Nome del team: $($TeamName)")
+    Write-Output("Ruolo nel team: $($Role)")
+    Write-Output("***")
 
 }
 
-
-Write-Host("Preparazione e verifica dell'ambiente in corso, attendere...")
-
-try {
-    $PSTeamsModule = "MicrosoftTeams"
-
-    $ModTeams = Get-InstalledModule -Name $PSTeamsModule
-
-    if ($null -eq $ModTeams) {
-        Install-Module -Name $PSTeamsModule -AllowPrerelease -RequiredVersion "1.1.5-preview" -Force
-    }
-    
-    if (-Not "1.1.5-preview" -eq $ModTeams.Version) {
-        Uninstall-Module -Name $PSTeamsModule -AllVersions -AcceptLicense -Force
-        Write-Warning("è necessario riavviare powershell e rilanciare lo script, premere un tasto per confermare.")
-        Read-Host
-        Exit
-    }
-}
-catch {
-    Write-Error("Modulo $($PSTeamsModule) non trovato...")
-    break
-}
-
-Import-Module -Name $PSTeamsModule
-
-Write-Host("Riepilogo moduli trovati")
-Get-InstalledModule -Name $PSTeamsModule
+PrepareEnvironment -Modules "MicrosoftTeams"
 
 Connect-MicrosoftTeams
 
@@ -106,7 +103,7 @@ try {
     $FileName = $TempFileName.Replace(".CSV", "")
     $OutputName = "$($FileName).txt"
 
-    Write-Host("Ricerca del Team $($TeamName) in corso, attendere...")
+    Write-Output("Ricerca del Team $($TeamName) in corso, attendere...")
     $Team = Get-Team -DisplayName $TeamName
 
     if ($null -eq $Team) {
@@ -115,10 +112,10 @@ try {
     }
 
     try {
-        
+
         try {
-            
-            Write-Host("Verifica del CSV in corso...")
+
+            Write-Output("Verifica del CSV in corso...")
             $Users = Import-Csv $PathCSV -Delimiter $Delimiter
 
             ForEach ($User in $Users) {
@@ -139,7 +136,7 @@ try {
             exit
         }
         
-        Write-Host("Ricerca dei canali del Team $($TeamName) in corso, attendere...")
+        Write-Output("Ricerca dei canali del Team $($TeamName) in corso, attendere...")
 
         $ChannelsCSV = $Users.Channel | Select-Object -Unique
         $Channels = Get-TeamChannel -GroupId $Team.GroupId
@@ -162,7 +159,7 @@ try {
             
         }
 
-        Write-Host("Ricerca dei membri gia presenti nel team $($Team.DisplayName) in corso...")
+        Write-Output("Ricerca dei membri gia presenti nel team $($Team.DisplayName) in corso...")
         $TeamUsers = Get-TeamUser -GroupId $Team.GroupId -Role $Role
 
         foreach ($User in $Users) {
@@ -172,10 +169,10 @@ try {
                 if (-not $TeamUsers.User.Contains($User.Email)) {
                     try {
                         $ErrorUser = $User
-                        Write-Host("Aggiunta dell'utente $($User.Email) al team $($Team.DisplayName) in corso, attendere...")
+                        Write-Output("Aggiunta dell'utente $($User.Email) al team $($Team.DisplayName) in corso, attendere...")
                         Add-TeamUser -GroupId $Team.GroupId -User $User.Email
                         Start-Sleep -Seconds 45
-                        Write-Host("$($User.Email) aggiunto al team $($Team.DisplayName)")
+                        Write-Output("$($User.Email) aggiunto al team $($Team.DisplayName)")
                     }
                     catch {
                         Write-Error("L'utente $($User.Email) non presente in Microsoft Teams!")
@@ -232,14 +229,13 @@ try {
         } while ($IsNotSpread)
     
 
-        Write-Host("Modifiche propagate. Raccolta delle informazioni necessarie in corso, attendere...")
+        Write-Output("Modifiche propagate. Raccolta delle informazioni necessarie in corso, attendere...")
 
         $Channels = Get-TeamChannel -GroupId $Team.GroupId
-        Write-Host("Canali trovati:")
-        Write-Host("$($Channels.DisplayName)")
+        Write-Output("Canali trovati:")
+        Write-Output("$($Channels.DisplayName)")
 
         $Team = Get-Team -DisplayName $TeamName
-
 
         foreach ($User in $FoundUsers) {
 
@@ -251,10 +247,10 @@ try {
                     if ($ChannelUsers.User.Contains($User.Email)) {
                         try {
                             $ErrorUser = $User
-                            Write-Host("Aggiunta dell'utente $($User.Email) al canale $($User.Channel) del team $($Team.DisplayName) in corso, attendere...")
+                            Write-Output("Aggiunta dell'utente $($User.Email) al canale $($User.Channel) del team $($Team.DisplayName) in corso, attendere...")
                             Add-TeamChannelUser -GroupId $Team.GroupId -DisplayName $User.Channel -User $User.Email
                             Start-Sleep -Seconds 45
-                            Write-Host("$($User.Email) aggiunto al canale $($User.Channel) del team $($Team.DisplayName)")
+                            Write-Output("$($User.Email) aggiunto al canale $($User.Channel) del team $($Team.DisplayName)")
                         }
                         catch {
                             Write-Error("Impossibile aggiungere l'utente al canale!")
@@ -266,10 +262,10 @@ try {
                     else {
                         try {
                             $ErrorUser = $User
-                            Write-Host("Aggiunta dell'utente $($User.Email) al canale $($User.Channel) del team $($Team.DisplayName) in corso, attendere...")
+                            Write-Output("Aggiunta dell'utente $($User.Email) al canale $($User.Channel) del team $($Team.DisplayName) in corso, attendere...")
                             Add-TeamChannelUser -GroupId $Team.GroupId -DisplayName $User.Channel -User $User.Email
                             Start-Sleep -Seconds 45
-                            Write-Host("$($User.Email) aggiunto al canale $($User.Channel) del team $($Team.DisplayName)")
+                            Write-Output("$($User.Email) aggiunto al canale $($User.Channel) del team $($Team.DisplayName)")
                         }
                         catch {
                             Write-Error("Impossibile aggiungere l'utente al canale!")
@@ -289,8 +285,8 @@ try {
         }
         
         Write-Warning("*** Potrebbero essere necessari alcuni minuti affiché le modifiche diventino visibile nell'applicazione. ***")
-        Write-Host("*** Operazione compeltata. Premere un tasto per uscire. ***")
-        Read-Host 
+        Write-Output("*** Operazione compeltata. Premere un tasto per uscire. ***")
+        Read-Host
 
     }
     catch {
@@ -300,3 +296,7 @@ try {
 catch {
     Write-Error("Errore: il team non esiste")
 }
+
+ExitSessions
+
+Write-Output("Esecuzione script completata.")

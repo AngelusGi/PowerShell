@@ -19,77 +19,82 @@
 
 Param
 (
-    [parameter(Mandatory=$true, ValueFromPipeline=$true)]
+    [parameter(Mandatory=$true)]
     [String]
     $PathCSV,
 
-    [parameter(Mandatory=$true, ValueFromPipeline=$true)]
+    [parameter(Mandatory=$true)]
     [String]
     $TeamName,
 
-    [parameter(ValueFromPipeline=$true)]
+    [parameter()]
     [String]
-    $Delimiter,
+    $Delimiter = ";",
 
-    [parameter(ValueFromPipeline=$true)]
+    [parameter()]
     [String]
-    $Role
+    $Role = "Member"
+    
 )
 
-if([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)){
-    $Delimiter = ";"
-}
+function ExitSessions {
 
-if([string]::IsNullOrEmpty($Role) -or [string]::IsNullOrWhiteSpace($Role)){
-    $Role = "Member"
-}
-
-
-
-if ([string]::IsNullOrWhiteSpace($Delimiter)) {
-    Write-Error("Il parametro Delimiter non può essere vuoto")
-    exit
-} elseif ([string]::IsNullOrWhiteSpace($TeamName)) {
-    Write-Error("Il parametro TeamName non può essere vuoto")
-    exit
-}elseif ([string]::IsNullOrWhiteSpace($PathCSV)) {
-    Write-Error("Il parametro PathCSV non può essere vuoto")
-    exit
-}elseif ([string]::IsNullOrWhiteSpace($Role)) {
-    Write-Error("Il parametro Role non può essere vuoto")
-    exit    
-}else {
-    Write-host("Riepilogo parametri:")
-    Write-host("Path CSV: $($PathCSV)")
-    Write-host("Delimitatore del file CSV: $($Delimiter)")
-    Write-host("Nome del team: $($TeamName)")
-    Write-host("Ruolo nel team: $($Role)")
-    Write-host("***")
-
-}
-
-
-Write-Host("Preparazione e verifica dell'ambiente in corso, attendere...")
-
-try {
-    $PSTeamsModule = "MicrosoftTeams"
-
-    $ModTeams = Get-InstalledModule -Name $PSTeamsModule
-
-    if ($null -eq $ModTeams) {
-        Install-Module -Name $PSTeamsModule -Scope CurrentUser -Force
+    process {
+        Disconnect-MicrosoftTeams -Confirm:$false
     }
     
 }
-catch {
-    Write-Error("Modulo $($PSTeamsModule) non trovato...")
-    break
+
+
+function PrepareEnvironment {
+
+    param(
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $Modules,
+        [int16]
+        $Version
+    )
+    
+    process {
+
+        $LibraryURL = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/ModuleManager.ps1"
+
+        $Client = New-Object System.Net.WebClient
+    
+        $Client.DownloadFile($LibraryURL, ".\ModuleManager.ps1")
+
+        .\ModuleManager.ps1 -Modules $Modules -CompatibleVersion $Version 
+
+    }
+    
 }
 
-Import-Module -Name $PSTeamsModule
 
-Write-Host("Riepilogo moduli trovati")
-Get-InstalledModule -Name $PSTeamsModule
+if ([string]::IsNullOrWhiteSpace($Delimiter)) {
+    throw "Il parametro Delimiter non può essere vuoto"
+    exit
+} elseif ([string]::IsNullOrWhiteSpace($TeamName)) {
+    throw "Il parametro TeamName non può essere vuoto"
+    exit
+}elseif ([string]::IsNullOrWhiteSpace($PathCSV)) {
+    throw "Il parametro PathCSV non può essere vuoto"
+    exit
+}elseif ([string]::IsNullOrWhiteSpace($Role)) {
+    throw "Il parametro Role non può essere vuoto"
+    exit
+}else {
+    Write-Output("Riepilogo parametri:")
+    Write-Output("Path CSV: $($PathCSV)")
+    Write-Output("Delimitatore del file CSV: $($Delimiter)")
+    Write-Output("Nome del team: $($TeamName)")
+    Write-Output("Ruolo nel team: $($Role)")
+    Write-Output("***")
+
+}
+
+
+PrepareEnvironment -Modules "MicrosoftTeams"
 
 Connect-MicrosoftTeams
 
@@ -104,7 +109,7 @@ try {
     $FileName = $TempFileName.Replace(".CSV", "")
     $OutputName = "$($FileName).txt"
 
-    Write-Host("Ricerca del Team $($TeamName) in corso, attendere...")
+    Write-Output("Ricerca del Team $($TeamName) in corso, attendere...")
     $Team = Get-Team -DisplayName $TeamName
 
     if ($null -eq $Team) {
@@ -116,7 +121,7 @@ try {
         
         try {
             
-            Write-Host("Verifica del CSV in corso...")
+            Write-Output("Verifica del CSV in corso...")
             $Users = Import-Csv $PathCSV -Delimiter $Delimiter
 
             ForEach ($User in $Users) {
@@ -133,7 +138,7 @@ try {
         }
         
 
-        Write-Host("Ricerca dei membri gia presenti nel team $($Team.DisplayName) in corso...")
+        Write-Output("Ricerca dei membri gia presenti nel team $($Team.DisplayName) in corso...")
         $TeamUsers = Get-TeamUser -GroupId $Team.GroupId -Role $Role
 
         foreach ($User in $Users) {
@@ -143,10 +148,10 @@ try {
                 if ( ($null -eq $TeamUsers) -or (-not $TeamUsers.User.Contains($User.Email))) {
                     try {
                         $ErrorUser = $User
-                        Write-Host("Aggiunta dell'utente $($User.Email) al team $($Team.DisplayName) in corso, attendere...")
+                        Write-Output("Aggiunta dell'utente $($User.Email) al team $($Team.DisplayName) in corso, attendere...")
                         Add-TeamUser -GroupId $Team.GroupId -User $User.Email
                         Start-Sleep -Seconds 15
-                        Write-Host("$($User.Email) aggiunto al team $($Team.DisplayName)")
+                        Write-Output("$($User.Email) aggiunto al team $($Team.DisplayName)")
                     }
                     catch {
                         Write-Error("L'utente $($User.Email) non presente in Microsoft Teams!")
@@ -165,7 +170,7 @@ try {
         }
         
         Write-Warning("*** Potrebbero essere necessari alcuni minuti affiché le modifiche diventino visibile nell'applicazione. ***")
-        Write-Host("*** Operazione compeltata. Premere un tasto per uscire. ***")
+        Write-Output("*** Operazione compeltata. Premere un tasto per uscire. ***")
         Read-Host 
 
     }
@@ -176,3 +181,7 @@ try {
 catch {
     Write-Error("Errore: il team non esiste")
 }
+
+ExitSessions
+
+Write-Output("Esecuzione script completata.")
