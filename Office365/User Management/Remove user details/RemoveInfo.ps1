@@ -35,14 +35,14 @@ function PrepareEnvironment {
 PrepareEnvironment -Modules "MSOnline"
 
 try {
-  
-    $ok = 's'
-    $stop = 'n'
+
+    Set-Variable ok -Value 's' -Option ReadOnly
+    Set-Variable stop -Value 'n' -Option ReadOnly
 
     do {
         Clear-Host
         Write-Warning("Questo script eliminerà le informazioni MobilePhone, Office, PhoneNumber, Fax , City, Department, Title dai profili di tutti gli utenti.")
-        $response = Read-Host("Continuare? [s/n]")
+        $response = Read-Host("Continuare? [$($ok)/$($stop)]")
     
         Write-Output("")
 
