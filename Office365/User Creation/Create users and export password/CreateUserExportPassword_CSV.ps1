@@ -11,11 +11,11 @@
 
 Param
 (
-    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true)]
     [String]
     $PathCSV,
 
-    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true)]
     [String]
     $DomainName,
 
@@ -23,87 +23,88 @@ Param
     [bool]
     $StaticPswd,   
 
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [string]
     $Pswd,
 
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [String]
-    $CountryCode,
+    $CountryCode = "IT",
 
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [String]
-    $Delimiter,
+    $Delimiter = ";",
 
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [String]
-    $DataLocation
+    $DataLocation = "EUR"
 )
 
 
-if ($PSVersionTable.PSVersion.Major -ne 5) {
-    Write-Error("Questo script può essere eseguita solo con la versione 5 di Windows PowerShell")
-    exit
-}
+function PrepareEnvironment {
 
-if ([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)) {
-    $Delimiter = ";"
-}
+    param(
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $Modules,
+        [int16]
+        $Version
+    )
+    
+    process {
 
-if ([string]::IsNullOrEmpty($DataLocation) -or [string]::IsNullOrWhiteSpace($DataLocation)) {
-    $DataLocation = "EUR"
-}
+        $LibraryURL = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/ModuleManager.ps1"
 
-if ([string]::IsNullOrEmpty($CountryCode) -or [string]::IsNullOrWhiteSpace($CountryCode)) {
-    $CountryCode = "IT"
+        $Client = New-Object System.Net.WebClient
+    
+        $Client.DownloadFile($LibraryURL, ".\ModuleManager.ps1")
+
+        .\ModuleManager.ps1 -Modules $Modules -CompatibleVersion $Version 
+
+    }
+    
 }
 
 
 if ([string]::IsNullOrWhiteSpace($Delimiter)) {
     Write-Error("Il parametro Delimiter non può essere vuoto")
-    break
+    exit
 
 }
 elseif ([string]::IsNullOrEmpty($PathCSV) -or [string]::IsNullOrWhiteSpace($PathCSV)) {
     Write-Error("Il parametro PathCSV non può essere vuoto")
-    break
+    exit
 
 }
 elseif ($StaticPswd) {
     if ([string]::IsNullOrEmpty($Pswd) -or [string]::IsNullOrWhiteSpace($Pswd)) {
         Write-Error("Il parametro Pswd non può essere vuoto avendo impostato una password statica (uguale per tutti al primo accesso)")
-        break
+        exit
     
     }
 }
 elseif ([string]::IsNullOrEmpty($DomainName) -or [string]::IsNullOrWhiteSpace($DomainName)) {
     Write-Error("Il parametro DomainName non può essere vuoto")
-    break
+    exit
 
 }
 
 
 Write-Warning("Parametri immessi:")
-Write-host("Path CSV: $($PathCSV)")
-Write-host("Delimitatore del file CSV: $($Delimiter)")
-Write-host("Nome dominio: $($DomainName)")
-Write-host("Password statica (comune per tutti al primo accesso): $($StaticPswd)")
+Write-Output("Path CSV: $($PathCSV)")
+Write-Output("Delimitatore del file CSV: $($Delimiter)")
+Write-Output("Nome dominio: $($DomainName)")
+Write-Output("Password statica (comune per tutti al primo accesso): $($StaticPswd)")
 
 if ($StaticPswd) {
         
-    Write-host("Passowrd predefinita: $($Pswd)")
+    Write-Output("Passowrd predefinita: $($Pswd)")
 }
 
-Write-host("Country code: $($CountryCode)")
-Write-Host("***")
+Write-Output("Country code: $($CountryCode)")
+Write-Output("***")
 
-Write-Warning("Verifica dell'ambiente in corso...")
-
-Install-Module MSOnline -Scope CurrentUser
-
-Get-InstalledModule -Name MSOnline
-
-Import-Module MSOnline
+PrepareEnvironment -Modules "MSOnline" -Version 5
 
 try {
     #tenant connection

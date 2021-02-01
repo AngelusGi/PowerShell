@@ -21,7 +21,7 @@ Param
 
     [parameter()]
     [String]
-    $Delimiter,
+    $Delimiter = ',',
 
     [parameter()]
     [string]
@@ -185,8 +185,7 @@ function CheckInputCsv {
 
     process {
 
-        if ([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)) {
-            $Delimiter = ','
+        if (',' -eq $Delimiter) {
             Write-Warning("Si sta utilizzando il delimitatore di default, in quanto non fornito: $($Delimiter)")
         }
         

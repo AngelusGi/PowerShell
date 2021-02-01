@@ -13,11 +13,11 @@
 
 Param
 (
-    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true)]
     [String]
     $PathCSV,
 
-    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true)]
     [String]
     $DomainName,
 
@@ -25,100 +25,98 @@ Param
     [bool]
     $StaticPswd,   
 
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [string]
     $Pswd,
 
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [String]
-    $CountryCode,
+    $CountryCode = "IT",
 
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [String]
-    $Delimiter,
+    $Delimiter = ",",
 
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [String]
-    $DataLocation,
+    $DataLocation = "EUR",
 
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [String]
-    $SMTPServer,
+    $SMTPServer = "smtp.office365.com",
 
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [int]
-    $SMTPPort
+    $SMTPPort = 587
 )
 
 
-if ([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)) {
-    $Delimiter = ";"
-}
+function PrepareEnvironment {
 
-if ([string]::IsNullOrEmpty($DataLocation) -or [string]::IsNullOrWhiteSpace($DataLocation)) {
-    $DataLocation = "EUR"
-}
+    param(
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $Modules,
+        [int16]
+        $Version
+    )
+    
+    process {
 
-if ([string]::IsNullOrEmpty($CountryCode) -or [string]::IsNullOrWhiteSpace($CountryCode)) {
-    $CountryCode = "IT"
-}
+        $LibraryURL = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/ModuleManager.ps1"
 
-if ([string]::IsNullOrEmpty($SMTPServer) -or [string]::IsNullOrWhiteSpace($SMTPServer)) {
-    $SMTPServer = "smtp.office365.com"
-}
+        $Client = New-Object System.Net.WebClient
+    
+        $Client.DownloadFile($LibraryURL, ".\ModuleManager.ps1")
 
-if ($SMTPPort -eq 0) {
-    $SMTPPort = 587
+        .\ModuleManager.ps1 -Modules $Modules -CompatibleVersion $Version 
+
+    }
+    
 }
 
 
 if ([string]::IsNullOrWhiteSpace($Delimiter)) {
     Write-Error("Il parametro Delimiter non può essere vuoto")
-    break
+    exit
 
 }
 elseif ([string]::IsNullOrEmpty($PathCSV) -or [string]::IsNullOrWhiteSpace($PathCSV)) {
     Write-Error("Il parametro PathCSV non può essere vuoto")
-    break
+    exit
 
 }
 elseif ($StaticPswd) {
     if ([string]::IsNullOrEmpty($Pswd) -or [string]::IsNullOrWhiteSpace($Pswd)) {
         Write-Error("Il parametro Pswd non può essere vuoto avendo impostato una password statica (uguale per tutti al primo accesso)")
-        break
+        exit
     
     }
 }
 elseif ([string]::IsNullOrEmpty($DomainName) -or [string]::IsNullOrWhiteSpace($DomainName)) {
     Write-Error("Il parametro DomainName non può essere vuoto")
-    break
+    exit
 
 }
 
 
 Write-Warning("Parametri immessi:")
-Write-host("Path CSV: $($PathCSV)")
-Write-host("Delimitatore del file CSV: $($Delimiter)")
-Write-host("Nome dominio: $($DomainName)")
-Write-host("Password statica (comune per tutti al primo accesso): $($StaticPswd)")
+Write-Output("Path CSV: $($PathCSV)")
+Write-Output("Delimitatore del file CSV: $($Delimiter)")
+Write-Output("Nome dominio: $($DomainName)")
+Write-Output("Password statica (comune per tutti al primo accesso): $($StaticPswd)")
 
 if ($StaticPswd) {
         
-    Write-host("Passowrd predefinita: $($Pswd)")
+    Write-Output("Passowrd predefinita: $($Pswd)")
 }
 
-Write-host("Country code: $($CountryCode)")
-Write-host("Server SMTP: $($SMTPServer)")
-Write-host("Porta SMTP: $($SMTPPort)")
-Write-Host("***")
+Write-Output("Country code: $($CountryCode)")
+Write-Output("Server SMTP: $($SMTPServer)")
+Write-Output("Porta SMTP: $($SMTPPort)")
+Write-Output("***")
 
-Write-Warning("Verifica dell'ambiente in corso...")
-
-Install-Module MSOnline, ExchangeOnlineManagement -Scope CurrentUser
-
-Get-InstalledModule -Name MSOnline, ExchangeOnlineManagement
-
-Import-Module MSOnline, ExchangeOnlineManagement
+PrepareModule -Modules "MSOnline", "ExchangeOnlineManagement"
 
 try {
     #tenant connection

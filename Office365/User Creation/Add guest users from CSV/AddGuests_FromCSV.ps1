@@ -9,42 +9,64 @@
 
 Param
 (
-    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true)]
     [String]
     $DomainName,
 
-    [parameter(ValueFromPipeline = $true)]
+    [parameter()]
     [String]
-    $Delimiter,
+    $Delimiter = ";",
 
-    [parameter(Mandatory=$true, ValueFromPipeline = $true)]
+    [parameter(Mandatory=$true)]
     [String]
-    $PathCSV    
+    $PathCSV
 )
 
 
-if ([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)) {
-    $Delimiter = ";"
+function PrepareEnvironment {
+
+    param(
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $Modules,
+        [int16]
+        $Version
+    )
+    
+    process {
+
+        $LibraryURL = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/ModuleManager.ps1"
+
+        $Client = New-Object System.Net.WebClient
+    
+        $Client.DownloadFile($LibraryURL, ".\ModuleManager.ps1")
+
+        .\ModuleManager.ps1 -Modules $Modules -CompatibleVersion $Version 
+
+    }
+    
 }
+
+
 
 if ([string]::IsNullOrWhiteSpace($Delimiter)) {
     Write-Error("Il parametro Delimiter non può essere vuoto")
-    break
+    exit
 }
 elseif ([string]::IsNullOrEmpty($PathCSV) -or [string]::IsNullOrWhiteSpace($PathCSV)) {
     Write-Error("Il parametro PathCSV non può essere vuoto")
-    break
+    exit
 }
 elseif ([string]::IsNullOrEmpty($DomainName) -or [string]::IsNullOrWhiteSpace($DomainName)) {
     Write-Error("Il parametro DomainName non può essere vuoto")
-    break
+    exit
 }
 else {
-    Write-host("Parametri:")
-    Write-host("Path CSV: $($PathCSV)")
-    Write-host("Delimitatore del file CSV: $($Delimiter)")
-    Write-host("Dominio: $($DomainName)")
-    Write-Host("***")
+    Write-Output("Parametri:")
+    Write-Output("Path CSV: $($PathCSV)")
+    Write-Output("Delimitatore del file CSV: $($Delimiter)")
+    Write-Output("Dominio: $($DomainName)")
+    Write-Output("***")
 }
 
 
@@ -80,10 +102,7 @@ catch {
     exit
 }
 
-Write-Warning("Verifica moduli in corso...")
-Write-Warning("Installazione del modulo Az in corso...")
-
-Install-Module AzureADPreview -Force -Verbose -Scope CurrentUser
+PrepareEnvironment -Modules "AzureADPreview"
 
 Connect-AzureAD -DomainNameDomain $DomainName
 
@@ -93,9 +112,9 @@ $GuestUsers | ForEach-Object {
 
     New-AzureADMSInvitation -InvitedUserDisplayName $DisplayName -InvitedUserEmailAddress $_.Email -InviteRedirectURL https://portal.office.com -SendInvitationMessage $true
    
-    Write-Host("*** Operazione compeltata su $($_.Email) ***")
-    Write-Host("")
-    Write-Host("")
+    Write-Output("*** Operazione compeltata su $($_.Email) ***")
+    Write-Output("")
+    Write-Output("")
 }
 
 Write-Warning("*** Operazione compeltata ***")

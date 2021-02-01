@@ -1,8 +1,52 @@
 # TechNet post https://devblogs.microsoft.com/scripting/use-powershell-to-create-bulk-users-for-office-365/
 
-Uninstall-Module AzureAD 
-Uninstall-Module AzureADPreview 
-Install-Module AzureADPreview 
+[CmdletBinding()]
+param (
+    [Parameter()]
+    [TypeName]
+    $ParameterName,
+
+    # Specifies a path to one or more locations. Unlike the Path parameter, the value of the LiteralPath parameter is
+    # used exactly as it is typed. No characters are interpreted as wildcards. If the path includes escape characters,
+    # enclose it in single quotation marks. Single quotation marks tell Windows PowerShell not to interpret any
+    # characters as escape sequences.
+    [Parameter(Mandatory=$true,
+               Position=0,
+               ParameterSetName="LiteralPath",
+               ValueFromPipelineByPropertyName=$true,
+               HelpMessage="Literal path to one or more locations.")]
+    [Alias("PSPath")]
+    [ValidateNotNullOrEmpty()]
+    [string[]]
+    $LiteralPath
+)
+
+function PrepareEnvironment {
+
+    param(
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $Modules,
+        [int16]
+        $Version
+    )
+    
+    process {
+
+        $LibraryURL = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/ModuleManager.ps1"
+
+        $Client = New-Object System.Net.WebClient
+    
+        $Client.DownloadFile($LibraryURL, ".\ModuleManager.ps1")
+
+        .\ModuleManager.ps1 -Modules $Modules -CompatibleVersion $Version 
+
+    }
+    
+}
+
+
+PrepareEnvironment -Modules "AzureAdPreview","MSOnline"
 
 Connect-AzureAD -TenantDomain "<Tenant_Domain_Name>" # ex. "contoso.onmicorsoft.com"
 
@@ -64,12 +108,12 @@ $users | ForEach-Object {
     # for details see this reference: https://docs.microsoft.com/en-us/powershell/module/msonline/set-msoluserpassword?view=azureadps-1.0
     Set-MsolUserPassword –UserPrincipalName $UserPrincipalName –NewPassword $UsrPswd -ForceChangePassword $True
 
-    Write-Host("*** Operazione compeltata su " + $UserPrincipalName + " | psw: " + $UsrPswd + " ***")
-    Write-Host("")
-    Write-Host("")
+    Write-Output("*** Operazione compeltata su " + $UserPrincipalName + " | psw: " + $UsrPswd + " ***")
+    Write-Output("")
+    Write-Output("")
 
 }
 
-Write-Host("")
-Write-Host("*** OPERAZIONE COMPLETATA ***")
-Write-Host("")
+Write-Output("")
+Write-Output("*** OPERAZIONE COMPLETATA ***")
+Write-Output("")

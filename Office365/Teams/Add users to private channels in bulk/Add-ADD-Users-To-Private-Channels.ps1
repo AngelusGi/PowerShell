@@ -108,7 +108,7 @@ try {
 
     if ($null -eq $Team) {
         Write-Error("Il team indicato non esiste $($TeamName)")
-        break
+        exit
     }
 
     try {
@@ -203,7 +203,7 @@ try {
             foreach ($FoundUserEmail in $FoundUsers.Email) {
                 if (-not $SpreadUsers.User.Contains($FoundUserEmail)) {
                     $IsNotSpread = $true
-                    break
+                    exit
                 }
                 else {
                     $IsNotSpread = $false
@@ -217,7 +217,7 @@ try {
             foreach ($ChannelCSV in $ChannelsCSV) {
                 if (-not $SpreadChannels.DisplayName.Contains($ChannelCSV)) {
                     $IsNotSpread = $true
-                    break
+                    exit
                 }
                 else {
                     $IsNotSpread = $false

@@ -3,68 +3,66 @@
 
 Param
 (
-    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true)]
     [String]
-    $PathCSV,
+    $OldLicense,
 
-    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true)]
     [String]
-    $AzureSubId,
+    $NewLicense,
 
-    [parameter(ValueFromPipeline = $true)]
-    [String]
-    $Delimiter,
-
-    [parameter(ValueFromPipeline = $true)]
+    [parameter(Mandatory = $true)]
     [SecureString]
-    $VmPassword    
+    $UserToChangeLicense    
 )
 
 
-if ([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)) {
-    $Delimiter = ";"
+function PrepareEnvironment {
+
+    param(
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $Modules,
+        [int16]
+        $Version
+    )
+    
+    process {
+
+        $LibraryURL = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/ModuleManager.ps1"
+
+        $Client = New-Object System.Net.WebClient
+    
+        $Client.DownloadFile($LibraryURL, ".\ModuleManager.ps1")
+
+        .\ModuleManager.ps1 -Modules $Modules -CompatibleVersion $Version 
+
+    }
+    
 }
 
-if ([string]::IsNullOrEmpty($VmPassword) -or [string]::IsNullOrWhiteSpace($VmPassword)) {
-    $InvitationText = "Contatta l'amministratore per avere informazioni circa la password."
 
+if ([string]::IsNullOrWhiteSpace($OldLicense)) {
+    Write-Error("Il parametro OldLicense non può essere vuoto")
+    exit
+}
+elseif ([string]::IsNullOrEmpty($NewLicense)) {
+    Write-Error("Il parametro NewLicense non può essere vuoto")
+    exit
+}
+elseif ([string]::IsNullOrEmpty($UserToChangeLicense)) {
+    Write-Error("Il parametro UserToChangeLicense non può essere vuoto")
+    exit
 }
 else {
-    $SecurePassword = $VmPassword | ConvertTo-SecureString -AsPlainText -Force
-    $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecurePassword)
-    $InvitationText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+    Write-Output("Parametri:")
+    Write-Output("Lencenza da rimuovere: $($OldLicense)")
+    Write-Output("Nuova licenza da assegnare: $($NewLicense)")
+    Write-Output("Categoria di utenti (JobTitle) a cui cambiare licenza: $($UserToChangeLicense)")
+    Write-Output("***")
 }
 
-
-if ([string]::IsNullOrWhiteSpace($Delimiter)) {
-    Write-Error("Il parametro Delimiter non può essere vuoto")
-    break
-}
-elseif ([string]::IsNullOrEmpty($PathCSV) -or [string]::IsNullOrWhiteSpace($PathCSV)) {
-    Write-Error("Il parametro PathCSV non può essere vuoto")
-    break
-}
-elseif ([string]::IsNullOrEmpty($AzureSubId) -or [string]::IsNullOrWhiteSpace($AzureSubId)) {
-    Write-Error("Il parametro AzureSubId non può essere vuoto")
-    break
-}
-else {
-    Write-host("Parametri:")
-    Write-host("Path CSV: $($PathCSV)")
-    Write-host("Delimitatore del file CSV: $($Delimiter)")
-    Write-host("Subscription di Azure: $($AzureSubId)")
-    Write-host("Messaggio d'invito: $($InvitationText)")
-    Write-Host("***")
-}
-
-
-
-Install-Module MSOnline
-
-$OldLicense = "OLD LICENSE SKU"
-$NewLicense = "NEW LICENSE SKU"
-$UserToChangeLicense = "docente"
-
+PrepareEnvironment -Modules "MSOnline"
 
 Connect-MsolService -Credential $AdminCred
 
@@ -74,17 +72,17 @@ foreach ($User in $Users){
 
     if ($User.Title -eq  $UserToChangeLicense) {
         $Upn = $User.UserPrincipalName
-        Write-Host("")
+        Write-Output("")
 
-        Write-Host("Modifica in corso su: '$($Upn)'")
+        Write-Output("Modifica in corso su: '$($Upn)'")
 
         Set-MsolUserLicense -UserPrincipalName $Upn -AddLicenses $NewLicense -RemoveLicenses $OldLicense
 
-        Write-Host("")
-        # Write-Host("Modifica terminata su: '$($Upn)'"
+        Write-Output("")
+        # Write-Output("Modifica terminata su: '$($Upn)'"
     }
     
 
 }
 
-Write-Host(" *** OPERAZIONE COMPLETATA *** ")
+Write-Output(" *** OPERAZIONE COMPLETATA *** ")

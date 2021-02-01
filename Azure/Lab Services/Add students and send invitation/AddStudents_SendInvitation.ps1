@@ -19,7 +19,7 @@ Param
 
     [parameter()]
     [String]
-    $Delimiter,
+    $Delimiter = ";",
 
     [parameter()]
     [SecureString]
@@ -52,10 +52,6 @@ function PrepareEnvironment {
 }
 
 
-if ([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)) {
-    $Delimiter = ";"
-}
-
 if ([string]::IsNullOrEmpty($VmPassword) -or [string]::IsNullOrWhiteSpace($VmPassword)) {
     $InvitationText = "Contatta l'amministratore per avere informazioni circa la password."
 
@@ -69,15 +65,15 @@ else {
 
 if ([string]::IsNullOrWhiteSpace($Delimiter)) {
     Write-Error("Il parametro Delimiter non può essere vuoto")
-    break
+    exit
 }
 elseif ([string]::IsNullOrEmpty($PathCSV) -or [string]::IsNullOrWhiteSpace($PathCSV)) {
     Write-Error("Il parametro PathCSV non può essere vuoto")
-    break
+    exit
 }
 elseif ([string]::IsNullOrEmpty($AzureSubId) -or [string]::IsNullOrWhiteSpace($AzureSubId)) {
     Write-Error("Il parametro AzureSubId non può essere vuoto")
-    break
+    exit
 }
 else {
     Write-Output("Parametri:")

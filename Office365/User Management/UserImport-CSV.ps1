@@ -1,6 +1,30 @@
 # TechNet post https://devblogs.microsoft.com/scripting/use-powershell-to-create-bulk-users-for-office-365/
 
-Install-Module MSOnline
+
+function PrepareEnvironment {
+
+    param(
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $Modules,
+        [int16]
+        $Version
+    )
+    
+    process {
+
+        $LibraryURL = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/ModuleManager.ps1"
+
+        $Client = New-Object System.Net.WebClient
+    
+        $Client.DownloadFile($LibraryURL, ".\ModuleManager.ps1")
+
+        .\ModuleManager.ps1 -Modules $Modules -CompatibleVersion $Version 
+
+    }
+    
+}
+
 
 # *** DEFAULT PARAMETERS ****
 $Country = "IT" # Country code "IT" = Italy
@@ -28,6 +52,7 @@ $Role = "MY ROLE" # "MY ROLE" User role's in this CSV # ex. "Docente" or "Studen
 $Class  = "MY DEPARTMENT" # "MY DEPARTMENT" it can be used for identify student's class # ex. "1D" - if you wont use it set as ""
 # *** END USER DATA ***
 
+PrepareEnvironment -Modules "MSOnline"
 
 Connect-MsolService -Credential $AdminCred
 
@@ -60,12 +85,12 @@ $users | ForEach-Object {
     # for details see this reference: https://docs.microsoft.com/en-us/powershell/module/msonline/set-msoluserpassword?view=azureadps-1.0
     Set-MsolUserPassword –UserPrincipalName $UserPrincipalName –NewPassword $UsrPswd -ForceChangePassword $True
 
-    Write-Host("*** Operazione compeltata su " + $UserPrincipalName + " | psw: " + $UsrPswd + " ***")
-    Write-Host("")
-    Write-Host("")
+    Write-Output("*** Operazione compeltata su " + $UserPrincipalName + " | psw: " + $UsrPswd + " ***")
+    Write-Output("")
+    Write-Output("")
 
 }
 
-Write-Host("")
-Write-Host("*** OPERAZIONE COMPLETATA ***")
-Write-Host("")
+Write-Output("")
+Write-Output("*** OPERAZIONE COMPLETATA ***")
+Write-Output("")
