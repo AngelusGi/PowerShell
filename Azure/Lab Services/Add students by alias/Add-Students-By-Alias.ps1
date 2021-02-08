@@ -7,7 +7,20 @@ $secStringPassword = ConvertTo-SecureString $userPassword -AsPlainText -Force
 
 $cred = New-Object System.Management.Automation.PSCredential ($userName, $secStringPassword)
 
+$PathCSV = 
+
 #>
+
+
+# PARAMETERS DESCRIPTION #
+
+# $PathCSV ex. ".\Add-Students-By-Alias.CSV" # Modificare inserendo la path e il nome del file CSV che contiene gli utenti da inserire
+# $Delimiter ex. ',' # Delimitatore del file CSV - valore di default ","
+# $AzureSub # ex. "1234-abcd-5678-xxxx-00yyyy" or "My Subscription" # Azure Subscription Id or Name # Per ottenerlo, usare il comando Connect-AzAccount -> Get-AzSubscription
+# $SendInvitation -> if its value is "$true" the script will invite users to ALS
+# $WelcomeMessage -> you can use this parameter to send a custom message to users
+
+# END PARAMETERS #
 
 Param
 (
@@ -17,12 +30,12 @@ Param
 
     [parameter()]
     [String]
-    $AzureSubId,
+    $AzureSub,
 
     [parameter()]
     [String]
     $Delimiter = ',',
-
+    
     [parameter()]
     [string]
     $SendInvitation,
@@ -96,8 +109,8 @@ function SearchUsers {
                             LabName            = $userToSearch.LabName
                         }
         
-                        # Write-Output($result.Values)
-                        # Write-Output($result.Get_Item("DisplayName"))
+                        # Write-Host($result.Values)
+                        # Write-Host($result.Get_Item("DisplayName"))
         
                         $FoundUsers.Add($result)
                     }
@@ -108,14 +121,14 @@ function SearchUsers {
 
             }
 
-            Write-Output("Utenti processati $($FoundUsers.Count) di $($UsersToSearchFromCsv.Count)")
+            Write-Host("Utenti processati $($FoundUsers.Count) di $($UsersToSearchFromCsv.Count)")
 
         }
 
         # $FoundUsers | Format-List -Property DisplayName,PrimarySmtpAddress
         # $FoundUsers | Format-Table
 
-        Write-Output("Utenti trovati $($FoundUsers.Count) su $($UsersToSearchFromCsv.Count)")
+        Write-Host("Utenti trovati $($FoundUsers.Count) su $($UsersToSearchFromCsv.Count)")
 
         ExportResults -SuccessUsers $FoundUsers -ErrorUsers $NotFoundUsers
 
@@ -185,8 +198,12 @@ function CheckInputCsv {
 
     process {
 
+        if ([string]::IsNullOrEmpty($Delimiter) -or [string]::IsNullOrWhiteSpace($Delimiter)) {
+            $Delimiter = ','
+        }
+
         if (',' -eq $Delimiter) {
-            Write-Warning("Si sta utilizzando il delimitatore di default, in quanto non fornito: $($Delimiter)")
+            Write-Host("Si sta utilizzando il delimitatore di default, in quanto non fornito -> $($Delimiter)")
         }
         
         if ([string]::IsNullOrEmpty($PathCSV) -or [string]::IsNullOrWhiteSpace($PathCSV)) {
@@ -212,7 +229,7 @@ function ProcessCsv {
             Write-Warning("Verifica del CSV in corso...")
             
             $delimiter = CheckInputCsv -Delimiter $Delimiter -PathCSV $PathCsv
-
+            
             $CsvUsers = Import-Csv -Path $PathCSV -Delimiter $delimiter
 
             VerifyCsv -CsvUsers $CsvUsers
@@ -234,6 +251,7 @@ function ExitSessions {
     process {
         Disconnect-ExchangeOnline -Confirm:$false
         Disconnect-AzAccount -Confirm:$false
+        Clear-AzContext -Confirm:$false -Force
         Get-PSSession | Disconnect-PSSession -Confirm:$false
     }
     
@@ -267,8 +285,8 @@ function AddStudentsToLab {
         $UsersToInvite | ForEach-Object {
 
             try {
-                # Write-Output($result.Values)
-                # Write-Output($result.Get_Item("DisplayName"))
+                # Write-Host($result.Values)
+                # Write-Host($result.Get_Item("DisplayName"))
 
                 $labName = $_.Get_Item("LabName")
                 $userEmail = $_.Get_Item("PrimarySmtpAddress")
@@ -276,7 +294,7 @@ function AddStudentsToLab {
                 if (($null -ne $labName) -and ($null -ne $userEmail)) {
                     $Lab = Get-AzLabAccount | Get-AzLab -LabName $labName
 
-                    Add-AzLabUser  -Lab $Lab -Emails $userEmail
+                    Add-AzLabUser -Lab $Lab -Emails $userEmail
                     Write-Warning("*** Aggiunta al laboratorio $($labName) di $($userEmail) completata ***")
 
                     $LabsList.Add($labName)
@@ -312,7 +330,6 @@ function AddStudentsToLab {
     
             }
         }
-
         
     }
     
@@ -341,7 +358,7 @@ function ExportResults {
 
 # BODY
 
-PrepareEnvironment -Modules "ExchangeOnlineManagement", "Az", "Az.LabServices"
+PrepareEnvironment -Modules "ExchangeOnlineManagement", "Az", "Az.LabServices" -Version 5
 
 $cred = Get-Credential
 
@@ -351,10 +368,15 @@ $UserAlias = Get-DataFromExchange
 
 $FoundUsers = Get-UsersToSearch -PathCsv $PathCSV -UsersFromExchange $UserAlias
 
-Connect-AzAccount -Credential $cred
+if ([string]::IsNullOrEmpty($AzureSub) -or [string]::IsNullOrWhiteSpace($AzureSub)) {
+    Connect-AzAccount -Credential $cred
+}
+else {
+    Connect-AzAccount -Credential $cred -Subscription $AzureSub
+}
 
 AddStudentsToLab -UsersToInvite $FoundUsers
 
 ExitSessions
 
-Write-Output("***Esecuzione script completata ***")
+Write-Host("***Esecuzione script completata ***")

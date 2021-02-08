@@ -1,9 +1,20 @@
+<# TEST PURPOSE
+
+$userName = 
+$userPassword = 
+
+$secStringPassword = ConvertTo-SecureString $userPassword -AsPlainText -Force
+
+$cred = New-Object System.Management.Automation.PSCredential ($userName, $secStringPassword)
+
+#>
+
 # PARAMETERS DESCRIPTION #
 
-# $PathCSV ex. ".\csv_test.CSV" # Modificare inserendo la path e il nome del file CSV che contiene gli utenti da inserire
-# $Delimiter ex. ';' # Delimitatore del file CSV - valore di default ";"
+# $PathCSV ex. ".\AddStudents_SendInvitation.CSV" # Modificare inserendo la path e il nome del file CSV che contiene gli utenti da inserire
+# $Delimiter ex. ',' # Delimitatore del file CSV - valore di default ";"
 # $VmPassword # ex. "Contoso1234@" # Password dell'utente locale della macchina virtuale
-# $AzureSubId # ex. "1234-abcd-5678-xxxx-00yyyy" # Azure Subscription Id # Per ottenerlo, usare il comando Connect-AzAccount -> Get-AzSubscription
+# $AzureSub # ex. "1234-abcd-5678-xxxx-00yyyy" or "My Subscription" # Azure Subscription Id or Name # Per ottenerlo, usare il comando Connect-AzAccount -> Get-AzSubscription
 
 # END PARAMETERS #
 
@@ -15,7 +26,7 @@ Param
 
     [parameter(Mandatory = $true)]
     [String]
-    $AzureSubId,
+    $AzureSub,
 
     [parameter()]
     [String]
@@ -71,15 +82,15 @@ elseif ([string]::IsNullOrEmpty($PathCSV) -or [string]::IsNullOrWhiteSpace($Path
     Write-Error("Il parametro PathCSV non può essere vuoto")
     exit
 }
-elseif ([string]::IsNullOrEmpty($AzureSubId) -or [string]::IsNullOrWhiteSpace($AzureSubId)) {
-    Write-Error("Il parametro AzureSubId non può essere vuoto")
+elseif ([string]::IsNullOrEmpty($AzureSub) -or [string]::IsNullOrWhiteSpace($AzureSub)) {
+    Write-Error("Il parametro AzureSub non può essere vuoto")
     exit
 }
 else {
     Write-Output("Parametri:")
     Write-Output("Path CSV: $($PathCSV)")
     Write-Output("Delimitatore del file CSV: $($Delimiter)")
-    Write-Output("Subscription di Azure: $($AzureSubId)")
+    Write-Output("Subscription di Azure: $($AzureSub)")
     Write-Output("Messaggio d'invito: $($InvitationText)")
     Write-Output("***")
 }
@@ -115,7 +126,7 @@ catch {
 
 PrepareEnvironment -Modules "Az","Az.LabServices"
 
-Connect-AzAccount -SubscriptionId $AzureSubId
+Connect-AzAccount -SubscriptionId $AzureSub
 
 $Users | ForEach-Object {
 

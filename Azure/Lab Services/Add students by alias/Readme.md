@@ -8,7 +8,7 @@ Those parameters are <b>mandatory</b>:
 
 Those parameters are <b>optional</b>:
 * Delimiter -> the values' delimiter in the CSV file, if black, the default value is ","
-* AzureSubId -> if you have multiple Azure Subscription, please insert the ID of the one wich contains the Lab Account
+* AzureSub -> if you have multiple Azure Subscription, please insert the <b>ID</b> or the <b>Name</b> of the one wich contains the Lab Account
 
 Using default values the script will only add students to the lab. If you want to invite them using this script, consider to use those two optional parameters:
 * SendInvitation -> if its value is "$true" the script will invite users to ALS
