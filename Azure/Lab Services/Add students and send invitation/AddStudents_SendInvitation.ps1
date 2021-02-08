@@ -19,7 +19,7 @@ Param
 
     [parameter()]
     [String]
-    $Delimiter = ";",
+    $Delimiter = ",",
 
     [parameter()]
     [SecureString]
@@ -43,7 +43,7 @@ function PrepareEnvironment {
 
         $Client = New-Object System.Net.WebClient
     
-        $Client.DownloadFile($LibraryURL, ".\ModuleManager.ps1")
+        $Client.DownloadFile($LibraryURL, "ModuleManager.ps1")
 
         .\ModuleManager.ps1 -Modules $Modules -CompatibleVersion $Version 
 
@@ -83,8 +83,6 @@ else {
     Write-Output("Messaggio d'invito: $($InvitationText)")
     Write-Output("***")
 }
-
-Write-Warning("Verifica dell'ambiente in corso...")
 
 
 try {
