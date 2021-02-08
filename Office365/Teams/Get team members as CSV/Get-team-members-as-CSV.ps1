@@ -56,7 +56,7 @@ function ExportResults {
         $currentPath = Get-Location
 
         Write-Warning("Esportazione utenti completata di $($FileName)")
-        Write-Output("Percorso di output $($currentPath.Path)")
+        Write-Host("Percorso di output $($currentPath.Path)")
 
     }
 }
@@ -68,7 +68,7 @@ PrepareEnvironment -Modules "MicrosoftTeams"
 Connect-MicrosoftTeams
 
 Write-Warning("Ricerca del team $($TeamName) in corso, attendere.")
-Write-Output("A seconda della dimensione della tua organizzazione e del numero di team, l'operazine potrebbe richiedere alcuni minuti.")
+Write-Host("A seconda della dimensione della tua organizzazione e del numero di team, l'operazine potrebbe richiedere alcuni minuti.")
 
 $TeamsData = Get-Team -DisplayName $TeamName
 
@@ -82,17 +82,17 @@ if ($null -eq $TeamsData) {
 }
 else {
 
-    Write-Output("Team trovati: $($TeamsData.Count)")
+    Write-Host("Team trovati: $($TeamsData.Count)")
 
     foreach ($TeamData in $TeamsData) {
-        Write-Output("")
+        Write-Host("")
 
         Write-Warning("Riepilogo dati del team:")
-        Write-Output("DisplayName: " + $TeamData.DisplayName)
-        Write-Output("NickName: " + $TeamData.MailNickName)
-        Write-Output("Visibility: " + $TeamData.Visibility)
+        Write-Host("DisplayName: " + $TeamData.DisplayName)
+        Write-Host("NickName: " + $TeamData.MailNickName)
+        Write-Host("Visibility: " + $TeamData.Visibility)
 
-        Write-Output("")
+        Write-Host("")
 
         Write-Warning("Esportazione utenti in corso sul team $($TeamData.DisplayName), attendere...")
         $UsersList = Get-TeamUser -GroupId $TeamData.GroupId
@@ -105,4 +105,4 @@ else {
 
 ExitSessions
 
-Write-Output("Esecuzione script completata.")
+Write-Host("Esecuzione script completata.")

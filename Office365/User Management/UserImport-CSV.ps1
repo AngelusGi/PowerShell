@@ -85,12 +85,12 @@ $users | ForEach-Object {
     # for details see this reference: https://docs.microsoft.com/en-us/powershell/module/msonline/set-msoluserpassword?view=azureadps-1.0
     Set-MsolUserPassword –UserPrincipalName $UserPrincipalName –NewPassword $UsrPswd -ForceChangePassword $True
 
-    Write-Output("*** Operazione compeltata su " + $UserPrincipalName + " | psw: " + $UsrPswd + " ***")
-    Write-Output("")
-    Write-Output("")
+    Write-Host("*** Operazione compeltata su " + $UserPrincipalName + " | psw: " + $UsrPswd + " ***")
+    Write-Host("")
+    Write-Host("")
 
 }
 
-Write-Output("")
-Write-Output("*** OPERAZIONE COMPLETATA ***")
-Write-Output("")
+Write-Host("")
+Write-Host("*** OPERAZIONE COMPLETATA ***")
+Write-Host("")

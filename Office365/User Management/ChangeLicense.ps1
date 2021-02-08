@@ -55,11 +55,11 @@ elseif ([string]::IsNullOrEmpty($UserToChangeLicense)) {
     exit
 }
 else {
-    Write-Output("Parametri:")
-    Write-Output("Lencenza da rimuovere: $($OldLicense)")
-    Write-Output("Nuova licenza da assegnare: $($NewLicense)")
-    Write-Output("Categoria di utenti (JobTitle) a cui cambiare licenza: $($UserToChangeLicense)")
-    Write-Output("***")
+    Write-Host("Parametri:")
+    Write-Host("Lencenza da rimuovere: $($OldLicense)")
+    Write-Host("Nuova licenza da assegnare: $($NewLicense)")
+    Write-Host("Categoria di utenti (JobTitle) a cui cambiare licenza: $($UserToChangeLicense)")
+    Write-Host("***")
 }
 
 PrepareEnvironment -Modules "MSOnline"
@@ -72,17 +72,17 @@ foreach ($User in $Users){
 
     if ($User.Title -eq  $UserToChangeLicense) {
         $Upn = $User.UserPrincipalName
-        Write-Output("")
+        Write-Host("")
 
-        Write-Output("Modifica in corso su: '$($Upn)'")
+        Write-Host("Modifica in corso su: '$($Upn)'")
 
         Set-MsolUserLicense -UserPrincipalName $Upn -AddLicenses $NewLicense -RemoveLicenses $OldLicense
 
-        Write-Output("")
-        # Write-Output("Modifica terminata su: '$($Upn)'"
+        Write-Host("")
+        # Write-Host("Modifica terminata su: '$($Upn)'"
     }
     
 
 }
 
-Write-Output(" *** OPERAZIONE COMPLETATA *** ")
+Write-Host(" *** OPERAZIONE COMPLETATA *** ")

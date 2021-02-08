@@ -62,11 +62,11 @@ elseif ([string]::IsNullOrEmpty($DomainName) -or [string]::IsNullOrWhiteSpace($D
     exit
 }
 else {
-    Write-Output("Parametri:")
-    Write-Output("Path CSV: $($PathCSV)")
-    Write-Output("Delimitatore del file CSV: $($Delimiter)")
-    Write-Output("Dominio: $($DomainName)")
-    Write-Output("***")
+    Write-Host("Parametri:")
+    Write-Host("Path CSV: $($PathCSV)")
+    Write-Host("Delimitatore del file CSV: $($Delimiter)")
+    Write-Host("Dominio: $($DomainName)")
+    Write-Host("***")
 }
 
 
@@ -112,9 +112,9 @@ $GuestUsers | ForEach-Object {
 
     New-AzureADMSInvitation -InvitedUserDisplayName $DisplayName -InvitedUserEmailAddress $_.Email -InviteRedirectURL https://portal.office.com -SendInvitationMessage $true
    
-    Write-Output("*** Operazione compeltata su $($_.Email) ***")
-    Write-Output("")
-    Write-Output("")
+    Write-Host("*** Operazione compeltata su $($_.Email) ***")
+    Write-Host("")
+    Write-Host("")
 }
 
 Write-Warning("*** Operazione compeltata ***")

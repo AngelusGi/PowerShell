@@ -55,12 +55,12 @@ $NotOnlyOrganizer = 2
 do {
     Clear-Host
 
-    Write-Output("Inserisci il numero inerente la policy che vuoi applicare a livello di tenant:")
-    Write-Output("$($OrganizerOnly). download attendance report disponibile solo per chi ha programmato la riunione")
-    Write-Output("$($NotOnlyOrganizer). download attendance report disponibile per tutti i relatori e partecipanti nel meeting")
+    Write-Host("Inserisci il numero inerente la policy che vuoi applicare a livello di tenant:")
+    Write-Host("$($OrganizerOnly). download attendance report disponibile solo per chi ha programmato la riunione")
+    Write-Host("$($NotOnlyOrganizer). download attendance report disponibile per tutti i relatori e partecipanti nel meeting")
     
     $response = Read-Host("Inserisci 1 o 2 e premi INVIO")
-    Write-Output("")
+    Write-Host("")
 } while (-not (($OrganizerOnly -eq $response) -or ($NotOnlyOrganizer -eq $response)))
 
 $msg = $null
@@ -84,4 +84,4 @@ Write-Warning($msg)
 
 ExitSessions
 
-Write-Output("*** Esecuzione completata ***")
+Write-Host("*** Esecuzione completata ***")

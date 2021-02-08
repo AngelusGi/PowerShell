@@ -310,7 +310,7 @@ C:\Windows\System32\Sysprep\Sysprep.exe /generalize /oobe /shutdown /quiet
 catch {
     $message = $error[0].Exception.Message
     if ($message) {
-        Write-Output("ERROR: $($message)") -ForegroundColor Red
+        Write-Host("ERROR: $($message)") -ForegroundColor Red
     }
 }
 finally {

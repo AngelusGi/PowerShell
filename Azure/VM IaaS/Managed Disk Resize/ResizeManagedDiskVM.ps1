@@ -144,7 +144,7 @@ $VM | Stop-AzVM -Force
 $SAS = Grant-AzDiskAccess -ResourceGroupName $resourceGroupName -DiskName $emptydiskforfootername -Access 'Read' -DurationInSecond 600000;
 
 # Copy the empty disk to blob storage
-Write-Output("Starting: copy the empty disk to blob storage")
+Write-Host("Starting: copy the empty disk to blob storage")
 Start-AzStorageBlobCopy -AbsoluteUri $SAS.AccessSAS -DestContainer $storageContainerName -DestBlob $emptydiskforfootername -DestContext $destinationContext
 while (($state = Get-AzStorageBlobCopyState -Context $destinationContext -Blob $emptydiskforfootername -Container $storageContainerName).Status -ne "Success") { $state; Start-Sleep -Seconds 20 }
 $state
@@ -173,7 +173,7 @@ $footerStream = New-Object -TypeName System.IO.MemoryStream -ArgumentList (, $fo
 write-output "Write footer of empty disk to OSDisk"
 $osDisk.ICloudBlob.WritePages($footerStream, $emptyDiskblob.Length - 512)
 
-Write-Output -InputObject "Removing empty disk blobs"
+Write-Host -InputObject "Removing empty disk blobs"
 $emptyDiskblob | Remove-AzStorageBlob -Force
 
 
@@ -200,23 +200,23 @@ Set-AzVMOSDisk -VM $VM -ManagedDiskId $NewManagedDisk.Id -Name $NewManagedDisk.N
 # Update the VM with the new OS disk
 Update-AzVM -ResourceGroupName $resourceGroupName -VM $VM
 
-Write-Output("Starting VM: $VM")
+Write-Host("Starting VM: $VM")
 $VM | Start-AzVM
-Write-Output("Completed start VM: $VM")
+Write-Host("Completed start VM: $VM")
 
 start-sleep 180
 # Please check the VM is running before proceeding with the below tidy-up steps
 
 # Delete old Managed Disk
-Write-Output("Remove Old Disk: $DiskName")
+Write-Host("Remove Old Disk: $DiskName")
 Remove-AzDisk -ResourceGroupName $resourceGroupName -DiskName $DiskName -Force;
 
 # Delete old blob storage
-Write-Output("Remove Old blob storage: $osdisk")
+Write-Host("Remove Old blob storage: $osdisk")
 $osdisk | Remove-AzStorageBlob -Force
 
 # Delete temp storage account
-Write-Output("Remove temp storage account: $StorageAccount")
+Write-Host("Remove temp storage account: $StorageAccount")
 $StorageAccount | Remove-AzStorageAccount -Force
 
-Write-Output(" *** OPERATION COMPLETE *** ")
+Write-Host(" *** OPERATION COMPLETE *** ")

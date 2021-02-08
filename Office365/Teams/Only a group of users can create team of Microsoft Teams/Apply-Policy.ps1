@@ -76,4 +76,4 @@ Set-AzureADDirectorySetting -Id $settingsObjectID -DirectorySetting $settingsCop
 
 ExitSessions
 
-Write-Output("Esecuzione script completata.")
+Write-Host("Esecuzione script completata.")

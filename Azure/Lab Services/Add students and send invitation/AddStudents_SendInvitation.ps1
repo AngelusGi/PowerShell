@@ -87,12 +87,12 @@ elseif ([string]::IsNullOrEmpty($AzureSub) -or [string]::IsNullOrWhiteSpace($Azu
     exit
 }
 else {
-    Write-Output("Parametri:")
-    Write-Output("Path CSV: $($PathCSV)")
-    Write-Output("Delimitatore del file CSV: $($Delimiter)")
-    Write-Output("Subscription di Azure: $($AzureSub)")
-    Write-Output("Messaggio d'invito: $($InvitationText)")
-    Write-Output("***")
+    Write-Host("Parametri:")
+    Write-Host("Path CSV: $($PathCSV)")
+    Write-Host("Delimitatore del file CSV: $($Delimiter)")
+    Write-Host("Subscription di Azure: $($AzureSub)")
+    Write-Host("Messaggio d'invito: $($InvitationText)")
+    Write-Host("***")
 }
 
 

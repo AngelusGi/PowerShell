@@ -20,7 +20,7 @@ param (
 $DomainsCsv = Import-Csv -Path $InputCsv -Delimiter $Delimiter -Encoding $Encoding
 
 foreach ($item in $DomainsCsv) {
-    Write-Output("Ricerca di $($item) in corso...")
+    Write-Host("Ricerca di $($item) in corso...")
     Resolve-DnsName -Name $item.Domain -Type $SearchType | Export-Csv $OutputCsv -Append -Force
 
 }

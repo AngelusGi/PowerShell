@@ -91,18 +91,18 @@ elseif ([string]::IsNullOrEmpty($DomainName) -or [string]::IsNullOrWhiteSpace($D
 
 
 Write-Warning("Parametri immessi:")
-Write-Output("Path CSV: $($PathCSV)")
-Write-Output("Delimitatore del file CSV: $($Delimiter)")
-Write-Output("Nome dominio: $($DomainName)")
-Write-Output("Password statica (comune per tutti al primo accesso): $($StaticPswd)")
+Write-Host("Path CSV: $($PathCSV)")
+Write-Host("Delimitatore del file CSV: $($Delimiter)")
+Write-Host("Nome dominio: $($DomainName)")
+Write-Host("Password statica (comune per tutti al primo accesso): $($StaticPswd)")
 
 if ($StaticPswd) {
         
-    Write-Output("Passowrd predefinita: $($Pswd)")
+    Write-Host("Passowrd predefinita: $($Pswd)")
 }
 
-Write-Output("Country code: $($CountryCode)")
-Write-Output("***")
+Write-Host("Country code: $($CountryCode)")
+Write-Host("***")
 
 PrepareEnvironment -Modules "MSOnline" -Version 5
 

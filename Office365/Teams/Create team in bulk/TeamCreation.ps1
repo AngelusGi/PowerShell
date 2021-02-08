@@ -48,10 +48,10 @@ if ([string]::IsNullOrWhiteSpace($Delimiter)) {
     exit
 } 
 else {
-    Write-Output("Parametri:")
-    Write-Output("Path CSV: $($PathCSV)")
-    Write-Output("Delimitatore del file CSV: $($Delimiter)")
-    Write-Output("***")
+    Write-Host("Parametri:")
+    Write-Host("Path CSV: $($PathCSV)")
+    Write-Host("Delimitatore del file CSV: $($Delimiter)")
+    Write-Host("***")
 }
 
 
@@ -63,7 +63,7 @@ $team = Get-Team -DisplayName $TeamName
 
 try {
             
-    Write-Output("Verifica del CSV in corso...")
+    Write-Host("Verifica del CSV in corso...")
     $Teams = Import-Csv $PathCSV -Delimiter $Delimiter
 
     ForEach ($Team in $Teams) {
@@ -81,7 +81,7 @@ catch {
 
 try {
             
-    Write-Output("Creazione dei team in corso...")
+    Write-Host("Creazione dei team in corso...")
 
     ForEach ($Team in $Teams) {
         if ( [string]::IsNullOrEmpty($Team.TeamDisplayName) -or [string]::IsNullOrWhiteSpace($Team.TeamDisplayName) ) {
@@ -114,4 +114,4 @@ catch {
     exit
 }
 
-Write-Output("*** Operazione compeltata potrebbero essere necessari alcuni minuti affinché le modifiche diventino visibili ***")
+Write-Host("*** Operazione compeltata potrebbero essere necessari alcuni minuti affinché le modifiche diventino visibili ***")

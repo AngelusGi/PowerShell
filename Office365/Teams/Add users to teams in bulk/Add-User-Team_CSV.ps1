@@ -65,14 +65,14 @@ if ([string]::IsNullOrWhiteSpace($Delimiter)) {
     exit
 }
 else {
-    Write-Output("Parametri:")
-    Write-Output("Path CSV: $($PathCSV)")
-    Write-Output("Delimitatore del file CSV: $($Delimiter)")
-    Write-Output("Nome del team: $($TeamName)")
-    Write-Output("***")
+    Write-Host("Parametri:")
+    Write-Host("Path CSV: $($PathCSV)")
+    Write-Host("Delimitatore del file CSV: $($Delimiter)")
+    Write-Host("Nome del team: $($TeamName)")
+    Write-Host("***")
 }
 
-Write-Output("Preparazione e verifica dell'ambiente in corso, attendere...")
+Write-Host("Preparazione e verifica dell'ambiente in corso, attendere...")
 
 PrepareEnvironment -Modules "MicrosoftTeams"
 
@@ -109,7 +109,7 @@ try {
 
     Write-Warning("Team trovato:")
 
-    Write-Output($team)
+    Write-Host($team)
     
     $guestUsers = Import-Csv $PathCSV -Delimiter $Delimiter
 
@@ -128,8 +128,8 @@ try {
             Write-Error("Errore, nessun team riconosciuto. Il nome team del CSV non è un nome valido.")
         }
 
-        Write-Output("")
-        Write-Output("")
+        Write-Host("")
+        Write-Host("")
     }
 
 }
@@ -139,4 +139,4 @@ catch {
 
 ExitSessions
 
-Write-Output("Esecuzione script completata.")
+Write-Host("Esecuzione script completata.")

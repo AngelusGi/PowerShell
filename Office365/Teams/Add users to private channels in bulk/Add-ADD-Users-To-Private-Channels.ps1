@@ -79,12 +79,12 @@ if ([string]::IsNullOrWhiteSpace($Delimiter)) {
     throw "Il parametro Role non può essere vuoto"
     exit
 }else {
-    Write-Output("Riepilogo parametri:")
-    Write-Output("Path CSV: $($PathCSV)")
-    Write-Output("Delimitatore del file CSV: $($Delimiter)")
-    Write-Output("Nome del team: $($TeamName)")
-    Write-Output("Ruolo nel team: $($Role)")
-    Write-Output("***")
+    Write-Host("Riepilogo parametri:")
+    Write-Host("Path CSV: $($PathCSV)")
+    Write-Host("Delimitatore del file CSV: $($Delimiter)")
+    Write-Host("Nome del team: $($TeamName)")
+    Write-Host("Ruolo nel team: $($Role)")
+    Write-Host("***")
 
 }
 
@@ -103,7 +103,7 @@ try {
     $FileName = $TempFileName.Replace(".CSV", "")
     $OutputName = "$($FileName).txt"
 
-    Write-Output("Ricerca del Team $($TeamName) in corso, attendere...")
+    Write-Host("Ricerca del Team $($TeamName) in corso, attendere...")
     $Team = Get-Team -DisplayName $TeamName
 
     if ($null -eq $Team) {
@@ -115,7 +115,7 @@ try {
 
         try {
 
-            Write-Output("Verifica del CSV in corso...")
+            Write-Host("Verifica del CSV in corso...")
             $Users = Import-Csv $PathCSV -Delimiter $Delimiter
 
             ForEach ($User in $Users) {
@@ -136,7 +136,7 @@ try {
             exit
         }
         
-        Write-Output("Ricerca dei canali del Team $($TeamName) in corso, attendere...")
+        Write-Host("Ricerca dei canali del Team $($TeamName) in corso, attendere...")
 
         $ChannelsCSV = $Users.Channel | Select-Object -Unique
         $Channels = Get-TeamChannel -GroupId $Team.GroupId
@@ -159,7 +159,7 @@ try {
             
         }
 
-        Write-Output("Ricerca dei membri gia presenti nel team $($Team.DisplayName) in corso...")
+        Write-Host("Ricerca dei membri gia presenti nel team $($Team.DisplayName) in corso...")
         $TeamUsers = Get-TeamUser -GroupId $Team.GroupId -Role $Role
 
         foreach ($User in $Users) {
@@ -169,10 +169,10 @@ try {
                 if (-not $TeamUsers.User.Contains($User.Email)) {
                     try {
                         $ErrorUser = $User
-                        Write-Output("Aggiunta dell'utente $($User.Email) al team $($Team.DisplayName) in corso, attendere...")
+                        Write-Host("Aggiunta dell'utente $($User.Email) al team $($Team.DisplayName) in corso, attendere...")
                         Add-TeamUser -GroupId $Team.GroupId -User $User.Email
                         Start-Sleep -Seconds 45
-                        Write-Output("$($User.Email) aggiunto al team $($Team.DisplayName)")
+                        Write-Host("$($User.Email) aggiunto al team $($Team.DisplayName)")
                     }
                     catch {
                         Write-Error("L'utente $($User.Email) non presente in Microsoft Teams!")
@@ -229,11 +229,11 @@ try {
         } while ($IsNotSpread)
     
 
-        Write-Output("Modifiche propagate. Raccolta delle informazioni necessarie in corso, attendere...")
+        Write-Host("Modifiche propagate. Raccolta delle informazioni necessarie in corso, attendere...")
 
         $Channels = Get-TeamChannel -GroupId $Team.GroupId
-        Write-Output("Canali trovati:")
-        Write-Output("$($Channels.DisplayName)")
+        Write-Host("Canali trovati:")
+        Write-Host("$($Channels.DisplayName)")
 
         $Team = Get-Team -DisplayName $TeamName
 
@@ -247,10 +247,10 @@ try {
                     if ($ChannelUsers.User.Contains($User.Email)) {
                         try {
                             $ErrorUser = $User
-                            Write-Output("Aggiunta dell'utente $($User.Email) al canale $($User.Channel) del team $($Team.DisplayName) in corso, attendere...")
+                            Write-Host("Aggiunta dell'utente $($User.Email) al canale $($User.Channel) del team $($Team.DisplayName) in corso, attendere...")
                             Add-TeamChannelUser -GroupId $Team.GroupId -DisplayName $User.Channel -User $User.Email
                             Start-Sleep -Seconds 45
-                            Write-Output("$($User.Email) aggiunto al canale $($User.Channel) del team $($Team.DisplayName)")
+                            Write-Host("$($User.Email) aggiunto al canale $($User.Channel) del team $($Team.DisplayName)")
                         }
                         catch {
                             Write-Error("Impossibile aggiungere l'utente al canale!")
@@ -262,10 +262,10 @@ try {
                     else {
                         try {
                             $ErrorUser = $User
-                            Write-Output("Aggiunta dell'utente $($User.Email) al canale $($User.Channel) del team $($Team.DisplayName) in corso, attendere...")
+                            Write-Host("Aggiunta dell'utente $($User.Email) al canale $($User.Channel) del team $($Team.DisplayName) in corso, attendere...")
                             Add-TeamChannelUser -GroupId $Team.GroupId -DisplayName $User.Channel -User $User.Email
                             Start-Sleep -Seconds 45
-                            Write-Output("$($User.Email) aggiunto al canale $($User.Channel) del team $($Team.DisplayName)")
+                            Write-Host("$($User.Email) aggiunto al canale $($User.Channel) del team $($Team.DisplayName)")
                         }
                         catch {
                             Write-Error("Impossibile aggiungere l'utente al canale!")
@@ -285,7 +285,7 @@ try {
         }
         
         Write-Warning("*** Potrebbero essere necessari alcuni minuti affiché le modifiche diventino visibile nell'applicazione. ***")
-        Write-Output("*** Operazione compeltata. Premere un tasto per uscire. ***")
+        Write-Host("*** Operazione compeltata. Premere un tasto per uscire. ***")
         Read-Host
 
     }
@@ -299,4 +299,4 @@ catch {
 
 ExitSessions
 
-Write-Output("Esecuzione script completata.")
+Write-Host("Esecuzione script completata.")

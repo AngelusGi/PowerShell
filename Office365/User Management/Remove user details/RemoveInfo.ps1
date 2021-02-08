@@ -44,10 +44,10 @@ try {
         Write-Warning("Questo script eliminerà le informazioni MobilePhone, Office, PhoneNumber, Fax , City, Department, Title dai profili di tutti gli utenti.")
         $response = Read-Host("Continuare? [$($ok)/$($stop)]")
     
-        Write-Output("")
+        Write-Host("")
 
         if ($response.Equals($stop)) {
-            Write-Output(" *** ESECUZIONE COMPLETATA *** ")
+            Write-Host(" *** ESECUZIONE COMPLETATA *** ")
 
             exit
         }
@@ -63,11 +63,11 @@ try {
         
     foreach ($User in $Users) {
 
-        Write-Output("Modifica in corso su: $($User.UserPrincipalName)")
+        Write-Host("Modifica in corso su: $($User.UserPrincipalName)")
 
         Set-MsolUser -UserPrincipalName $User.UserPrincipalName -MobilePhone $Empty -Office $Empty -PhoneNumber $Empty -Fax $Empty -City $Empty -Department $Empty -Title $Empty
 
-        Write-Output("")
+        Write-Host("")
 
     }
 
@@ -77,5 +77,5 @@ catch {
     
 }
 
-Write-Output(" *** ESECUZIONE COMPLETATA *** ")
+Write-Host(" *** ESECUZIONE COMPLETATA *** ")
     
