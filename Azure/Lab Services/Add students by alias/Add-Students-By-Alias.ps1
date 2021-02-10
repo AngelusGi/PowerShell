@@ -365,19 +365,17 @@ function ExportResults {
 
 PrepareEnvironment -Modules "ExchangeOnlineManagement", "Az", "Az.LabServices" -Version 5
 
-$cred = Get-Credential
-
-Connect-ExchangeOnline -Credential $cred
+Connect-ExchangeOnline
 
 $UserAlias = Get-DataFromExchange
 
 $FoundUsers = Get-UsersToSearch -PathCsv $PathCSV -UsersFromExchange $UserAlias
 
 if ([string]::IsNullOrEmpty($AzureSub) -or [string]::IsNullOrWhiteSpace($AzureSub)) {
-    Connect-AzAccount -Credential $cred
+    Connect-AzAccount
 }
 else {
-    Connect-AzAccount -Credential $cred -Subscription $AzureSub
+    Connect-AzAccount -Subscription $AzureSub
 }
 
 AddStudentsToLab -UsersToInvite $FoundUsers
