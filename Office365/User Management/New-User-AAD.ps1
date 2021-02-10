@@ -37,7 +37,11 @@ function PrepareEnvironment {
 
         $Client = New-Object System.Net.WebClient
     
-        $Client.DownloadFile($LibraryURL, "ModuleManager.ps1")
+        $currentPath = Get-Location
+
+        $downloadPath = $currentPath.Path + "\ModuleManager.ps1"
+        
+        $Client.DownloadFile($LibraryURL, $downloadPath)
 
         .\ModuleManager.ps1 -Modules $Modules -CompatibleVersion $Version 
 
