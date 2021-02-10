@@ -42,7 +42,11 @@ function CheckModules {
 
                 $Client = New-Object System.Net.WebClient
 
-                $Client.DownloadFile($LabServiceLibraryURL, "Az.LabServices.psm1")
+                $currentPath = Get-Location
+
+                $downloadPath = $currentPath.Path + "\Az.LabServices.psm1"
+                
+                $Client.DownloadFile($LabServiceLibraryURL, $downloadPath)
 
                 Import-Module .\Az.LabServices.psm1
 
