@@ -29,8 +29,5 @@ After this, assign this custom role to an Azure Lab Service faculty or administr
 
 ## Troubleshooting
 
-### How to download the script
-Please, follow [this guide](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Others/How%20to%20download%20single%20file%20from%20GitHub)
-
-### How to change execution Policy
-Please, follow [this guide](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Others/Resolve%20errors%20about%20Execution%20Policy)
+### How to download the file
+Please, follow [this guide](https://github.com/AngelusGi/PowerShell/tree/master/Others/How%20to%20download%20single%20file%20from%20GitHub)
