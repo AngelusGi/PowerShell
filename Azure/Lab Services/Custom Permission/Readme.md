@@ -7,7 +7,7 @@
 ## Example
 
 ### How it works
-![How-it-works](https://github.com/AngelusGi/PowerShell/blob/master/Azure/Lab%20Services/Custom%20Permission/Screenshot/How-it-works.mp4?raw=true)
+<video src="https://github.com/AngelusGi/PowerShell/blob/master/Azure/Lab%20Services/Custom%20Permission/Screenshot/How-it-works.mp4?raw=true" controls preload></video>
 
 ## Troubleshooting
 
