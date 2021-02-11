@@ -1,0 +1,51 @@
+{
+  "properties": {
+    "roleName": "AzLabService-UserAndScheduleManager",
+    "description": "This user can read all the settings in Azure Lab Services and can modify only the users and schedule tab.",
+    "assignableScopes": [
+      "/subscriptions/{YOUR-SUBSCRIPTION-ID}"
+    ],
+    "permissions": [
+      {
+        "actions": ["*"],
+        "notActions": [
+          "Microsoft.Authorization/*/Delete",
+          "Microsoft.Authorization/*/Write",
+          "Microsoft.Authorization/elevateAccess/Action",
+          "Microsoft.Blueprint/blueprintAssignments/write",
+          "Microsoft.Blueprint/blueprintAssignments/delete",
+          "Microsoft.Compute/galleries/share/action",
+          "Microsoft.LabServices/labAccounts/delete",
+          "Microsoft.LabServices/labAccounts/write",
+          "Microsoft.LabServices/labAccounts/CreateLab/action",
+          "Microsoft.LabServices/labAccounts/GetRegionalAvailability/action",
+          "Microsoft.LabServices/labAccounts/GetPricingAndAvailability/action",
+          "Microsoft.LabServices/labAccounts/GetRestrictionsAndUsage/action",
+          "Microsoft.LabServices/labAccounts/galleryImages/delete",
+          "Microsoft.LabServices/labAccounts/galleryImages/write",
+          "Microsoft.LabServices/labAccounts/labs/delete",
+          "Microsoft.LabServices/labAccounts/labs/write",
+          "Microsoft.LabServices/labAccounts/labs/GetLabPricingAndAvailability/action",
+          "Microsoft.LabServices/labAccounts/labs/environmentSettings/delete",
+          "Microsoft.LabServices/labAccounts/labs/environmentSettings/write",
+          "Microsoft.LabServices/labAccounts/labs/environmentSettings/Publish/action",
+          "Microsoft.LabServices/labAccounts/labs/environmentSettings/Start/action",
+          "Microsoft.LabServices/labAccounts/labs/environmentSettings/Stop/action",
+          "Microsoft.LabServices/labAccounts/labs/environmentSettings/SaveImage/action",
+          "Microsoft.LabServices/labAccounts/labs/environmentSettings/ResetPassword/action",
+          "Microsoft.LabServices/labAccounts/labs/environmentSettings/environments/delete",
+          "Microsoft.LabServices/labAccounts/labs/environmentSettings/environments/Start/action",
+          "Microsoft.LabServices/labAccounts/labs/environmentSettings/environments/Stop/action",
+          "Microsoft.LabServices/labAccounts/sharedGalleries/delete",
+          "Microsoft.LabServices/labAccounts/sharedGalleries/write",
+          "Microsoft.LabServices/labAccounts/sharedImages/delete",
+          "Microsoft.LabServices/labAccounts/sharedImages/write",
+          "Microsoft.LabServices/users/StartEnvironment/action",
+          "Microsoft.LabServices/users/StopEnvironment/action"
+        ],
+        "dataActions": [],
+        "notDataActions": []
+      }
+    ]
+  }
+}
