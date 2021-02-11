@@ -8,6 +8,7 @@ If you want to download a single file from this repositoy, please follow this pr
 <br>
 <i>An alternative way is to clone the entire repository</i>
 <br>
+<br>
 
 ![How-To-Download](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Others/How%20to%20download%20single%20file%20from%20GitHub/How-To-Download.gif)
 
