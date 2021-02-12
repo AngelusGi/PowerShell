@@ -1,0 +1,56 @@
+{
+  "properties": {
+      "roleName": "AzLabService-TemplateAdministrator",
+      "description": "This user can read all the settings in Azure Lab Services and can modify only the template tab and VM. This user can export the VM image in the Shared Image Gallery attached to the Lab Account (if exists).",
+      "assignableScopes": [
+          "/subscriptions/{YOUR-SUBSCRIPTION-ID}"
+      ],
+      "permissions": [
+          {
+              "actions": [
+                  "*"
+              ],
+              "notActions": [
+                  "Microsoft.Authorization/*/Delete",
+                  "Microsoft.Authorization/*/Write",
+                  "Microsoft.Authorization/elevateAccess/Action",
+                  "Microsoft.Blueprint/blueprintAssignments/write",
+                  "Microsoft.Blueprint/blueprintAssignments/delete",
+                  "Microsoft.Compute/galleries/share/action",
+                  "Microsoft.LabServices/labAccounts/delete",
+                  "Microsoft.LabServices/labAccounts/write",
+                  "Microsoft.LabServices/labAccounts/CreateLab/action",
+                  "Microsoft.LabServices/labAccounts/GetRegionalAvailability/action",
+                  "Microsoft.LabServices/labAccounts/GetPricingAndAvailability/action",
+                  "Microsoft.LabServices/labAccounts/GetRestrictionsAndUsage/action",
+                  "Microsoft.LabServices/labAccounts/galleryImages/delete",
+                  "Microsoft.LabServices/labAccounts/galleryImages/write",
+                  "Microsoft.LabServices/labAccounts/labs/delete",
+                  "Microsoft.LabServices/labAccounts/labs/write",
+                  "Microsoft.LabServices/labAccounts/labs/AddUsers/action",
+                  "Microsoft.LabServices/labAccounts/labs/SendEmail/action",
+                  "Microsoft.LabServices/labAccounts/labs/SyncUserList/action",
+                  "Microsoft.LabServices/labAccounts/labs/environmentSettings/environments/delete",
+                  "Microsoft.LabServices/labAccounts/labs/environmentSettings/environments/Start/action",
+                  "Microsoft.LabServices/labAccounts/labs/environmentSettings/environments/Stop/action",
+                  "Microsoft.LabServices/labAccounts/labs/environmentSettings/environments/ResetPassword/action",
+                  "Microsoft.LabServices/labAccounts/labs/environmentSettings/schedules/delete",
+                  "Microsoft.LabServices/labAccounts/labs/environmentSettings/schedules/write",
+                  "Microsoft.LabServices/labAccounts/labs/users/delete",
+                  "Microsoft.LabServices/labAccounts/labs/users/write",
+                  "Microsoft.LabServices/labAccounts/sharedGalleries/delete",
+                  "Microsoft.LabServices/labAccounts/sharedGalleries/write",
+                  "Microsoft.LabServices/labAccounts/sharedImages/delete",
+                  "Microsoft.LabServices/users/Register/action",
+                  "Microsoft.LabServices/users/ListAllEnvironments/action",
+                  "Microsoft.LabServices/users/StartEnvironment/action",
+                  "Microsoft.LabServices/users/StopEnvironment/action",
+                  "Microsoft.LabServices/users/ResetPassword/action",
+                  "Microsoft.LabServices/users/UserSettings/action"
+              ],
+              "dataActions": [],
+              "notDataActions": []
+          }
+      ]
+  }
+}

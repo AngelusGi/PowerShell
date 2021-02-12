@@ -18,6 +18,7 @@ After this, assign this custom role to an Azure Lab Service faculty or administr
 - AzLabService-ScheduleManager -> this role can manage <b>only schedule</b> related stuff (or tab)
 - AzLabService-UserManager -> this role can manage <b>only users</b> related stuff (or tab)
 - AzLabService-UserManagerAndScheduleManager -> this role can manage <b>only schedule and student</b> related stuff (or tab)
+* AzLabService-TemplateAdministrator -> This user can read all the settings in Azure Lab Services and can <b>modify only the template tab and VM</b>. This user can export the VM image in the Shared Image Gallery attached to the Lab Account (if exists).
 
 ## Example
 
