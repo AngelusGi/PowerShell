@@ -81,94 +81,6 @@ function PrepareEnvironment {
 
 # CSV Manager
 
-
-function SearchUsersDynamic {
-    param (
-        $UsersToSearchFromCsv
-    )
-    
-    process {
-
-        $FoundUsers = New-Object -TypeName "System.Collections.ArrayList"
-        $NotFoundUsers = New-Object -TypeName "System.Collections.ArrayList"
-
-        Write-Warning("Ricerca utenti in corso... Attendere.")
-
-        foreach ($userToSearch in $UsersToSearchFromCsv) {
-            $AadResult = Get-AzureADUser -SearchString $userToSearch.Email | Select-Object DisplayName, UserPrincipalName, ProxyAddresses
-
-            
-            if ($null -eq $AadResult) {
-                $ExchangeResult = Get-Mailbox -Identity $userToSearch.Email | Select-Object DisplayName, PrimarySmtpAddress, EmailAddresses
-
-
-                if ($null -eq $ExchangeResult) {
-                    $NotFoundUsers.Add($userToSearch)                    
-                }
-                else {
-                    if ($null -ne $ExchangeResult.PrimarySmtpAddress) {
-                        $result = @{
-                            DisplayName        = $ExchangeResult.DisplayName
-                            PrimarySmtpAddress = $ExchangeResult.PrimarySmtpAddress
-                            EmailAddresses     = $ExchangeResult.EmailAddresses
-                            LabName            = $userToSearch.LabName
-                            Source             = "Exchange Online"
-                        }
-        
-                        # Write-Host($result.Values)
-                        # Write-Host($result.Get_Item("DisplayName"))
-        
-                        $FoundUsers.Add($result)
-                    }
-                }
-                
-
-            }
-            else {
-
-                try {
-                
-                    if ($null -ne $AadResult.UserPrincipalName) {
-                        $result = @{
-                            DisplayName        = $AadResult.DisplayName
-                            PrimarySmtpAddress = $AadResult.UserPrincipalName
-                            EmailAddresses     = $AadResult.ProxyAddresses
-                            LabName            = $userToSearch.LabName
-                            Source             = "Azure Active Directory"
-                        }
-        
-                        # Write-Host($result.Values)
-                        # Write-Host($result.Get_Item("DisplayName"))
-        
-                        $FoundUsers.Add($result)
-                    }
-                    
-                }
-                catch {
-                    
-                }
-
-            }
-
-        }
-
-        # $FoundUsers | Format-List -Property DisplayName,PrimarySmtpAddress
-        # $FoundUsers | Format-Table
-
-        if ($null -ne $UsersToSearchFromCsv.Count) {
-            Write-Host("Utenti processati $($FoundUsers.Count) di $($UsersToSearchFromCsv.Count)")
-        }
-        else {
-            Write-Host("Utenti processati $($FoundUsers.Count) di 1")
-        }
-
-        ExportResults -SuccessUsers $FoundUsers -ErrorUsers $NotFoundUsers
-
-        return $FoundUsers
-
-    }
-}
-
 function UserSearchString {
     param (
         $UserName
@@ -200,7 +112,9 @@ function SearchUsers {
 
         foreach ($userToSearch in $UsersToSearchFromCsv) {
 
-            $UserNick = $userToSearch.Email
+            $UserNick = UserSearchString -UserName $userToSearch.Email
+            # $UserNick = $userToSearch.Email
+            
 
             $foundResultAAD = $UsersFromAzureAd | Where-Object { $_.ProxyAddresses -match $UserNick }
             
@@ -265,24 +179,6 @@ function SearchUsers {
         return $FoundUsers
 
     }
-}
-
-function Get-UsersToSearchDynamic {
-    param (
-        # $PathCsv
-        $UsersFromCsv
-    )
-    
-    process {
-
-        # $FoundUsers = SearchUsersDynamic -UsersToSearch $UsersFromCsv
-
-        # return MatchUsers -FoundUsers $FoundUsers
-        # return $FoundUsers
-        return SearchUsersDynamic -UsersToSearch $UsersFromCsv
-
-    }
-    
 }
 
 function Get-UsersToSearch {
@@ -412,7 +308,7 @@ function Get-DataFromAAD {
     )
     process {
 
-        Write-Warning("Ottenimento utenti da Azure Active Directory in corso... Attendere.")
+        Write-Host("Ottenimento utenti da Azure Active Directory in corso... Attendere.")
 
         return Get-AzureADUser -All $true | Where-Object { $_.UserType -ne "Guest" }
 
@@ -427,7 +323,7 @@ function Get-DataFromExchange {
 
     process {
 
-        Write-Warning("Ottenimento utenti da Exchange Online in corso... Attendere.")
+        Write-Host("Ottenimento utenti da Exchange Online in corso... Attendere.")
         return Get-Mailbox -Identity * -ResultSize Unlimited | Select-Object DisplayName, PrimarySmtpAddress, EmailAddresses
 
     }
@@ -533,16 +429,12 @@ else {
 
 $UsersFromCsv = ProcessCsv -PathCSV $PathCsv
 
-if ($UsersFromCsv.Length -le 100) {
-    $FoundUsers = Get-UsersToSearchDynamic -UsersFromCsv $UsersFromCsv
-    
-}
-else {
-    $ExchangeUsers = Get-DataFromExchange
-    $AadUsers = Get-DataFromAAD
+Write-Warning("Ricerca utenti in corso, l'operazione potrebbe richiedere diversi minuti. Attendere...")
 
-    $FoundUsers = Get-UsersToSearch -UsersFromCsv $UsersFromCsv -UsersFromExchange $ExchangeUsers -UsersFromAAD $AadUsers
-}
+$ExchangeUsers = Get-DataFromExchange
+$AadUsers = Get-DataFromAAD
+
+$FoundUsers = Get-UsersToSearch -UsersFromCsv $UsersFromCsv -UsersFromExchange $ExchangeUsers -UsersFromAAD $AadUsers
 
 AddStudentsToLab -UsersToInvite $FoundUsers
 
