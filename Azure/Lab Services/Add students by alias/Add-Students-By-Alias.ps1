@@ -81,10 +81,113 @@ function PrepareEnvironment {
 
 # CSV Manager
 
+
+function SearchUsersDynamic {
+    param (
+        $UsersToSearchFromCsv
+    )
+    
+    process {
+
+        $FoundUsers = New-Object -TypeName "System.Collections.ArrayList"
+        $NotFoundUsers = New-Object -TypeName "System.Collections.ArrayList"
+
+        Write-Warning("Ricerca utenti in corso... Attendere.")
+
+        foreach ($userToSearch in $UsersToSearchFromCsv) {
+            $AadResult = Get-AzureADUser -SearchString $userToSearch.Email | Select-Object DisplayName, UserPrincipalName, ProxyAddresses
+
+            
+            if ($null -eq $AadResult) {
+                $ExchangeResult = Get-Mailbox -Identity $userToSearch.Email | Select-Object DisplayName, PrimarySmtpAddress, EmailAddresses
+
+
+                if ($null -eq $ExchangeResult) {
+                    $NotFoundUsers.Add($userToSearch)                    
+                }
+                else {
+                    if ($null -ne $ExchangeResult.PrimarySmtpAddress) {
+                        $result = @{
+                            DisplayName        = $ExchangeResult.DisplayName
+                            PrimarySmtpAddress = $ExchangeResult.PrimarySmtpAddress
+                            EmailAddresses     = $ExchangeResult.EmailAddresses
+                            LabName            = $userToSearch.LabName
+                            Source             = "Exchange Online"
+                        }
+        
+                        # Write-Host($result.Values)
+                        # Write-Host($result.Get_Item("DisplayName"))
+        
+                        $FoundUsers.Add($result)
+                    }
+                }
+                
+
+            }
+            else {
+
+                try {
+                
+                    if ($null -ne $AadResult.UserPrincipalName) {
+                        $result = @{
+                            DisplayName        = $AadResult.DisplayName
+                            PrimarySmtpAddress = $AadResult.UserPrincipalName
+                            EmailAddresses     = $AadResult.ProxyAddresses
+                            LabName            = $userToSearch.LabName
+                            Source             = "Azure Active Directory"
+                        }
+        
+                        # Write-Host($result.Values)
+                        # Write-Host($result.Get_Item("DisplayName"))
+        
+                        $FoundUsers.Add($result)
+                    }
+                    
+                }
+                catch {
+                    
+                }
+
+            }
+
+        }
+
+        # $FoundUsers | Format-List -Property DisplayName,PrimarySmtpAddress
+        # $FoundUsers | Format-Table
+
+        if ($null -ne $UsersToSearchFromCsv.Count) {
+            Write-Host("Utenti processati $($FoundUsers.Count) di $($UsersToSearchFromCsv.Count)")
+        }
+        else {
+            Write-Host("Utenti processati $($FoundUsers.Count) di 1")
+        }
+
+        ExportResults -SuccessUsers $FoundUsers -ErrorUsers $NotFoundUsers
+
+        return $FoundUsers
+
+    }
+}
+
+function UserSearchString {
+    param (
+        $UserName
+    )
+
+    process {
+
+        if ($UserName.Contains("@")) {
+            return $UserName.Substring(0, $UserName.IndexOf("@"))
+        }
+    }
+    
+}
+
 function SearchUsers {
     param (
         $UsersToSearchFromCsv,
-        $UsersFromExchange
+        $UsersFromExchange,
+        $UsersFromAzureAd
     )
     
     process {
@@ -93,27 +196,49 @@ function SearchUsers {
         $NotFoundUsers = New-Object -TypeName "System.Collections.ArrayList"
 
 
-        Write-Warning("Ricerca utenti in corso... Attendere.")
+        Write-Warning("Ricerca utenti in corso, questa operazione potrebbe richiedere diversi minuti... Attendere.")
 
         foreach ($userToSearch in $UsersToSearchFromCsv) {
-            $foundResult = $UsersFromExchange | Where-Object { $_.EmailAddresses -match $userToSearch.Email }
+
+            $UserNick = $userToSearch.Email
+
+            $foundResultAAD = $UsersFromAzureAd | Where-Object { $_.ProxyAddresses -match $UserNick }
             
-            
-            if ($null -eq $foundResult) {
-                $NotFoundUsers.Add($userToSearch)
+            if ($null -eq $foundResultAAD) {
+
+                $foundResultExchange = $UsersFromExchange | Where-Object { $_.EmailAddresses -match $UserNick }
+
+                if ($null -eq $foundResultExchange) {
+                    $NotFoundUsers.Add($userToSearch)                    
+                }
+                else {
+                    if ($null -ne $foundResultExchange.PrimarySmtpAddress) {
+                        $result = @{
+                            DisplayName        = $foundResultExchange.DisplayName
+                            PrimarySmtpAddress = $foundResultExchange.PrimarySmtpAddress
+                            EmailAddresses     = $foundResultExchange.EmailAddresses
+                            LabName            = $userToSearch.LabName
+                            Source             = "Exchange Online"
+                        }
+                        # Write-Host($result.Values)
+                        # Write-Host($result.Get_Item("DisplayName"))
+        
+                        $FoundUsers.Add($result)
+                    }
+                }
             }
             else {
 
                 try {
                 
-                    if ($null -ne $foundResult.PrimarySmtpAddress) {
+                    if ($null -ne $foundResultAAD.UserPrincipalName) {
                         $result = @{
-                            DisplayName        = $foundResult.DisplayName
-                            PrimarySmtpAddress = $foundResult.PrimarySmtpAddress
-                            EmailAddresses     = $foundResult.EmailAddresses
+                            DisplayName        = $foundResultAAD.DisplayName
+                            PrimarySmtpAddress = $foundResultAAD.UserPrincipalName
+                            EmailAddresses     = $foundResultAAD.ProxyAddresses
                             LabName            = $userToSearch.LabName
+                            Source             = "Azure Active Directory"
                         }
-        
                         # Write-Host($result.Values)
                         # Write-Host($result.Get_Item("DisplayName"))
         
@@ -142,20 +267,39 @@ function SearchUsers {
     }
 }
 
-function Get-UsersToSearch {
+function Get-UsersToSearchDynamic {
     param (
-        $PathCsv,
-        $UsersFromExchange
+        # $PathCsv
+        $UsersFromCsv
     )
     
     process {
 
-        $UsersFromCsv = ProcessCsv -PathCSV $PathCsv
-        
-        $FoundUsers = SearchUsers -UsersToSearch $UsersFromCsv -UsersFromExchange $UsersFromExchange
+        # $FoundUsers = SearchUsersDynamic -UsersToSearch $UsersFromCsv
 
         # return MatchUsers -FoundUsers $FoundUsers
-        return $FoundUsers
+        # return $FoundUsers
+        return SearchUsersDynamic -UsersToSearch $UsersFromCsv
+
+    }
+    
+}
+
+function Get-UsersToSearch {
+    param (
+        $UsersFromCsv,
+        $UsersFromExchange,
+        $UsersFromAAD
+    )
+    
+    process {
+
+        return SearchUsers -UsersToSearch $UsersFromCsv -UsersFromExchange $UsersFromExchange -UsersFromAzureAd $UsersFromAAD
+        
+        # $FoundUsers = SearchUsers -UsersToSearch $UsersFromCsv -UsersFromExchange $UsersFromExchange -UsersFromAzureAd $UsersFromAAD
+
+        # return MatchUsers -FoundUsers $FoundUsers
+        # return $FoundUsers
 
     }
     
@@ -171,12 +315,12 @@ function VerifyCsv {
         try {
             ForEach ($CsvUser in $CsvUsers) {
                 if ( [string]::IsNullOrEmpty($CsvUser.Email) -or [string]::IsNullOrWhiteSpace($CsvUser.Email) ) {
-                    Write-Error("Il CSV non è formattato correttamente, verificare il campo 'Email' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
+                    Write-Error("Il CSV non e' formattato correttamente, verificare il campo 'Email' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
                     exit
                 }
 
                 if ( [string]::IsNullOrEmpty($CsvUser.LabName) -or [string]::IsNullOrWhiteSpace($CsvUser.LabName) ) {
-                    Write-Error("Il CSV non è formattato correttamente, verificare il campo 'LabName' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
+                    Write-Error("Il CSV non e' formattato correttamente, verificare il campo 'LabName' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
                     exit
                 }
             }
@@ -256,10 +400,23 @@ function ExitSessions {
     process {
         Disconnect-ExchangeOnline -Confirm:$false
         Disconnect-AzAccount -Confirm:$false
+        Disconnect-AzureAD -Confirm:$false
         Clear-AzContext -Confirm:$false -Force
         Get-PSSession | Disconnect-PSSession -Confirm:$false
     }
     
+}
+
+function Get-DataFromAAD {
+    param (
+    )
+    process {
+
+        Write-Warning("Ottenimento utenti da Azure Active Directory in corso... Attendere.")
+
+        return Get-AzureADUser -All $true | Where-Object { $_.UserType -ne "Guest" }
+
+    }
 }
 
 function Get-DataFromExchange {
@@ -295,7 +452,7 @@ function AddStudentsToLab {
 
                 $labName = $_.Get_Item("LabName")
                 $userEmail = $_.Get_Item("PrimarySmtpAddress")
-            
+
                 if (($null -ne $labName) -and ($null -ne $userEmail)) {
                     $Lab = Get-AzLabAccount | Get-AzLab -LabName $labName
 
@@ -313,7 +470,7 @@ function AddStudentsToLab {
 
             
         if ([string]::IsNullOrEmpty($SendInvitation) -or [string]::IsNullOrWhiteSpace($SendInvitation)) {
-            Write-Warning("Non è stato abilitato l'invito automatico degli utenti. Sarà necessario recarsi su https://labs.azure.com e invitarli facendo click sul bottone 'Invita tutti'")
+            Write-Warning("Non e' stato abilitato l'invito automatico degli utenti. Sarà necessario recarsi su https://labs.azure.com e invitarli facendo click sul bottone 'Invita tutti'")
            
         }
         else {
@@ -340,7 +497,6 @@ function AddStudentsToLab {
     
 }
 
-
 function ExportResults {
     param (
         $ErrorUsers,
@@ -360,22 +516,32 @@ function ExportResults {
     }
 }
 
-
 # BODY
 
-PrepareEnvironment -Modules "ExchangeOnlineManagement", "Az", "Az.LabServices" -Version 5
+PrepareEnvironment -Modules "ExchangeOnlineManagement", "AzureAD", "Az", "Az.LabServices" -Version 5
 
 Connect-ExchangeOnline
 
-$UserAlias = Get-DataFromExchange
-
-$FoundUsers = Get-UsersToSearch -PathCsv $PathCSV -UsersFromExchange $UserAlias
+Connect-AzureAD
 
 if ([string]::IsNullOrEmpty($AzureSub) -or [string]::IsNullOrWhiteSpace($AzureSub)) {
     Connect-AzAccount
 }
 else {
     Connect-AzAccount -Subscription $AzureSub
+}
+
+$UsersFromCsv = ProcessCsv -PathCSV $PathCsv
+
+if ($UsersFromCsv.Length -le 100) {
+    $FoundUsers = Get-UsersToSearchDynamic -UsersFromCsv $UsersFromCsv
+    
+}
+else {
+    $ExchangeUsers = Get-DataFromExchange
+    $AadUsers = Get-DataFromAAD
+
+    $FoundUsers = Get-UsersToSearch -UsersFromCsv $UsersFromCsv -UsersFromExchange $ExchangeUsers -UsersFromAAD $AadUsers
 }
 
 AddStudentsToLab -UsersToInvite $FoundUsers
