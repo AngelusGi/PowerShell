@@ -350,7 +350,26 @@ function AddStudentsToLab {
                 $userEmail = $_.Get_Item("PrimarySmtpAddress")
 
                 if (($null -ne $labName) -and ($null -ne $userEmail)) {
-                    $Lab = Get-AzLabAccount | Get-AzLab -LabName $labName
+                    
+
+                    do {
+                        $Lab = Get-AzLabAccount | Get-AzLab -LabName $labName
+
+                        if($null -eq $Lab){
+                            Write-Warning("Nella sottoscrizione corrente non sono stati trovati Lab Account di Azure Lab Services.")
+                            $sub = Get-AzContext
+                            Write-Host("Nome sottoscrizione corrente -> $($sub.Subscription.Name)")
+                            Write-Host("Id sottoscrizione corrente -> $($sub.Subscription.Id)")
+
+                            do {
+                                Write-Host("Inserire il nome o l'ID della sottoscrizione in cui si trova il Lab Account di Azure Lab Services.")
+                                $labName = Read-Host("->  ")
+
+                            } while ([string]::IsNullOrEmpty($labName) -or [string]::IsNullOrWhiteSpace($labName))
+
+                        }
+
+                    } while ($null -eq $Lab)
 
                     Add-AzLabUser -Lab $Lab -Emails $userEmail
                     Write-Warning("*** Aggiunta al laboratorio $($labName) di $($userEmail) completata ***")
@@ -429,7 +448,7 @@ else {
 
 $UsersFromCsv = ProcessCsv -PathCSV $PathCsv
 
-Write-Warning("Ricerca utenti in corso, l'operazione potrebbe richiedere diversi minuti. Attendere...")
+Write-Warning("Ricerca utenti in corso, l'operazione potrebbe richiedere alcuni minuti. Attendere...")
 
 $ExchangeUsers = Get-DataFromExchange
 $AadUsers = Get-DataFromAAD
