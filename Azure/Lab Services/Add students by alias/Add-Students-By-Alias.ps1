@@ -361,26 +361,26 @@ function AddStudentsToLab {
                 $userEmail = $_.Get_Item("PrimarySmtpAddress")
 
                 if (($null -ne $labName) -and ($null -ne $userEmail)) {
+                    $Lab = Get-AzLabAccount | Get-AzLab -LabName $labName
                     
 
-                    do {
-                        $Lab = Get-AzLabAccount | Get-AzLab -LabName $labName
+                    # do {
 
-                        if($null -eq $Lab){
-                            Write-Warning("Nella sottoscrizione corrente non sono stati trovati Lab Account di Azure Lab Services.")
-                            $sub = Get-AzSubscription
-                            Write-Host("Nome sottoscrizione corrente -> $($subName)")
-                            Write-Host("Id sottoscrizione corrente -> $($sub.Id)")
+                    #     # if($null -eq $Lab){
+                    #     #     Write-Warning("Nella sottoscrizione corrente non sono stati trovati Lab Account di Azure Lab Services.")
+                    #     #     $sub = Get-AzSubscription
+                    #     #     Write-Host("Nome sottoscrizione corrente -> $($subName)")
+                    #     #     Write-Host("Id sottoscrizione corrente -> $($sub.Id)")
 
-                            do {
-                                Write-Host("Inserire il nome o l'ID della sottoscrizione in cui si trova il Lab Account di Azure Lab Services.")
-                                $labName = Read-Host("->  ")
+                    #     #     do {
+                    #     #         Write-Host("Inserire il nome o l'ID della sottoscrizione in cui si trova il Lab Account di Azure Lab Services.")
+                    #     #         $labName = Read-Host("->  ")
 
-                            } while ([string]::IsNullOrEmpty($labName) -or [string]::IsNullOrWhiteSpace($labName))
+                    #     #     } while ([string]::IsNullOrEmpty($labName) -or [string]::IsNullOrWhiteSpace($labName))
 
-                        }
+                    #     # }
 
-                    } while ($null -eq $Lab)
+                    # } while ($null -eq $Lab)
 
                     Add-AzLabUser -Lab $Lab -Emails $userEmail
                     Write-Warning("*** Aggiunta al laboratorio $($labName) di $($userEmail) completata ***")
