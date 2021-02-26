@@ -34,7 +34,7 @@ Param
 
     [parameter()]
     [String]
-    $Delimiter = ',',
+    $Delimiter,
     
     [parameter()]
     [string]
@@ -43,7 +43,12 @@ Param
 
     [parameter()]
     [String]
-    $WelcomeMessaege
+    $WelcomeMessaege,
+
+    [parameter()]
+    [String]
+    $LabName
+
 )
 
 # Region module manager
@@ -215,10 +220,13 @@ function VerifyCsv {
                     exit
                 }
 
-                if ( [string]::IsNullOrEmpty($CsvUser.LabName) -or [string]::IsNullOrWhiteSpace($CsvUser.LabName) ) {
-                    Write-Error("Il CSV non e' formattato correttamente, verificare il campo 'LabName' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
-                    exit
+                if ($null -eq $LabName) {
+                    if ( [string]::IsNullOrEmpty($CsvUser.LabName) -or [string]::IsNullOrWhiteSpace($CsvUser.LabName) ) {
+                        Write-Error("Il CSV non e' formattato correttamente, verificare il campo 'LabName' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
+                        exit
+                    }    
                 }
+                
             }
 
         }
@@ -249,10 +257,12 @@ function CheckInputCsv {
 
         if (',' -eq $Delimiter) {
             Write-Host("Si sta utilizzando il delimitatore di default, in quanto non fornito -> $($Delimiter)")
+        } else {
+            Write-Host("Delimitatore attualmente in uso -> $($Delimiter)")
         }
         
         if ([string]::IsNullOrEmpty($PathCSV) -or [string]::IsNullOrWhiteSpace($PathCSV)) {
-            Write-Error("Il parametro PathCSV non può essere vuoto")
+            Write-Error("Il parametro PathCSV non pu� essere vuoto")
             exit
         }
         
@@ -294,11 +304,12 @@ function ProcessCsv {
 function ExitSessions {
 
     process {
-        Disconnect-ExchangeOnline -Confirm:$false
-        Disconnect-AzAccount -Confirm:$false
-        Disconnect-AzureAD -Confirm:$false
-        Clear-AzContext -Confirm:$false -Force
-        Get-PSSession | Disconnect-PSSession -Confirm:$false
+        Write-Host("Disconnessione in corso...")
+        Disconnect-ExchangeOnline -Confirm:$false | Out-Null
+        Disconnect-AzAccount -Confirm:$false  | Out-Null
+        Disconnect-AzureAD -Confirm:$false | Out-Null
+        Clear-AzContext -Confirm:$false -Force | Out-Null
+        Get-PSSession | Disconnect-PSSession -Confirm:$false | Out-Null
     }
     
 }
@@ -357,9 +368,9 @@ function AddStudentsToLab {
 
                         if($null -eq $Lab){
                             Write-Warning("Nella sottoscrizione corrente non sono stati trovati Lab Account di Azure Lab Services.")
-                            $sub = Get-AzContext
-                            Write-Host("Nome sottoscrizione corrente -> $($sub.Subscription.Name)")
-                            Write-Host("Id sottoscrizione corrente -> $($sub.Subscription.Id)")
+                            $sub = Get-AzSubscription
+                            Write-Host("Nome sottoscrizione corrente -> $($subName)")
+                            Write-Host("Id sottoscrizione corrente -> $($sub.Id)")
 
                             do {
                                 Write-Host("Inserire il nome o l'ID della sottoscrizione in cui si trova il Lab Account di Azure Lab Services.")
@@ -385,7 +396,7 @@ function AddStudentsToLab {
 
             
         if ([string]::IsNullOrEmpty($SendInvitation) -or [string]::IsNullOrWhiteSpace($SendInvitation)) {
-            Write-Warning("Non e' stato abilitato l'invito automatico degli utenti. Sarà necessario recarsi su https://labs.azure.com e invitarli facendo click sul bottone 'Invita tutti'")
+            Write-Warning("Non e' stato abilitato l'invito automatico degli utenti. Sar� necessario recarsi su https://labs.azure.com e invitarli facendo click sul bottone 'Invita tutti'")
            
         }
         else {
@@ -435,18 +446,21 @@ function ExportResults {
 
 PrepareEnvironment -Modules "ExchangeOnlineManagement", "AzureAD", "Az", "Az.LabServices" -Version 5
 
-Connect-ExchangeOnline
+Connect-ExchangeOnline | Out-Null
 
 Connect-AzureAD
 
 if ([string]::IsNullOrEmpty($AzureSub) -or [string]::IsNullOrWhiteSpace($AzureSub)) {
+    Write-Warning("Si utilizzerà la sottoscrizione predefinita, non è stato fornita una sottoscrizione.")
     Connect-AzAccount
 }
 else {
     Connect-AzAccount -Subscription $AzureSub
 }
 
-$UsersFromCsv = ProcessCsv -PathCSV $PathCsv
+$UsersFromCsv = ProcessCsv -PathCSV $PathCsv -Delimiter $Delimiter
+
+# $UsersFromCsv
 
 Write-Warning("Ricerca utenti in corso, l'operazione potrebbe richiedere alcuni minuti. Attendere...")
 
