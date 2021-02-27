@@ -43,12 +43,7 @@ Param
 
     [parameter()]
     [String]
-    $WelcomeMessage,
-
-    [parameter()]
-    [String]
-    $LabNameForAll
-
+    $WelcomeMessage
 )
 
 # Region module manager
@@ -367,7 +362,6 @@ function AddStudentsToLab {
                 if (($null -ne $labName) -and ($null -ne $userEmail)) {
 
                     do {
-                        $Lab = $null
                         try {
                             # $Lab = Get-AzLabAccount | Get-AzLab -LabName $labName
                             # if ($null -eq $Lab) {
@@ -402,9 +396,11 @@ function AddStudentsToLab {
             catch {
                 
             }
-        Write-Warning("Aggiunta utenti completata...")
             
         }
+
+        Write-Warning("Aggiunta utenti completata...")
+
 
         if ([string]::IsNullOrEmpty($SendInvitation) -or [string]::IsNullOrWhiteSpace($SendInvitation)) {
             Write-Warning("Non e' stato abilitato l'invito automatico degli utenti. Sara' necessario recarsi su https://labs.azure.com e invitarli facendo click sul bottone 'Invita tutti'")
@@ -456,6 +452,8 @@ function ExportResults {
 }
 
 # BODY
+
+PrepareEnvironment -Modules "ExchangeOnlineManagement", "AzureAD", "Az", "Az.LabServices" -Version 5
 
 Connect-ExchangeOnline | Out-Null
 

@@ -7,7 +7,7 @@ Those parameters are <b>mandatory</b>:
 * PathCSV -> path of the CSV | ex. ".\Add-Students-By-Alias.CSV"
 
 Those parameters are <b>optional</b>:
-* Delimiter -> the values' delimiter in the CSV file, if black, the default value is ","
+* Delimiter -> the values' delimiter in the CSV file, if black, the default value is ',' <br><b><i>If the data enty has some comma in the value please change the delimiter of the CSV to another one, such as ';'</i></b>
 * AzureSub -> if you have multiple Azure Subscription, please insert the <b>ID</b> or the <b>Name</b> of the one wich contains the Lab Account
 
 Using default values the script will only add students to the lab. If you want to invite them using this script, consider to use those two optional parameters:
