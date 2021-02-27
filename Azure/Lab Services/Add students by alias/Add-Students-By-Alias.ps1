@@ -107,9 +107,6 @@ function SearchUsers {
         $FoundUsers = New-Object -TypeName "System.Collections.ArrayList"
         $NotFoundUsers = New-Object -TypeName "System.Collections.ArrayList"
 
-
-        Write-Warning("Ricerca utenti in corso, questa operazione potrebbe richiedere diversi minuti... Attendere.")
-
         foreach ($userToSearch in $UsersToSearchFromCsv) {
 
             $UserNick = UserSearchString -UserName $userToSearch.Email
@@ -374,7 +371,7 @@ function AddStudentsToLab {
                             if ($null -eq $Lab) {
                                 Write-Warning("Nella sottoscrizione corrente non sono stati trovati Lab Account di Azure Lab Services.")
                                 $currentAzure = Get-AzContext
-                                Write-Host("Sottoscrizione attualmente in uso:")
+                                Write-Host("Dati della sottoscrizione attualmente in uso:")
                                 Write-Host("`tSub Id -> $($currentAzure.Subscription.Id)")
                                 Write-Host("`tSub Name -> $($currentAzure.Subscription.Name)`n")
                                 Write-Host("Inserire il nome o l'ID della sottoscrizione in cui si trova il Lab Account di Azure Lab Services.")
@@ -468,7 +465,7 @@ else {
 }
 
 $currentAzure = Get-AzContext
-Write-Host("Sottoscrizione attualmente in uso:")
+Write-Host("Dati della sottoscrizione attualmente in uso:")
 Write-Host("`tSub Id -> $($currentAzure.Subscription.Id)")
 Write-Host("`tSub Name -> $($currentAzure.Subscription.Name)`n")
 
