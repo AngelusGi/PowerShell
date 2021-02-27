@@ -39,15 +39,15 @@ Param
     [parameter()]
     [string]
     [ValidateSet('$false', '$true')]
-    $SendInvitation = $false,
+    $SendInvitation,
 
     [parameter()]
     [String]
-    $WelcomeMessaege,
+    $WelcomeMessage,
 
     [parameter()]
     [String]
-    $LabName
+    $LabNameForAll
 
 )
 
@@ -119,7 +119,6 @@ function SearchUsers {
 
             $UserNick = UserSearchString -UserName $userToSearch.Email
             # $UserNick = $userToSearch.Email
-            
 
             $foundResultAAD = $UsersFromAzureAd | Where-Object { $_.ProxyAddresses -match $UserNick }
             
@@ -214,25 +213,25 @@ function VerifyCsv {
 
     process {
         try {
+
             ForEach ($CsvUser in $CsvUsers) {
                 if ( [string]::IsNullOrEmpty($CsvUser.Email) -or [string]::IsNullOrWhiteSpace($CsvUser.Email) ) {
                     Write-Error("Il CSV non e' formattato correttamente, verificare il campo 'Email' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
                     exit
                 }
 
-                if ($null -eq $LabName) {
-                    if ( [string]::IsNullOrEmpty($CsvUser.LabName) -or [string]::IsNullOrWhiteSpace($CsvUser.LabName) ) {
-                        Write-Error("Il CSV non e' formattato correttamente, verificare il campo 'LabName' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
-                        exit
-                    }    
-                }
+                if ( [string]::IsNullOrEmpty($CsvUser.LabName) -or [string]::IsNullOrWhiteSpace($CsvUser.LabName) ) {
+                    Write-Error("Il CSV non e' formattato correttamente, verificare il campo 'LabName' e verificare che non sia vuoto o che sia avvalorato su tutte le istanze")
+                    exit
+                }    
+               
+                
                 
             }
 
         }
         catch {
-            Write-Error("Impossibile verificare il CSV, verificare che i campi siano conformi")
-            exit
+            
         }
     }
 }
@@ -257,12 +256,13 @@ function CheckInputCsv {
 
         if (',' -eq $Delimiter) {
             Write-Host("Si sta utilizzando il delimitatore di default, in quanto non fornito -> $($Delimiter)")
-        } else {
+        }
+        else {
             Write-Host("Delimitatore attualmente in uso -> $($Delimiter)")
         }
         
         if ([string]::IsNullOrEmpty($PathCSV) -or [string]::IsNullOrWhiteSpace($PathCSV)) {
-            Write-Error("Il parametro PathCSV non pu� essere vuoto")
+            Write-Error("Il parametro PathCSV non puo' essere vuoto")
             exit
         }
         
@@ -335,7 +335,8 @@ function Get-DataFromExchange {
     process {
 
         Write-Host("Ottenimento utenti da Exchange Online in corso... Attendere.")
-        return Get-Mailbox -Identity * -ResultSize Unlimited | Select-Object DisplayName, PrimarySmtpAddress, EmailAddresses
+        # return Get-Mailbox -Identity * -ResultSize Unlimited | Select-Object DisplayName, PrimarySmtpAddress, EmailAddresses
+        return Get-EXOMailbox -Identity * -ResultSize Unlimited | Select-Object DisplayName, PrimarySmtpAddress, EmailAddresses
 
     }
     
@@ -345,7 +346,7 @@ function AddStudentsToLab {
     param (
         $UsersToInvite,
         $SendInvitation,
-        $WelcomeMessaege
+        $WelcomeMessage
     )
 
     process {
@@ -357,33 +358,43 @@ function AddStudentsToLab {
                 # Write-Host($result.Values)
                 # Write-Host($result.Get_Item("DisplayName"))
 
+                # $labName = $_.LabName
+                # $userEmail = $_.Email
+
                 $labName = $_.Get_Item("LabName")
                 $userEmail = $_.Get_Item("PrimarySmtpAddress")
 
                 if (($null -ne $labName) -and ($null -ne $userEmail)) {
-                    $Lab = Get-AzLabAccount | Get-AzLab -LabName $labName
-                    
 
-                    # do {
-
-                    #     # if($null -eq $Lab){
-                    #     #     Write-Warning("Nella sottoscrizione corrente non sono stati trovati Lab Account di Azure Lab Services.")
-                    #     #     $sub = Get-AzSubscription
-                    #     #     Write-Host("Nome sottoscrizione corrente -> $($subName)")
-                    #     #     Write-Host("Id sottoscrizione corrente -> $($sub.Id)")
-
-                    #     #     do {
-                    #     #         Write-Host("Inserire il nome o l'ID della sottoscrizione in cui si trova il Lab Account di Azure Lab Services.")
-                    #     #         $labName = Read-Host("->  ")
-
-                    #     #     } while ([string]::IsNullOrEmpty($labName) -or [string]::IsNullOrWhiteSpace($labName))
-
-                    #     # }
-
-                    # } while ($null -eq $Lab)
+                    do {
+                        $Lab = $null
+                        try {
+                            # $Lab = Get-AzLabAccount | Get-AzLab -LabName $labName
+                            # if ($null -eq $Lab) {
+                            $Lab = Get-AzLabAccount | Get-AzLab | Where-Object { $_.LabName -eq $labName }
+                            # }
+                        }
+                        catch {
+                        }
+                        finally {
+                            if ($null -eq $Lab) {
+                                Write-Warning("Nella sottoscrizione corrente non sono stati trovati Lab Account di Azure Lab Services.")
+                                $currentAzure = Get-AzContext
+                                Write-Host("Sottoscrizione attualmente in uso:")
+                                Write-Host("`tSub Id -> $($currentAzure.Subscription.Id)")
+                                Write-Host("`tSub Name -> $($currentAzure.Subscription.Name)`n")
+                                Write-Host("Inserire il nome o l'ID della sottoscrizione in cui si trova il Lab Account di Azure Lab Services.")
+                                $sub = Read-Host("->  ")
+                                Set-AzContext -Subscription $sub
+                            }
+                            else {
+                                Write-Host("Operazione in corso sul laboratorio -> $($Lab.LabName)")
+                            }
+                        }
+                    } while ($null -eq $Lab)
 
                     Add-AzLabUser -Lab $Lab -Emails $userEmail
-                    Write-Warning("*** Aggiunta al laboratorio $($labName) di $($userEmail) completata ***")
+                    Write-Host("*** Aggiunta al laboratorio $($labName) di $($userEmail) completata ***")
 
                     $LabsList.Add($labName)
                 }
@@ -391,19 +402,19 @@ function AddStudentsToLab {
             catch {
                 
             }
+        Write-Warning("Aggiunta utenti completata...")
             
         }
 
-            
         if ([string]::IsNullOrEmpty($SendInvitation) -or [string]::IsNullOrWhiteSpace($SendInvitation)) {
-            Write-Warning("Non e' stato abilitato l'invito automatico degli utenti. Sar� necessario recarsi su https://labs.azure.com e invitarli facendo click sul bottone 'Invita tutti'")
+            Write-Warning("Non e' stato abilitato l'invito automatico degli utenti. Sara' necessario recarsi su https://labs.azure.com e invitarli facendo click sul bottone 'Invita tutti'")
            
         }
         else {
             $Labs = $LabsList | Get-Unique
 
-            if ([string]::IsNullOrEmpty($WelcomeMessaege) -or [string]::IsNullOrWhiteSpace($WelcomeMessaege)) {
-                $WelcomeMessaege = "Benenuto su Azure LabServices"
+            if ([string]::IsNullOrEmpty($WelcomeMessage) -or [string]::IsNullOrWhiteSpace($WelcomeMessage)) {
+                $WelcomeMessage = "Benenuto su Azure LabServices"
             }
 
             foreach ($Lab in $Labs) {
@@ -412,11 +423,13 @@ function AddStudentsToLab {
                 $LabUsers = Get-AzLabUser -Lab $CurrentLab
 
                 foreach ($User in $LabUsers) {
-                    Send-AzLabUserInvitationEmail -User $User -InvitationText $WelcomeMessaege -Lab $CurrentLab
-                    Write-Warning("*** Invito al laboratorio $($CurrentLab.name) inviato a $($User.properties.email) ***")
+                    Send-AzLabUserInvitationEmail -User $User -InvitationText $WelcomeMessage -Lab $CurrentLab
+                    Write-Host("*** Invito al laboratorio $($CurrentLab.name) inviato a $($User.properties.email) ***")
                 }
     
             }
+
+            Write-Warning("Invito utenti completato...")
         }
         
     }
@@ -444,23 +457,24 @@ function ExportResults {
 
 # BODY
 
-PrepareEnvironment -Modules "ExchangeOnlineManagement", "AzureAD", "Az", "Az.LabServices" -Version 5
-
 Connect-ExchangeOnline | Out-Null
 
 Connect-AzureAD
 
 if ([string]::IsNullOrEmpty($AzureSub) -or [string]::IsNullOrWhiteSpace($AzureSub)) {
-    Write-Warning("Si utilizzerà la sottoscrizione predefinita, non è stato fornita una sottoscrizione.")
+    Write-Warning("Non sono state fornite spechifiche inerenti la sottoscrizione, verra' utilizzata quella predefinita.")
     Connect-AzAccount
 }
 else {
     Connect-AzAccount -Subscription $AzureSub
 }
 
-$UsersFromCsv = ProcessCsv -PathCSV $PathCsv -Delimiter $Delimiter
+$currentAzure = Get-AzContext
+Write-Host("Sottoscrizione attualmente in uso:")
+Write-Host("`tSub Id -> $($currentAzure.Subscription.Id)")
+Write-Host("`tSub Name -> $($currentAzure.Subscription.Name)`n")
 
-# $UsersFromCsv
+$UsersFromCsv = ProcessCsv -PathCSV $PathCsv -Delimiter $Delimiter
 
 Write-Warning("Ricerca utenti in corso, l'operazione potrebbe richiedere alcuni minuti. Attendere...")
 
@@ -469,7 +483,8 @@ $AadUsers = Get-DataFromAAD
 
 $FoundUsers = Get-UsersToSearch -UsersFromCsv $UsersFromCsv -UsersFromExchange $ExchangeUsers -UsersFromAAD $AadUsers
 
-AddStudentsToLab -UsersToInvite $FoundUsers
+AddStudentsToLab -UsersToInvite $FoundUsers -SendInvitation $SendInvitation -WelcomeMessage $WelcomeMessage
+# AddStudentsToLab -UsersToInvite $UsersFromCsv -SendInvitation $SendInvitation -WelcomeMessage $WelcomeMessage
 
 ExitSessions
 
