@@ -31,7 +31,7 @@ In tool setting of Android Studio please set:
 <code>/sku:Android launch /id:"YOUR-ID"</code>
 
 To obtaion <b>"YOUR-ID"</b> run this <b>PowerShell</b> comand in the VM where you have runned the script in this repository.
-<code>emulatorcmd.exe /sku:Android list /type:device</code>
+<br><code>emulatorcmd.exe /sku:Android list /type:device</code>
 
 ### Settings window
 ![Android Studio External Tools](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Setup%20Android%20Emulator/Screenshot/AndroidStudio-ExternalTools-Configuration.png)
