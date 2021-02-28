@@ -49,16 +49,20 @@ function InstallSoftware {
     process {
 
         Set-location -Path $Path
-        $programs = Get-ChildItem
+        # $programs = Get-ChildItem
         
-        foreach ($program in $programs) {
+        # foreach ($program in $programs) {
 
-            Start-Process -FilePath $program -Verb runAs
-            # Start-Process -FilePath $downloadPath -Verb runAs -ArgumentList '/s', '/v"/qn"'
+        #     Start-Process -FilePath $program.Name -Verb runAs
+        #     # Start-Process -FilePath $downloadPath -Verb runAs -ArgumentList '/s', '/v"/qn"'
 
-            Read-Host("Al termine del wizard d'installazione premere un tasto per continuare...")
+        #     Read-Host("Al termine del wizard d'installazione premere un tasto per continuare...")
 
-        }
+        # }
+
+        .\1-enableHyperV.ps1
+        .\2-softwareDownloadAndInstall.ps1
+        .\3-redirectEmulator.ps1
 
         Write-Warning("Installazione software completata.")
 
@@ -68,7 +72,7 @@ function InstallSoftware {
 if (Get-RunningAsAdministrator) {
 
     
-    $components = "1-enableHyperV.ps1", "2-softwareDownloadAndInstall", "3-redirectEmulator.ps1"
+    $components = "1-enableHyperV.ps1", "2-softwareDownloadAndInstall.ps1", "3-redirectEmulator.ps1"
 
     $currentPath = DownloadModules -Software $components
 

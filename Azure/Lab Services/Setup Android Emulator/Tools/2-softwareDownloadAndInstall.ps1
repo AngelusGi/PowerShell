@@ -1,7 +1,7 @@
 
 function DownloadSoftware {
     param (
-        
+        $SoftwareList
     )
     
     process {
