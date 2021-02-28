@@ -8,7 +8,7 @@ function DownloadModules {
         $Client = New-Object System.Net.WebClient
         $currentPath = Get-Location
         
-        $baseDownloadUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Setup%20Android%20Emulator/" 
+        $baseDownloadUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Setup%20Android%20Emulator/Tools/" 
 
         $tempPath = $currentPath.Path + "\"
         
