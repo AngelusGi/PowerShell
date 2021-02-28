@@ -1,7 +1,11 @@
 # Setup Android Emulator
 
 ## Table of contents
-
+* [Reference](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Setup%20Android%20Emulator#reference)
+* [How to use](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Setup%20Android%20Emulator#how-to-use)
+* [How to configure](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Setup%20Android%20Emulator#how-to-configure)
+* [Example](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Setup%20Android%20Emulator#example)
+* [Troubleshooting](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Setup%20Android%20Emulator#troubleshooting)
 
 ## Reference
 * [Azure VMs that support nested virtualization](https://azure.microsoft.com/blog/nested-virtualization-in-azure/)
