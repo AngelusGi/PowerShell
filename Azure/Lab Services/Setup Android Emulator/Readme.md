@@ -21,14 +21,16 @@ After the system reboot configure Android Studio as referred in the "[How to con
 
 ## How to configure
 
+* In tool setting of Android Studio set <b>"Program"</b> as
 <code>C:\Program Files (x86)\Microsoft Emulator Manager\1.0\emulatorcmd.exe</code>
 
+* In tool setting of Android Studio set <b>"Arguments"</b> as
 <code>C:\Program Files (x86)\Microsoft Emulator Manager\1.0</code>
 
+* In tool setting of Android Studio set <b>"Working Directory"</b> as
 <code>/sku:Android launch /id:"YOUR-ID"</code>
 
 To obtaion <b>"YOUR-ID"</b> run this <b>PowerShell</b> comand in the VM where you have runned the script in this repository.
-<br>
 <code>emulatorcmd.exe /sku:Android list /type:device</code>
 
 
