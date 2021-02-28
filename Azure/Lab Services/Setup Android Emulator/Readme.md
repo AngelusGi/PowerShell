@@ -20,21 +20,24 @@ After the system reboot configure Android Studio as referred in the "[How to con
 
 
 ## How to configure
-
-* In tool setting of Android Studio set <b>"Program"</b> as
+In tool setting of Android Studio please set: 
+* <b>"Program"</b> as
 <code>C:\Program Files (x86)\Microsoft Emulator Manager\1.0\emulatorcmd.exe</code>
 
-* In tool setting of Android Studio set <b>"Arguments"</b> as
+* <b>"Arguments"</b> as
 <code>C:\Program Files (x86)\Microsoft Emulator Manager\1.0</code>
 
-* In tool setting of Android Studio set <b>"Working Directory"</b> as
+* <b>"Working Directory"</b> as
 <code>/sku:Android launch /id:"YOUR-ID"</code>
 
 To obtaion <b>"YOUR-ID"</b> run this <b>PowerShell</b> comand in the VM where you have runned the script in this repository.
 <code>emulatorcmd.exe /sku:Android list /type:device</code>
 
+### Settings window
+![Android Studio External Tools](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Setup%20Android%20Emulator/Screenshot/AndroidStudio-ExternalTools-Configuration.png)
 
-![How-to-configure](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Setup%20Android%20Emulator/Screenshot/How-to-configure.gif)
+### Video guide
+![How to configure](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Setup%20Android%20Emulator/Screenshot/How-to-configure.gif)
 
 
 ## Example
