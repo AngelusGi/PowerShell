@@ -15,12 +15,12 @@ param(
     # New Size - eg. 32, 64, ...
     [Parameter(AttributeValues)]
     [int16]
-    $DiskSizeGB = 64,
+    $DiskSizeGB,
 
     # Subscription Name - eg: Contoso
     [Parameter(AttributeValues)]
     [String]
-    $AzSubscription = "" 
+    $AzSubscription
 
 )
 
@@ -64,13 +64,13 @@ Connect-AzAccount
 Select-AzSubscription -Subscription $AzSubscription
 
 # VM to resize disk of
-$VM = Get-AzVm | ? Name -eq $VmName
+$VM = Get-AzVm | Where-Object Name -eq $VmName
 
 #Provide the name of your resource group where snapshot is created
 $resourceGroupName = $VM.ResourceGroupName
 
 # Get Disk from ID
-$Disk = Get-AzDisk | ? Id -eq $DiskId
+$Disk = Get-AzDisk | Where-Object Id -eq $DiskId
 
 # Get VM/Disk generation from Disk
 $HyperVGen = $Disk.HyperVGeneration
@@ -116,28 +116,16 @@ $state
 Revoke-AzDiskAccess -ResourceGroupName $resourceGroupName -DiskName $DiskName
 
 # Emtpy disk to get footer from
-$emptydiskforfootername = "$($VM.StorageProfile.OsDisk.Name)-empty.vhd"
+$emptyDiskForFooterName = "$($VM.StorageProfile.OsDisk.Name)-empty.vhd"
 
 # Empty disk URI
 #$EmptyDiskURI = $container.CloudBlobContainer.Uri.AbsoluteUri + "/" + $emptydiskforfooter
 
-$diskConfig = New-AzDiskConfig `
-    -Location $VM.Location `
-    -CreateOption Empty `
-    -DiskSizeGB $DiskSizeGB `
-    -HyperVGeneration $HyperVGen
+$diskConfig = New-AzDiskConfig -Location $VM.Location -CreateOption Empty -DiskSizeGB $DiskSizeGB -HyperVGeneration $HyperVGen
 
-$dataDisk = New-AzDisk `
-    -ResourceGroupName $resourceGroupName `
-    -DiskName $emptydiskforfootername `
-    -Disk $diskConfig
+$dataDisk = New-AzDisk -ResourceGroupName $resourceGroupName -DiskName $emptyDiskForFooterName -Disk $diskConfig
 
-$VM = Add-AzVMDataDisk `
-    -VM $VM `
-    -Name $emptydiskforfootername `
-    -CreateOption Attach `
-    -ManagedDiskId $dataDisk.Id `
-    -Lun 63
+$VM = Add-AzVMDataDisk -VM $VM -Name $emptyDiskForFooterName -CreateOption Attach -ManagedDiskId $dataDisk.Id -Lun 63
 
 Update-AzVM -ResourceGroupName $resourceGroupName -VM $VM
 
@@ -145,26 +133,26 @@ $VM | Stop-AzVM -Force
 
 
 # Get SAS token for the empty disk
-$SAS = Grant-AzDiskAccess -ResourceGroupName $resourceGroupName -DiskName $emptydiskforfootername -Access 'Read' -DurationInSecond 600000;
+$SAS = Grant-AzDiskAccess -ResourceGroupName $resourceGroupName -DiskName $emptyDiskForFooterName -Access 'Read' -DurationInSecond 600000;
 
 # Copy the empty disk to blob storage
 Write-Host("Starting: copy the empty disk to blob storage")
-Start-AzStorageBlobCopy -AbsoluteUri $SAS.AccessSAS -DestContainer $storageContainerName -DestBlob $emptydiskforfootername -DestContext $destinationContext
-while (($state = Get-AzStorageBlobCopyState -Context $destinationContext -Blob $emptydiskforfootername -Container $storageContainerName).Status -ne "Success") { $state; Start-Sleep -Seconds 20 }
+Start-AzStorageBlobCopy -AbsoluteUri $SAS.AccessSAS -DestContainer $storageContainerName -DestBlob $emptyDiskForFooterName -DestContext $destinationContext
+while (($state = Get-AzStorageBlobCopyState -Context $destinationContext -Blob $emptyDiskForFooterName -Container $storageContainerName).Status -ne "Success") { $state; Start-Sleep -Seconds 20 }
 $state
 
 # Revoke SAS token
-Revoke-AzDiskAccess -ResourceGroupName $resourceGroupName -DiskName $emptydiskforfootername
+Revoke-AzDiskAccess -ResourceGroupName $resourceGroupName -DiskName $emptyDiskForFooterName
 
 # Remove temp empty disk
-Remove-AzVMDataDisk -VM $VM -DataDiskNames $emptydiskforfootername
+Remove-AzVMDataDisk -VM $VM -DataDiskNames $emptyDiskForFooterName
 Update-AzVM -ResourceGroupName $resourceGroupName -VM $VM
 
 # Delete temp disk
-Remove-AzDisk -ResourceGroupName $resourceGroupName -DiskName $emptydiskforfootername -Force;
+Remove-AzDisk -ResourceGroupName $resourceGroupName -DiskName $emptyDiskForFooterName -Force;
 
 # Get the blobs
-$emptyDiskblob = Get-AzStorageBlob -Context $destinationContext -Container $storageContainerName -Blob $emptydiskforfootername
+$emptyDiskblob = Get-AzStorageBlob -Context $destinationContext -Container $storageContainerName -Blob $emptyDiskForFooterName
 $osdisk = Get-AzStorageBlob -Context $destinationContext -Container $storageContainerName -Blob $destinationVHDFileName
 
 $footer = New-Object -TypeName byte[] -ArgumentList 512
