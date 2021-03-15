@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param (
 
 )
@@ -26,13 +26,13 @@ function PrepareEnvironment {
     
     process {
 
-        $LibraryURL = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/ModuleManager.ps1"
+        $LibraryURL = 'https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/ModuleManager.ps1'
 
         $Client = New-Object System.Net.WebClient
     
         $currentPath = Get-Location
 
-        $downloadPath = $currentPath.Path + "\ModuleManager.ps1"
+        $downloadPath = $currentPath.Path + '\ModuleManager.ps1'
         
         $Client.DownloadFile($LibraryURL, $downloadPath)
 
@@ -45,18 +45,18 @@ function PrepareEnvironment {
 
 # End parameters region
 
-PrepareEnvironment -Modules "MicrosoftTeams"
+PrepareEnvironment -Modules 'MicrosoftTeams'
 
 $data = Connect-MicrosoftTeams
 
-Write-Warning("Applicazione policy in corso, attendere...")
+Write-Warning('Applicazione policy in corso, attendere...')
 Set-CsTeamsMessagingPolicy -Tenant $data.Tenant.Id –AllowOwnerDeleteMessage $true
 
-Write-Host("La policy 'AllowOwnerDeleteMessage' e' stata applicata correttamente.")
-Write-Host("Le policy applicate nel tenant sono le seguenti:")
+Write-Host('La policy `AllowOwnerDeleteMessage` e` stata applicata correttamente.')
+Write-Host('Le policy applicate nel tenant sono le seguenti:')
 
 Get-CsTeamsMessagingPolicy
 
 ExitSessions
 
-Write-Host("Esecuzione script completata.")
+Write-Host('Esecuzione script completata.')

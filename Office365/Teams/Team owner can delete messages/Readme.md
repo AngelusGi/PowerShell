@@ -1,5 +1,5 @@
 # Team owner can delete messages
-# How Teams administrators can delete users messages
+How Teams administrators can delete users messages
 
 ## Table of contents
 * [References](https://github.com/AngelusGi/PowerShell/tree/master/Office365/Teams/Team%20owner%20can%20delete%20messages#references)
