@@ -37,12 +37,20 @@ To obtaion <b>"YOUR-ID"</b> run this <b>PowerShell</b> comand in the VM where yo
 ![Android Studio External Tools](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Setup%20Android%20Emulator/Screenshot/AndroidStudio-ExternalTools-Configuration.png)
 
 ### Video guide
-![How to configure](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Setup%20Android%20Emulator/Screenshot/How-to-configure.gif)
+
+#### How to run
+![How to run](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Setup%20Android%20Emulator/Screenshot/How-to-run.gif)
+
+#### How to configure Android Studio
+![How to Configure Android Studio](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Setup%20Android%20Emulator/Screenshot/How-To-Configure-Android-Studio.gif)
+
+#### Expected Result
+
 
 
 ## Example
 
-![Expected-result](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Setup%20Android%20Emulator/Screenshot/Expected-result.gif)
+![Expected Result](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Setup%20Android%20Emulator/Screenshot/Expected-Result.gif)
 
 
 ## Troubleshooting
