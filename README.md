@@ -15,6 +15,7 @@
 * Add users and invite them to an existing Lab in bulk <br> [link](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Add%20students%20and%20send%20invitation)
 * Add users and (optionally) invite them to an existing Lab using an email alias of Exchange instead of the UPN <br> [link](https://github.com/AngelusGi/PowerShell/blob/master/Azure/Lab%20Services/Add%20students%20by%20alias/)
 * Domain join in a lab's vm <br> [link](https://github.com/AngelusGi/azure-devtestlab-activedirectoryjoin)
+* How to setup Android Emulator <br> [link](https://github.com/AngelusGi/PowerShell/tree/master/Azure/Lab%20Services/Setup%20Android%20Emulator)
 
 
 ---
