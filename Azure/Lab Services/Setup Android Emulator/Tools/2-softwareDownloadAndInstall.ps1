@@ -34,7 +34,7 @@ function CleanResources {
 
         Read-Host("Verrranno rimossi i file d'installazione, premere un tasto per continuare...")
 
-        Remove-item $Path -recurse
+        Remove-item $Path -Recurse -Force
         Write-Host("Percorso temporaneo rimosso > $($Path)")
 
     }
@@ -48,10 +48,11 @@ function InstallSoftware {
     
     process {
 
+        Set-Location -LiteralPath $Path
         foreach ($nameSetup in $SoftwareList.Keys) {
             Write-Host("Installazione in corso di: $($nameSetup)")
 
-            $installPath = $Path + "\" + $nameSetup
+            $installPath = ".\" + $nameSetup
             Unblock-File $installPath
             & $installPath
 
