@@ -6,19 +6,19 @@ function DownloadSoftware {
     
     process {
         
-$Client = New-Object System.Net.WebClient
-$currentPath = Get-Location
-$tempFolder = "TempDownload"
-New-Item -Path $currentPath -Name $tempFolder -ItemType Directory
-$tempPath = $currentPath.Path + "\" + $tempFolder
-foreach ($nameSetup in $SoftwareList.Keys) {
-Write-Host("Download in corso di: $($nameSetup)")
-$downloadPath = $tempPath + "\" + $nameSetup
-$Client.DownloadFile($SoftwareList.$nameSetup, $downloadPath)
-Write-Host("Percorso > $($downloadPath)")
-Write-Host("Download di $($nameSetup) completato.")
-}
-Write-Warning("Download completati.")
+        $Client = New-Object System.Net.WebClient
+        $currentPath = Get-Location
+        $tempFolder = "TempDownload"
+        New-Item -Path $currentPath -Name $tempFolder -ItemType Directory
+        $tempPath = $currentPath.Path + "\" + $tempFolder
+        foreach ($nameSetup in $SoftwareList.Keys) {
+            Write-Host("Download in corso di: $($nameSetup)")
+            $downloadPath = $tempPath + "\" + $nameSetup
+            $Client.DownloadFile($SoftwareList.$nameSetup, $downloadPath)
+            Write-Host("Percorso > $($downloadPath)")
+            Write-Host("Download di $($nameSetup) completato.")
+        }
+        Write-Warning("Download completati.")
 
         return $tempPath
         
@@ -34,7 +34,7 @@ function CleanResources {
 
         Read-Host("Verrranno rimossi i file d'installazione, premere un tasto per continuare...")
 
-        Remove-item $Path -recurse
+        Remove-item $Path -Recurse -Force
         Write-Host("Percorso temporaneo rimosso > $($Path)")
 
     }
@@ -48,22 +48,15 @@ function InstallSoftware {
     
     process {
 
-        # foreach ($program in $programs) {
-        #     Start-Process -FilePath $program -Verb runAs
-        #     # Start-Process -FilePath $downloadPath -Verb runAs -ArgumentList '/s', '/v"/qn"'
-        #     Read-Host("Al termine del wizard d'installazione premere un tasto per continuare...")
-        # }
-
+        Set-Location -LiteralPath $Path
         foreach ($nameSetup in $SoftwareList.Keys) {
             Write-Host("Installazione in corso di: $($nameSetup)")
-            if($nameSetup -eq "SetupForNestedVirtualization.ps1"){
-                # $installPath = $Path + "\" + $nameSetup
-                .\SetupForNestedVirtualization.ps1
-            } else {
-                $installPath = $Path + "\" + $nameSetup
-                Start-Process -FilePath $installPath -Verb runA
-            }
-            Read-Host("Al termine del wizard d'installazione premere un tasto per continuare...")
+
+            $installPath = ".\" + $nameSetup
+            Unblock-File $installPath
+            & $installPath
+
+            Read-Host("Al termine del wizard d'installazione di $($nameSetup) premere un tasto per continuare...")
 
         }
 

@@ -15,11 +15,8 @@ function DownloadModules {
         foreach ($script in $Software) {
 
             Write-Host("Download in corso di: $($script)")
-
             $downloadPath = $tempPath + "\" + $script
-
             $downloadUrl = $baseDownloadUrl + $script
-
             $Client.DownloadFile($downloadUrl, $downloadPath)
 
         }
@@ -49,21 +46,14 @@ function InstallSoftware {
     process {
 
         Set-location -Path $Path
-        # $programs = Get-ChildItem
+
+        $PsScripts = ".\1-enableHyperV.ps1", ".\2-softwareDownloadAndInstall.ps1", ".\3-redirectEmulator.ps1"
         
-        # foreach ($program in $programs) {
-
-        #     Start-Process -FilePath $program.Name -Verb runAs
-        #     # Start-Process -FilePath $downloadPath -Verb runAs -ArgumentList '/s', '/v"/qn"'
-
-        #     Read-Host("Al termine del wizard d'installazione premere un tasto per continuare...")
-
-        # }
-
-        .\1-enableHyperV.ps1
-        .\2-softwareDownloadAndInstall.ps1
-        .\3-redirectEmulator.ps1
-
+        foreach ($psScript in $PsScripts) {
+            Unblock-File $psScript
+            & $psScript
+        }
+        
         Write-Warning("Installazione software completata.")
 
     }
@@ -71,11 +61,8 @@ function InstallSoftware {
 
 if (Get-RunningAsAdministrator) {
 
-    
     $components = "1-enableHyperV.ps1", "2-softwareDownloadAndInstall.ps1", "3-redirectEmulator.ps1"
-
     $currentPath = DownloadModules -Software $components
-
     InstallSoftware -SoftwareList $components -Path $currentPath
     
 }
