@@ -24,10 +24,10 @@ In tool setting of Android Studio please set:
 * <b>"Program"</b> as
 <code>C:\Program Files (x86)\Microsoft Emulator Manager\1.0\emulatorcmd.exe</code>
 
-* <b>"Arguments"</b> as
+* <b>"Working Directory"</b> as
 <code>C:\Program Files (x86)\Microsoft Emulator Manager\1.0</code>
 
-* <b>"Working Directory"</b> as
+* <b>"Arguments"</b> as
 <code>/sku:Android launch /id:"YOUR-ID"</code>
 
 To obtaion <b>"YOUR-ID"</b> run this <b>PowerShell</b> comand in the VM where you have runned the script in this repository.
