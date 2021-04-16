@@ -44,9 +44,6 @@ To obtaion <b>"YOUR-ID"</b> run this <b>PowerShell</b> comand in the VM where yo
 #### How to configure Android Studio
 ![How to Configure Android Studio](https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Setup%20Android%20Emulator/Screenshot/How-To-Configure-Android-Studio.gif)
 
-#### Expected Result
-
-
 
 ## Example
 
