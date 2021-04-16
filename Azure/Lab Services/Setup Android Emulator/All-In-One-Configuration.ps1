@@ -1,26 +1,23 @@
-function DownloadModules {
-    param(
-        $Software
-    )
 
+function DownloadSoftware {
+    param (
+        $SoftwareList
+    )
+    
     process {
         
         $Client = New-Object System.Net.WebClient
         $currentPath = Get-Location
-        
-        $baseDownloadUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Azure/Lab%20Services/Setup%20Android%20Emulator/Tools/" 
-
-        $tempPath = $currentPath.Path + "\"
-        
-        foreach ($script in $Software) {
-
-            Write-Host("Download in corso di: $($script)")
-            $downloadPath = $tempPath + "\" + $script
-            $downloadUrl = $baseDownloadUrl + $script
-            $Client.DownloadFile($downloadUrl, $downloadPath)
-
+        $tempFolder = "TempDownload"
+        New-Item -Path $currentPath -Name $tempFolder -ItemType Directory
+        $tempPath = $currentPath.Path + "\" + $tempFolder
+        foreach ($nameSetup in $SoftwareList.Keys) {
+            Write-Host("Download in corso di: $($nameSetup)")
+            $downloadPath = $tempPath + "\" + $nameSetup
+            $Client.DownloadFile($SoftwareList.$nameSetup, $downloadPath)
+            Write-Host("Percorso > $($downloadPath)")
+            Write-Host("Download di $($nameSetup) completato.")
         }
-
         Write-Warning("Download completati.")
 
         return $tempPath
@@ -28,13 +25,19 @@ function DownloadModules {
     }
 }
 
-function Get-RunningAsAdministrator {
-    [CmdletBinding()]
-    param()
+function CleanResources {
+    param (
+        $Path
+    )
     
-    $isAdministrator = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
-    Write-Verbose "Running with Administrator privileges (t/f): $isAdministrator"
-    return $isAdministrator
+    process {
+
+        Read-Host("Verrranno rimossi i file d'installazione, premere un tasto per continuare...")
+
+        Remove-item $Path -Recurse -Force
+        Write-Host("Percorso temporaneo rimosso > $($Path)")
+
+    }
 }
 
 function InstallSoftware {
@@ -45,29 +48,32 @@ function InstallSoftware {
     
     process {
 
-        Set-location -Path $Path
+        Set-Location -LiteralPath $Path
+        foreach ($nameSetup in $SoftwareList.Keys) {
+            Write-Host("Installazione in corso di: $($nameSetup)")
 
-        $PsScripts = ".\1-enableHyperV.ps1", ".\2-softwareDownloadAndInstall.ps1", ".\3-redirectEmulator.ps1"
-        
-        foreach ($psScript in $PsScripts) {
-            Unblock-File $psScript
-            & $psScript
+            $installPath = ".\" + $nameSetup
+            Unblock-File $installPath
+            & $installPath
+
+            Read-Host("Al termine del wizard d'installazione di $($nameSetup) premere un tasto per continuare...")
+
         }
-        
-        Write-Warning("Installazione software completata.")
 
+        Write-Warning("Installazione software completata.")
     }
 }
 
-if (Get-RunningAsAdministrator) {
 
-    $components = "1-enableHyperV.ps1", "2-softwareDownloadAndInstall.ps1", "3-redirectEmulator.ps1"
-    $currentPath = DownloadModules -Software $components
-    InstallSoftware -SoftwareList $components -Path $currentPath
-    
-}
-else {
-    Write-Warning("Questo script deve essere eseguito come amministratore.")
+$softwares = @{
+    "SetupForNestedVirtualization.ps1"           = "https://raw.githubusercontent.com/Azure/azure-devtestlab/master/samples/ClassroomLabs/Scripts/HyperV/SetupForNestedVirtualization.ps1";
+    "jre-8u281-windows-x64.exe"                  = "https://javadl.oracle.com/webapps/download/AutoDL?BundleId=244068_89d678f2be164786b292527658ca1605";
+    "vs_emulatorsetup.exe"                       = "https://go.microsoft.com/fwlink/?LinkID=809030";
+    "android-studio-ide-201.7042882-windows.exe" = "https://redirector.gvt1.com/edgedl/android/studio/install/4.1.2.0/android-studio-ide-201.7042882-windows.exe"
+
 }
 
-Write-Host("*** Esecuzione script completata ***")
+
+$path = DownloadSoftware -SoftwareList $softwares
+InstallSoftware -SoftwareList $softwares -Path $path
+CleanResources -Path $path
