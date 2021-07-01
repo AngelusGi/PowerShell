@@ -3,6 +3,7 @@
 ##
 ! /Tools/*
 ! /Tools/ModuleManager.psm1
+! /Tools/ModuleManager.psd1
 ! /Tools/TestModuleManager.ps1
 
 # User-specific files
