@@ -1,20 +1,29 @@
-# Region module manager
+#region mod manager
 
 param(
     # List of modules to install
-    [Parameter(Mandatory = $true)]
+    [Parameter(
+        HelpMessage = "List of PowerShell modules to be installed.",
+        Mandatory = $true
+    )]
     [String[]]
     $Modules,
 
-    # Install module -scope
-    [Parameter()]
+    # Install mod -scope
+    [Parameter(
+        HelpMessage = "Scope of the mod installer. Default: CurrentUser.",
+        Mandatory = $false
+    )]
     [String]
     $Scope = "CurrentUser",
 
     # Version required to run the script - if null every version of PowerShell is good
-    [Parameter()]
-    [int16]
-    $CompatibleVersion = 0
+    [Parameter(
+        HelpMessage = "If true, PowerShell 5.x is required to run the script - if flase/blank every version of PowerShell is good.",
+        Mandatory = $false
+    )]
+    [bool]
+    $CompatibleVersion
 )
 
 function CheckModules {
@@ -24,59 +33,69 @@ function CheckModules {
     )
     process {
 
-        $installedModules = Get-InstalledModule
+        $_installedModules = Get-InstalledModule
 
-        foreach ($module in $Modules) {
+        foreach ($mod in $Modules) {
         
-            if ($module -eq "Az") {
+            if ($mod -eq "Az") {
                 if ($PSVersionTable.PSEdition -eq 'Desktop' -and (Get-Module -Name AzureRM -ListAvailable)) {
                     throw 'Il modulo AzureRM è installato sulla macchina. Rimuoverlo prima di procedere.'
                 }
             }
 
-            if ($module -eq "Az.LabServices") {
+            if ($mod -eq "Az.LabServices") {
                 
                 Write-Host("Installazione del modulo Az.LabServices in corso...")
 
-                $LabServiceLibraryURL = "https://raw.githubusercontent.com/Azure/azure-devtestlab/master/samples/ClassroomLabs/Modules/Library/Az.LabServices.psm1"
+                $_azLabServiceLib = "https://raw.githubusercontent.com/Azure/azure-devtestlab/master/samples/ClassroomLabs/Modules/Library/Az.LabServices.psm1"
 
-                $Client = New-Object System.Net.WebClient
+                $_client = New-Object System.Net.WebClient
 
-                $currentPath = Get-Location
+                $_currentPath = Get-Location
 
-                $downloadPath = $currentPath.Path + "\Az.LabServices.psm1"
-                
-                $Client.DownloadFile($LabServiceLibraryURL, $downloadPath)
+                $_moduleFileName = "\Az.LabServices.psm1"
 
-                Import-Module .\Az.LabServices.psm1
+                if ([System.Environment]::OSVersion.Platform.Equals("Unix")) {
+                    $_moduleFileName = "/Az.LabServices.psm1"
+                }
+
+                $_downloadPath = $_currentPath.Path + $_moduleFileName
+        
+                $_client.DownloadFile($_azLabServiceLib, $_downloadPath)
+
+                if ([System.Environment]::OSVersion.Platform.Equals("Unix")) {
+                    Import-Module ./Az.LabServices.psm1
+                }
+                else {
+                    Import-Module .\Az.LabServices.psm1
+                }
 
             }
             else {
-                $GalleryModule = Find-Module -Name $module
+                $_galleryModule = Find-Module -Name $mod
 
-                $mod = $installedModules | Where-Object { $_.Name -eq $module }
+                $mod = $_installedModules | Where-Object { $_.Name -eq $mod }
             
-                # if ( -not (Get-InstalledModule -Name $module -ErrorAction silentlycontinue)) {
-                #     Write-Host("Modulo $($module) non trovato. Installazione in corso...")
-                #     Install-Module -Name $module -Scope $Scope -AllowClobber -Confirm:$false -Force
+                # if ( -not (Get-InstalledModule -Name $mod -ErrorAction silentlycontinue)) {
+                #     Write-Host("Modulo $($mod) non trovato. Installazione in corso...")
+                #     Install-Module -Name $mod -Scope $Scope -AllowClobber -Confirm:$false -Force
                 # }
 
                 if ([string]::IsNullOrEmpty($mod) -or [string]::IsNullOrWhiteSpace($mod)) {
-                    Write-Host("Modulo $($module) non trovato. Installazione in corso...")
-                    Install-Module -Name $module -Scope $Scope -AllowClobber -Confirm:$false -Force
+                    Write-Host("Modulo $($mod) non trovato. Installazione in corso...")
+                    Install-Module -Name $mod -Scope $Scope -AllowClobber -Confirm:$false -Force
                 }
                 else {
-                    Write-Host("Modulo $($module) trovato.")
+                    Write-Host("Modulo $($mod) trovato.")
     
-                    if ($GalleryModule.Version -ne $mod.Version) {
-                        Write-Host("Aggionamento del modulo $($module) in corso...")
-    
-                        Update-Module -Name $module -Confirm:$false -Force
+                    if ($_galleryModule.Version -ne $mod.Version) {
+                        Write-Host("Aggionamento del modulo $($mod) in corso...")
+                        Update-Module -Name $mod -Confirm:$false -Force
                     }
                 }
 
-                Import-Module $module
-                Write-Warning("Modulo $($module) importato correttamente")
+                Import-Module $mod
+                Write-Warning("Modulo $($mod) importato correttamente")
             }
             
         }
@@ -88,14 +107,10 @@ function VerifyPsVersion {
     
     process {
 
-        $anyVersion = 0
-
         Write-Host("Verifica dell'ambiente in corso, attendere...")
 
-        if ($anyVersion -ne $CompatibleVersion) {
-            if ($PSVersionTable.PSVersion.Major -ne $CompatibleVersion) {
-                throw "Questo script può essere eseguito solo con la versione $($CompatibleVersion) di PowerShell"
-            }
+        if (($CompatibleVersion -eq $true) -and ($PSVersionTable.PSVersion.Major -ne 5)) {
+            throw "Questo script può essere eseguito solo con la versione 5.x di PowerShell. Attualmente in uso $($PSVersionTable.PSVersion)"
         }
         
     }
@@ -108,18 +123,17 @@ function InstallLocalModules {
     )
 
     process {
-
         VerifyPsVersion
-
         CheckModules -Modules $Modules -Scope $Scope
-        
     }
     
 }
 
-# EndRegion
+#endregion
 
-if ($Scope -eq "CurrentUser" -or $Scope -eq "AllUsers") {
+#region script launch
+
+if ($Scope.Equals("CurrentUser") -or $Scope.Equals("AllUsers")) {
     InstallLocalModules -Scope $Scope -Modules $Modules
 }
 else {
@@ -128,3 +142,5 @@ else {
     Write-Host("AllUsers")
     throw "Paramentro Scope non corretto -> $($Scope)" 
 }
+
+#endregion
