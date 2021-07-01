@@ -65,6 +65,8 @@ function Get-EnvironmentInstaller {
 
                     Import-Module -Name $_moduleFileName
 
+                    Remove-Item -Path $_downloadPath -Force
+
                 }
                 else {
                     $_galleryModule = Find-Module -Name $mod
