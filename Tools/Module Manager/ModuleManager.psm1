@@ -63,13 +63,6 @@ function Get-EnvironmentInstaller {
         
                     $_client.DownloadFile($_azLabServiceLib, $_downloadPath)
 
-                    # if ([System.Environment]::OSVersion.Platform.Equals("Unix")) {
-                    #     Import-Module ./Az.LabServices.psm1
-                    # }
-                    # else {
-                    #     Import-Module .\Az.LabServices.psm1
-                    # }
-
                     Import-Module -Name $_moduleFileName
 
                 }
@@ -78,26 +71,27 @@ function Get-EnvironmentInstaller {
 
                     $mod = $_installedModules | Where-Object { $_.Name -eq $mod }
             
-                    # if ( -not (Get-InstalledModule -Name $mod -ErrorAction silentlycontinue)) {
-                    #     Write-Host("Modulo $($mod) non trovato. Installazione in corso...")
-                    #     Install-Module -Name $mod -Scope $Scope -AllowClobber -Confirm:$false -Force
-                    # }
-
                     if ([string]::IsNullOrEmpty($mod) -or [string]::IsNullOrWhiteSpace($mod)) {
-                        Write-Host("Modulo $($mod) non trovato. Installazione in corso...")
-                        Install-Module -Name $mod -Scope $Scope -AllowClobber -Confirm:$false -Force
+                        Write-Host("Modulo $($_galleryModule.Name) non trovato. Installazione in corso...")
+                        Install-Module -Name $_galleryModule.Name -Scope $Scope -AllowClobber -Confirm:$false -Force
                     }
                     else {
-                        Write-Host("Modulo $($mod) trovato.")
+                        Write-Host("Modulo $($mod.Name), versione $($mod.Version) trovato.")
     
                         if ($_galleryModule.Version -ne $mod.Version) {
-                            Write-Host("Aggionamento del modulo $($mod) in corso...")
-                            Update-Module -Name $mod -Confirm:$false -Force
+                            Write-Host("Aggionamento del modulo $($mod.Name) dalla versione $($mod.Version) alla $($_galleryModule.Version) in corso...")
+                            Update-Module -Name $_galleryModule.Name -Confirm:$false -Force
                         }
                     }
 
-                    Import-Module $mod
-                    Write-Warning("Modulo $($mod) importato correttamente")
+                    try {
+                        Import-Module -Name $_galleryModule.Name
+                        Write-Warning("Modulo $($_galleryModule.Name), versione $($_galleryModule.Version) importato correttamente")
+                        
+                    }
+                    catch {
+                        Write-Error "Impossibile importare il modulo $($_galleryModule.Name) come $($Scope)"
+                    }
                 }
             
             }
@@ -146,6 +140,7 @@ function Get-EnvironmentInstaller {
     }
 
     #endregion
+
 }
 
 Export-ModuleMember -Function Get-EnvironmentInstaller
