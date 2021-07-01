@@ -22,37 +22,31 @@ function PrepareEnvironment {
     
     process {
 
-        $_customModName = "ModuleManager.psd1"
+        $_customMod = "ModuleManager.psm1"
 
-        $_libraryUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/$($_customModName)"
+        $_libraryUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/Module%20Manager/$($_customMod)"
 
         $_client = New-Object System.Net.WebClient
     
         $_currentPath = Get-Location
 
-        $_moduleFileName = "\$($_customModName)"
+        $_moduleFileName = "\$($_customMod)"
 
         if ([System.Environment]::OSVersion.Platform.Equals("Unix")) {
-        $_moduleFileName = "/$($_customModName)"
+        $_moduleFileName = "/$($_customMod)"
         }
 
         $_downloadPath = $_currentPath.Path + $_moduleFileName
         
         $_client.DownloadFile($_libraryUrl, $_downloadPath)
 
-        Import-Module -Name $_customModName
+        Import-Module -Name ".$($_moduleFileName)"
         
         Get-EnvironmentInstaller -Modules $ModulesToInstall -CompatibleVersion $OnlyPowerShell5 -Scope $Scope
         
-        # if ([System.Environment]::OSVersion.Platform.Equals("Unix")) {
-        #     pwsh "$($loc.Path)/$($_customModName) -Modules $ModulesToInstall -CompatibleVersion $OnlyPowerShell5"
-        # }
-        # else {
-        #     .\$_customModName -Modules $ModulesToInstall -CompatibleVersion $OnlyPowerShell5
-        # }
-
     }
     
 }
 
-PrepareEnvironment -ModulesToInstall "Az" -OnlyPowerShell5 $true
+PrepareEnvironment -ModulesToInstall "Az"
+# PrepareEnvironment -ModulesToInstall "Az" -OnlyPowerShell5 $true
