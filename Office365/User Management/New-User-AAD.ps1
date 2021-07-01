@@ -67,6 +67,8 @@ function PrepareEnvironment {
         
         Get-EnvironmentInstaller -Modules $ModulesToInstall -CompatibleVersion $OnlyPowerShell5 -Scope $Scope
         
+        Remove-Item -Path $_downloadPath -Force
+        
     }
     
 }

@@ -45,7 +45,7 @@ function Get-EnvironmentInstaller {
 
                 if ($mod -eq "Az.LabServices") {
                 
-                    Write-Host("Installazione del modulo Az.LabServices in corso...")
+                    Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Installazione del modulo Az.LabServices in corso..."
 
                     $_azLabServiceLib = "https://raw.githubusercontent.com/Azure/azure-devtestlab/master/samples/ClassroomLabs/Modules/Library/Az.LabServices.psm1"
 
@@ -72,21 +72,22 @@ function Get-EnvironmentInstaller {
                     $mod = $_installedModules | Where-Object { $_.Name -eq $mod }
             
                     if ([string]::IsNullOrEmpty($mod) -or [string]::IsNullOrWhiteSpace($mod)) {
-                        Write-Host("Modulo $($_galleryModule.Name) non trovato. Installazione in corso...")
+                        Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Modulo $($_galleryModule.Name) non trovato. Installazione in corso..."
                         Install-Module -Name $_galleryModule.Name -Scope $Scope -AllowClobber -Confirm:$false -Force
                     }
                     else {
-                        Write-Host("Modulo $($mod.Name), versione $($mod.Version) trovato.")
+                        Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Modulo $($mod.Name), versione $($mod.Version) trovato."
     
                         if ($_galleryModule.Version -ne $mod.Version) {
-                            Write-Host("Aggionamento del modulo $($mod.Name) dalla versione $($mod.Version) alla $($_galleryModule.Version) in corso...")
+                            Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Aggionamento del modulo $($mod.Name) dalla versione $($mod.Version) alla $($_galleryModule.Version) in corso..."
                             Update-Module -Name $_galleryModule.Name -Confirm:$false -Force
                         }
                     }
 
                     try {
+                        Write-Output "Importazione modulo $($_galleryModule.Name) in corso..."
                         Import-Module -Name $_galleryModule.Name
-                        Write-Warning("Modulo $($_galleryModule.Name), versione $($_galleryModule.Version) importato correttamente")
+                        Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Modulo $($_galleryModule.Name), versione $($_galleryModule.Version) importato correttamente"
                         
                     }
                     catch {
@@ -103,7 +104,7 @@ function Get-EnvironmentInstaller {
     
         process {
 
-            Write-Host("Verifica dell'ambiente in corso, attendere...")
+            Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Verifica dell'ambiente in corso, attendere..."
 
             if (($CompatibleVersion -eq $true) -and ($PSVersionTable.PSVersion.Major -ne 5)) {
                 throw "Questo script può essere eseguito solo con la versione 5.x di PowerShell. Attualmente in uso $($PSVersionTable.PSVersion)"
@@ -133,9 +134,9 @@ function Get-EnvironmentInstaller {
         InstallLocalModules -Scope $Scope -Modules $Modules
     }
     else {
-        Write-Host("Il parametro Scope accetta solo i seguenti valori:")
-        Write-Host("CurrentUser (predefinito)")
-        Write-Host("AllUsers")
+        Write-Error("Il parametro Scope accetta solo i seguenti valori:")
+        Write-Error("CurrentUser (predefinito)")
+        Write-Error("AllUsers")
         throw "Paramentro Scope non corretto -> $($Scope)" 
     }
 
