@@ -472,6 +472,18 @@ function ExportResults {
     }
 }
 
+function AzureConnect {
+    process
+    {
+        if ([System.Environment]::OSVersion.Platform -eq "Unix") {
+            Connect-AzAccount -UseDeviceAuthentication
+        } else {
+            Connect-AzAccount
+        }
+    }
+    
+}
+
 # BODY
 
 PrepareEnvironment -ModulesToInstall  "ExchangeOnlineManagement", "AzureAD", "Az", "Az.LabServices" -OnlyPowerShell5 $true
@@ -482,10 +494,10 @@ Connect-AzureAD
 
 if ([string]::IsNullOrEmpty($AzureSub) -or [string]::IsNullOrWhiteSpace($AzureSub)) {
     Write-Warning("Non sono state fornite spechifiche inerenti la sottoscrizione, verra' utilizzata quella predefinita.")
-    Connect-AzAccount
+    AzureConnect
 }
 else {
-    Connect-AzAccount -Subscription $AzureSub
+    AzureConnect
 }
 
 $currentAzure = Get-AzContext

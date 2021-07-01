@@ -150,11 +150,21 @@ catch {
     exit
 }
 
-
+function AzureConnect {
+    process
+    {
+        if ([System.Environment]::OSVersion.Platform -eq "Unix") {
+            Connect-AzAccount -SubscriptionId $AzureSub -UseDeviceAuthentication
+        } else {
+            Connect-AzAccount -SubscriptionId $AzureSub
+        }
+    }
+    
+}
 
 PrepareEnvironment -ModulesToInstall  "Az","Az.LabServices"
 
-Connect-AzAccount -SubscriptionId $AzureSub
+AzureConnect
 
 $Users | ForEach-Object {
 

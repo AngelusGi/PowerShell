@@ -76,13 +76,24 @@ function PrepareEnvironment {
     
 }
 
+function AzureConnect {
+    process
+    {
+        if ([System.Environment]::OSVersion.Platform -eq "Unix") {
+            Connect-AzAccount -UseDeviceAuthentication
+        } else {
+            Connect-AzAccount
+        }
+    }
+    
+}
 
 # Script
 
 PrepareEnvironment -ModulesToInstall  "Az"
 
 # Provide your Azure admin credentials
-Connect-AzAccount
+AzureConnect
 
 #Provide the subscription Id of the subscription where snapshot is created
 Select-AzSubscription -Subscription $AzSubscription
