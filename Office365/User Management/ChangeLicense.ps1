@@ -20,27 +20,49 @@ Param
 function PrepareEnvironment {
 
     param(
-        [Parameter(Mandatory = $true)]
-        [String[]]
-        $Modules,
-        [int16]
-        $Version
+        [Parameter(
+            HelpMessage = "List of modules to be installed.",
+            Mandatory = $true)]
+        [string[]]
+        $ModulesToInstall,
+        
+        [Parameter(
+            HelpMessage = "If true, this script has dependecies in order to be executed only on PowerShell 5.",
+            Mandatory = $false)]
+        [bool]
+        $OnlyPowerShell5 = $false,
+
+        [Parameter(
+            HelpMessage = "Scope of the module installation. Default: CurrentUser",
+            Mandatory = $false)]
+        [string]
+        $Scope = "CurrentUser"
     )
     
     process {
 
-        $LibraryURL = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/ModuleManager.ps1"
+        $_customMod = "ModuleManager.psm1"
 
-        $Client = New-Object System.Net.WebClient
+        $_libraryUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/Module%20Manager/$($_customMod)"
+
+        $_client = New-Object System.Net.WebClient
     
-        $currentPath = Get-Location
+        $_currentPath = Get-Location
 
-        $downloadPath = $currentPath.Path + "\ModuleManager.ps1"
+        $_moduleFileName = "\$($_customMod)"
+
+        if ([System.Environment]::OSVersion.Platform.Equals("Unix")) {
+        $_moduleFileName = "/$($_customMod)"
+        }
+
+        $_downloadPath = $_currentPath.Path + $_moduleFileName
         
-        $Client.DownloadFile($LibraryURL, $downloadPath)
+        $_client.DownloadFile($_libraryUrl, $_downloadPath)
 
-        .\ModuleManager.ps1 -Modules $Modules -CompatibleVersion $Version 
-
+        Import-Module -Name ".$($_moduleFileName)"
+        
+        Get-EnvironmentInstaller -Modules $ModulesToInstall -CompatibleVersion $OnlyPowerShell5 -Scope $Scope
+        
     }
     
 }
@@ -66,7 +88,7 @@ else {
     Write-Host("***")
 }
 
-PrepareEnvironment -Modules "MSOnline"
+PrepareEnvironment -ModulesToInstall  "MSOnline"
 
 Connect-MsolService -Credential $AdminCred
 

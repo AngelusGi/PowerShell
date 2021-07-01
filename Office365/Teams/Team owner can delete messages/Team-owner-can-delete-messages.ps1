@@ -45,7 +45,7 @@ function PrepareEnvironment {
 
 # End parameters region
 
-PrepareEnvironment -Modules 'MicrosoftTeams'
+PrepareEnvironment -ModulesToInstall  'MicrosoftTeams'
 
 $data = Connect-MicrosoftTeams
 
