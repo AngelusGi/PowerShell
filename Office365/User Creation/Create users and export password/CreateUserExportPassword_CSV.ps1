@@ -133,7 +133,7 @@ if ($StaticPswd) {
 Write-Host("Country code: $($CountryCode)")
 Write-Host("***")
 
-PrepareEnvironment -ModulesToInstall  "MSOnline" -OnlyPowerShell5 $true
+PrepareEnvironment -ModulesToInstall "MSOnline" -OnlyPowerShell5 $true
 
 try {
     #tenant connection

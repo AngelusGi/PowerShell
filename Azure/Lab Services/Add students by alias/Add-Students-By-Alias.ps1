@@ -487,7 +487,7 @@ function AzureConnect {
 
 # BODY
 
-PrepareEnvironment -ModulesToInstall  "ExchangeOnlineManagement", "AzureAD", "Az", "Az.LabServices" -OnlyPowerShell5 $true
+PrepareEnvironment -ModulesToInstall "ExchangeOnlineManagement", "AzureAD", "Az", "Az.LabServices" -OnlyPowerShell5 $true
 
 Connect-ExchangeOnline | Out-Null
 

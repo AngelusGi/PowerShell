@@ -63,7 +63,7 @@ function ExitSessions {
 
 # EndRegion
 
-PrepareEnvironment -ModulesToInstall  "MicrosoftTeams"
+PrepareEnvironment -ModulesToInstall "MicrosoftTeams"
 
 Write-Warning("Inserire le credenziali dell'amministratore del tanant")
 

@@ -131,7 +131,7 @@ catch {
     exit
 }
 
-PrepareEnvironment -ModulesToInstall  "AzureADPreview"
+PrepareEnvironment -ModulesToInstall "AzureADPreview"
 
 Connect-AzureAD -DomainNameDomain $DomainName
 

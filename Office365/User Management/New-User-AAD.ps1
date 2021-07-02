@@ -75,7 +75,7 @@ function PrepareEnvironment {
 }
 
 
-PrepareEnvironment -ModulesToInstall  "AzureAdPreview","MSOnline"
+PrepareEnvironment -ModulesToInstall "AzureAdPreview","MSOnline"
 
 Connect-AzureAD -TenantDomain "<Tenant_Domain_Name>" # ex. "contoso.onmicorsoft.com"
 

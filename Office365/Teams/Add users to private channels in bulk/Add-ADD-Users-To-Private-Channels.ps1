@@ -117,7 +117,7 @@ if ([string]::IsNullOrWhiteSpace($Delimiter)) {
 
 }
 
-PrepareEnvironment -ModulesToInstall  "MicrosoftTeams"
+PrepareEnvironment -ModulesToInstall "MicrosoftTeams"
 
 Connect-MicrosoftTeams
 

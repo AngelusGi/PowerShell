@@ -91,7 +91,7 @@ function AzureConnect {
 
 # Script
 
-PrepareEnvironment -ModulesToInstall  "Az"
+PrepareEnvironment -ModulesToInstall "Az"
 
 # Provide your Azure admin credentials
 AzureConnect

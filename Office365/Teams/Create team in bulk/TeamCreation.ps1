@@ -84,7 +84,7 @@ else {
 }
 
 
-PrepareEnvironment -ModulesToInstall  "MicrosoftTeams"
+PrepareEnvironment -ModulesToInstall "MicrosoftTeams"
 
 Connect-MicrosoftTeams
 

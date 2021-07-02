@@ -61,7 +61,7 @@ function PrepareEnvironment {
 
 # EndRegion
 
-PrepareEnvironment -ModulesToInstall  "MSOnline"
+PrepareEnvironment -ModulesToInstall "MSOnline"
 
 try {
 

@@ -91,7 +91,7 @@ else {
     Write-Host("***")
 }
 
-PrepareEnvironment -ModulesToInstall  "MSOnline"
+PrepareEnvironment -ModulesToInstall "MSOnline"
 
 Connect-MsolService -Credential $AdminCred
 

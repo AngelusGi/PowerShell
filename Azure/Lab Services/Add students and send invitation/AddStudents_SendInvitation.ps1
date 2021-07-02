@@ -163,7 +163,7 @@ function AzureConnect {
     
 }
 
-PrepareEnvironment -ModulesToInstall  "Az","Az.LabServices"
+PrepareEnvironment -ModulesToInstall "Az","Az.LabServices"
 
 AzureConnect
 

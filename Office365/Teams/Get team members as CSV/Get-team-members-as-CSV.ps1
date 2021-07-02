@@ -92,7 +92,7 @@ function ExportResults {
 
 # EndRegion
 
-PrepareEnvironment -ModulesToInstall  "MicrosoftTeams"
+PrepareEnvironment -ModulesToInstall "MicrosoftTeams"
 
 Connect-MicrosoftTeams
 

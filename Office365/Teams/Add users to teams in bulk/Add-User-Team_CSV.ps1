@@ -103,7 +103,7 @@ else {
 
 Write-Host("Preparazione e verifica dell'ambiente in corso, attendere...")
 
-PrepareEnvironment -ModulesToInstall  "MicrosoftTeams"
+PrepareEnvironment -ModulesToInstall "MicrosoftTeams"
 
 Connect-MicrosoftTeams
 

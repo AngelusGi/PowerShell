@@ -81,7 +81,7 @@ $Role = "MY ROLE" # "MY ROLE" User role's in this CSV # ex. "Docente" or "Studen
 $Class  = "MY DEPARTMENT" # "MY DEPARTMENT" it can be used for identify student's class # ex. "1D" - if you wont use it set as ""
 # *** END USER DATA ***
 
-PrepareEnvironment -ModulesToInstall  "MSOnline"
+PrepareEnvironment -ModulesToInstall "MSOnline"
 
 Connect-MsolService -Credential $AdminCred
 

@@ -74,7 +74,7 @@ function PrepareEnvironment {
 # End parameters region
 
 
-PrepareEnvironment -ModulesToInstall  "AzureAdPreview"
+PrepareEnvironment -ModulesToInstall "AzureAdPreview"
 
 $AllowGroupCreation = $False
 
