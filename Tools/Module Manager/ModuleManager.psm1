@@ -67,6 +67,8 @@ function Get-EnvironmentInstaller {
                     # Write-Debug($test)
                     #endif
 
+                    Remove-Item -Path $_downloadPath -Force
+
                 }
                 else {
                     $_galleryModule = Find-Module -Name $mod
