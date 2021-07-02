@@ -79,7 +79,7 @@ function PrepareEnvironment {
 function AzureConnect {
     process
     {
-        if ([System.Environment]::OSVersion.Platform -eq "Unix") {
+        if ([System.Environment]::OSVersion.Platform -ne "Win32NT") {
             Connect-AzAccount -UseDeviceAuthentication
         } else {
             Connect-AzAccount

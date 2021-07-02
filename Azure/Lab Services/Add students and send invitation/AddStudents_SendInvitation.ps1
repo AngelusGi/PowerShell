@@ -153,7 +153,7 @@ catch {
 function AzureConnect {
     process
     {
-        if ([System.Environment]::OSVersion.Platform -eq "Unix") {
+        if ([System.Environment]::OSVersion.Platform -ne "Win32NT") {
             Connect-AzAccount -SubscriptionId $AzureSub -UseDeviceAuthentication
         } else {
             Connect-AzAccount -SubscriptionId $AzureSub
