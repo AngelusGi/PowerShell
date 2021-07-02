@@ -11,19 +11,24 @@ function Get-EnvironmentInstaller {
 
         # Install mod -scope
         [Parameter(
-            HelpMessage = "Scope of the mod installer. Default: CurrentUser.",
-            Mandatory = $false
-        )]
-        [String]
+            HelpMessage = "Scope of the module installation (CurrentUser or AllUsers). Default: CurrentUser",
+            Mandatory = $false)]
+        [ValidateSet("CurrentUser", "AllUsers")]
+        [string]
         $Scope = "CurrentUser",
 
         # Version required to run the script - if null every version of PowerShell is good
         [Parameter(
-            HelpMessage = "If true, PowerShell 5.x is required to run the script - if flase/blank every version of PowerShell is good.",
-            Mandatory = $false
-        )]
+            HelpMessage = "If true, this script has dependecies in order to be executed only on PowerShell 5.x.",
+            Mandatory = $false)]
         [bool]
-        $CompatibleVersion
+        $OnlyPowerShell5 = $false,
+
+        [Parameter(
+            HelpMessage = "If true, this script has dependecies in order to be executed PowerShell >=6.x.",
+            Mandatory = $false)]
+        [bool]
+        $OnlyPowerShell6 = $false
     )
 
     function CheckModules {
@@ -110,8 +115,12 @@ function Get-EnvironmentInstaller {
 
             Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Verifica dell'ambiente in corso, attendere..."
 
-            if (($CompatibleVersion -eq $true) -and ($PSVersionTable.PSVersion.Major -ne 5)) {
+            if (($OnlyPowerShell5 -eq $true) -and ($PSVersionTable.PSVersion.Major -ne 5)) {
                 throw "Questo script può essere eseguito solo con la versione 5.x di PowerShell. Attualmente in uso $($PSVersionTable.PSVersion)"
+            }
+
+            if (($OnlyPowerShell5 -eq $true) -and ($PSVersionTable.PSVersion.Major -le 6)) {
+                throw "Questo script può essere eseguito con una versione >=6.x di PowerShell. Attualmente in uso $($PSVersionTable.PSVersion)"
             }
         
         }
@@ -134,15 +143,7 @@ function Get-EnvironmentInstaller {
 
     #region script launch
 
-    if ($Scope.Equals("CurrentUser") -or $Scope.Equals("AllUsers")) {
-        InstallLocalModules -Scope $Scope -Modules $Modules
-    }
-    else {
-        Write-Error("Il parametro Scope accetta solo i seguenti valori:")
-        Write-Error("CurrentUser (predefinito)")
-        Write-Error("AllUsers")
-        throw "Paramentro Scope non corretto -> $($Scope)" 
-    }
+    InstallLocalModules -Scope $Scope -Modules $Modules
 
     #endregion
 
