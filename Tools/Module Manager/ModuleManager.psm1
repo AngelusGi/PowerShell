@@ -36,14 +36,10 @@ function Get-EnvironmentInstaller {
             $_installedModules = Get-InstalledModule
 
             foreach ($mod in $Modules) {
-        
-                if ($mod -eq "Az") {
-                    if ($PSVersionTable.PSEdition -eq 'Desktop' -and (Get-Module -Name AzureRM -ListAvailable)) {
-                        throw 'Il modulo AzureRM è installato sulla macchina. Rimuoverlo prima di procedere.'
-                    }
-                }
 
-                if ($mod -eq "Az.LabServices") {
+                $_azLabServiceModName = "Az.LabServices"
+
+                if ($mod -eq $_azLabServiceModName) {
                 
                     Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Installazione del modulo Az.LabServices in corso..."
 
@@ -63,9 +59,13 @@ function Get-EnvironmentInstaller {
         
                     $_client.DownloadFile($_azLabServiceLib, $_downloadPath)
 
-                    Import-Module -Name ".$($_moduleFileName)"
+                    Write-Output "Importazione modulo $($_moduleFileName) in corso..."
+                    Import-Module ".$($_moduleFileName)"
 
-                    Remove-Item -Path $_downloadPath -Force
+#if DEBUG
+                    # $test = Get-Command -Module $_azLabServiceModName
+                    # Write-Debug($test)
+#endif
 
                 }
                 else {
