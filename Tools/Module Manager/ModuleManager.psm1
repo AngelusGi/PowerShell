@@ -60,13 +60,12 @@ function Get-EnvironmentInstaller {
                     $_client.DownloadFile($_azLabServiceLib, $_downloadPath)
 
                     Write-Output "Importazione modulo $($_azLabServiceModName) in corso..."
-                    # Import-Module .\Az.LabServices.psm1
-                    Import-Module .$_moduleFileName
+                    Import-Module ".$($_moduleFileName)"
 
-#if DEBUG
+                    #if DEBUG
                     # $test = Get-Command -Module $_azLabServiceModName
                     # Write-Debug($test)
-#endif
+                    #endif
 
                 }
                 else {
