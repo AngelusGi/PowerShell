@@ -63,7 +63,7 @@ function Get-EnvironmentInstaller {
         
                     $_client.DownloadFile($_azLabServiceLib, $_downloadPath)
 
-                    Import-Module -Name $_moduleFileName
+                    Import-Module -Name ".$($_moduleFileName)"
 
                     Remove-Item -Path $_downloadPath -Force
 
