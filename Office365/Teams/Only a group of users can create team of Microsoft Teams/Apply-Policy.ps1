@@ -33,8 +33,9 @@ function PrepareEnvironment {
         $OnlyPowerShell5 = $false,
 
         [Parameter(
-            HelpMessage = "Scope of the module installation. Default: CurrentUser",
+            HelpMessage = "Scope of the module installation (CurrentUser or AllUsers). Default: CurrentUser",
             Mandatory = $false)]
+        [ValidateSet("CurrentUser", "AllUsers")]
         [string]
         $Scope = "CurrentUser"
     )

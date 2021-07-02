@@ -14,8 +14,9 @@ function PrepareEnvironment {
         $OnlyPowerShell5 = $false,
 
         [Parameter(
-            HelpMessage = "Scope of the module installation. Default: CurrentUser",
+            HelpMessage = "Scope of the module installation (CurrentUser or AllUsers). Default: CurrentUser",
             Mandatory = $false)]
+        [ValidateSet("CurrentUser", "AllUsers")]
         [string]
         $Scope = "CurrentUser"
     )
@@ -33,7 +34,7 @@ function PrepareEnvironment {
         $_moduleFileName = "\$($_customMod)"
 
         if ([System.Environment]::OSVersion.Platform.Equals("Unix")) {
-        $_moduleFileName = "/$($_customMod)"
+            $_moduleFileName = "/$($_customMod)"
         }
 
         $_downloadPath = $_currentPath.Path + $_moduleFileName
