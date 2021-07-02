@@ -36,7 +36,7 @@ function PrepareEnvironment {
         
         $Client.DownloadFile($LibraryURL, $downloadPath)
 
-        .\ModuleManager.ps1 -Modules $Modules -CompatibleVersion $Version 
+        .\ModuleManager.ps1 -Modules $Modules - $Version 
 
     }
     

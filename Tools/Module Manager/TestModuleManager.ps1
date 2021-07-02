@@ -7,11 +7,18 @@ function PrepareEnvironment {
         [string[]]
         $ModulesToInstall,
         
+        # Version required to run the script - if null every version of PowerShell is good
         [Parameter(
-            HelpMessage = "If true, this script has dependecies in order to be executed only on PowerShell 5.",
+            HelpMessage = "If true, this script has dependecies in order to be executed only on PowerShell 5.x.",
             Mandatory = $false)]
         [bool]
         $OnlyPowerShell5 = $false,
+
+        [Parameter(
+            HelpMessage = "If true, this script has dependecies in order to be executed PowerShell >=6.x.",
+            Mandatory = $false)]
+        [bool]
+        $OnlyAbovePs6 = $false,
 
         [Parameter(
             HelpMessage = "Scope of the module installation (CurrentUser or AllUsers). Default: CurrentUser",
@@ -43,7 +50,7 @@ function PrepareEnvironment {
 
         Import-Module -Name ".$($_moduleFileName)"
         
-        Get-EnvironmentInstaller -Modules $ModulesToInstall -CompatibleVersion $OnlyPowerShell5 -Scope $Scope
+        Get-EnvironmentInstaller -Modules $ModulesToInstall - $OnlyPowerShell5 -Scope $Scope
         
         Remove-Item -Path $_downloadPath -Force
         
@@ -53,3 +60,4 @@ function PrepareEnvironment {
 
 PrepareEnvironment -ModulesToInstall "Az"
 # PrepareEnvironment -ModulesToInstall "Az" -OnlyPowerShell5 $true
+# PrepareEnvironment -ModulesToInstall "Az" -OnlyAbovePs6 $true
