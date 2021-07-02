@@ -50,7 +50,7 @@ function PrepareEnvironment {
 
         Import-Module -Name ".$($_moduleFileName)"
         
-        Get-EnvironmentInstaller -Modules $ModulesToInstall - $OnlyPowerShell5 -Scope $Scope
+        Get-EnvironmentInstaller -Modules $ModulesToInstall -OnlyPowerShell5 $OnlyPowerShell5 -Scope $Scope
         
         Remove-Item -Path $_downloadPath -Force
         

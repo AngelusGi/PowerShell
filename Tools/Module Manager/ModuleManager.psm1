@@ -28,7 +28,7 @@ function Get-EnvironmentInstaller {
             HelpMessage = "If true, this script has dependecies in order to be executed PowerShell >=6.x.",
             Mandatory = $false)]
         [bool]
-        $OnlyPowerShell6 = $false
+        $OnlyAbovePs6 = $false
     )
 
     function CheckModules {
