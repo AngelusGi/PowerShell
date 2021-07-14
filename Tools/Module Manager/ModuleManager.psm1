@@ -6,7 +6,7 @@ function Get-EnvironmentInstaller {
             HelpMessage = "List of PowerShell modules to be installed.",
             Mandatory = $true
         )]
-        [String[]]
+        [string[]]
         $Modules,
 
         # Install mod -scope
@@ -31,13 +31,17 @@ function Get-EnvironmentInstaller {
         $OnlyAbovePs6 = $false
     )
 
-    function CheckModules {
+    function Run-CheckModules {
         param (
+            [string[]]
             $Modules,
-            [String]$Scope
+
+            [string]
+            $Scope
         )
         process {
 
+            $Modules = $Modules | Select-Object -Unique
             $_installedModules = Get-InstalledModule
 
             foreach ($mod in $Modules) {
@@ -49,11 +53,8 @@ function Get-EnvironmentInstaller {
                     Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Installazione del modulo Az.LabServices in corso..."
 
                     $_azLabServiceLib = "https://raw.githubusercontent.com/Azure/azure-devtestlab/master/samples/ClassroomLabs/Modules/Library/Az.LabServices.psm1"
-
                     $_client = New-Object System.Net.WebClient
-
                     $_currentPath = Get-Location
-
                     $_moduleFileName = "\Az.LabServices.psm1"
 
                     if ([System.Environment]::OSVersion.Platform.Equals("Unix")) {
@@ -61,9 +62,8 @@ function Get-EnvironmentInstaller {
                     }
 
                     $_downloadPath = $_currentPath.Path + $_moduleFileName
-        
                     $_client.DownloadFile($_azLabServiceLib, $_downloadPath)
-
+                    
                     Write-Output "Importazione modulo $($_azLabServiceModName) in corso..."
                     Import-Module ".$($_moduleFileName)"
 
@@ -73,11 +73,9 @@ function Get-EnvironmentInstaller {
                     #endif
 
                     Remove-Item -Path $_downloadPath -Force
-
                 }
                 else {
                     $_galleryModule = Find-Module -Name $mod
-
                     $mod = $_installedModules | Where-Object { $_.Name -eq $mod }
             
                     if ([string]::IsNullOrEmpty($mod) -or [string]::IsNullOrWhiteSpace($mod)) {
@@ -103,13 +101,11 @@ function Get-EnvironmentInstaller {
                         Write-Error "Impossibile importare il modulo $($_galleryModule.Name) come $($Scope)"
                     }
                 }
-            
             }
-        
         }
     }
 
-    function VerifyPsVersion {
+    function Verify-PsVersion {
     
         process {
 
@@ -122,19 +118,21 @@ function Get-EnvironmentInstaller {
             if (($OnlyPowerShell5 -eq $true) -and ($PSVersionTable.PSVersion.Major -le 6)) {
                 throw "Questo script può essere eseguito con una versione >=6.x di PowerShell. Attualmente in uso $($PSVersionTable.PSVersion)"
             }
-        
         }
     }
 
-    function InstallLocalModules {
+    function Install-LocalModules {
         param (
-            [String]$Scope,
-            $Modules
+            [string[]]
+            $Modules,
+
+            [string]
+            $Scope
         )
 
         process {
-            VerifyPsVersion
-            CheckModules -Modules $Modules -Scope $Scope
+            Verify-PsVersion
+            Run-CheckModules -Modules $Modules -Scope $Scope
         }
     
     }
@@ -143,7 +141,7 @@ function Get-EnvironmentInstaller {
 
     #region script launch
 
-    InstallLocalModules -Scope $Scope -Modules $Modules
+    Install-LocalModules -Scope $Scope -Modules $Modules
 
     #endregion
 
