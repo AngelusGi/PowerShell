@@ -235,14 +235,14 @@ function Set-PsEvnironment {
         [string[]]
         $ModulesToInstall = "ModuleManager"
     )
-    
-    Get-process {
+
+    process {
         $psModuleExtension = "psm1"
     
         foreach ($module in $ModulesToInstall) {
 
-            $folder = ($ModulesToInstall -eq "ModuleManager") ? "ModuleManager" : "TerraformBackendOnAzure" 
-            $libraryUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/$($folder)/$($ModulesToInstall).$($psModuleExtension)"
+            $libraryUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/$($module)/$($module).$($psModuleExtension)"
+            $module = "$($module).$($psModuleExtension)"
 
             $client = New-Object System.Net.WebClient
             $currentPath = Get-Location
@@ -254,6 +254,7 @@ function Set-PsEvnironment {
             Remove-Item -Path $modToImport -Force
         }
     }
+
 }
 
 #endregion

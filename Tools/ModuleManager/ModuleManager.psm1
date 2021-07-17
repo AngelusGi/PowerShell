@@ -71,7 +71,7 @@ function Get-EnvironmentInstaller {
             $Scope = "CurrentUser"
         )
 
-        Get-Process {
+        process {
 
             $Modules = $Modules | Select-Object -Unique
             $_installedModules = Get-InstalledModule
@@ -138,7 +138,7 @@ function Get-EnvironmentInstaller {
     }
 
     function Test-PsVersion {
-        Get-Process {
+        process {
             Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Verifica dell'ambiente in corso, attendere..."
 
             if (($OnlyPowerShell5 -eq $true) -and ($PSVersionTable.PSVersion.Major -ne 5)) {
@@ -168,7 +168,7 @@ function Get-EnvironmentInstaller {
             $Scope = "CurrentUser"
         )
 
-        Get-Process {
+        process {
             Test-PsVersion
             Find-ModulesToInstall -Modules $Modules -Scope $Scope
         }
