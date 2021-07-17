@@ -38,46 +38,33 @@ Param
 )
 
 
-function PrepareEnvironment {
-
+function Set-PsEvnironment {
     param(
         [Parameter(
-            HelpMessage = "List of modules to be installed.",
-            Mandatory = $true)]
+            HelpMessage = "Modules name to install from the GitHub tool repo.",
+            Mandatory = $false)]
+        [ValidateSet("ModuleManager", "TerraformBackendOnAzure")]
         [string[]]
-        $ModulesToInstall,
-
-        [Parameter(
-            HelpMessage = "If true, this script has dependecies in order to be executed only on PowerShell 5.x.",
-            Mandatory = $false)]
-        [bool]
-        $OnlyPowerShell5 = $false,
-
-        [Parameter(
-            HelpMessage = "If true, this script has dependecies in order to be executed PowerShell >=6.x.",
-            Mandatory = $false)]
-        [bool]
-        $OnlyAbovePs6 = $false,
-
-        [Parameter(
-            HelpMessage = "Scope of the module installation (CurrentUser or AllUsers). Default: CurrentUser",
-            Mandatory = $false)]
-        [ValidateSet("CurrentUser", "AllUsers")]
-        [string]
-        $Scope = "CurrentUser"
+        $ModulesToInstall = "ModuleManager"
     )
 
     process {
-        $_customMod = "ModuleManager.psm1"
-        $_libraryUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/Module%20Manager/$($_customMod)"
-        $_client = New-Object System.Net.WebClient
-        $_currentPath = Get-Location
-        $_downloadPath = Join-Path -Path $_currentPath.Path -ChildPath $_customMod
-        $_client.DownloadFile($_libraryUrl, $_downloadPath)
-        $_modToImport = Join-Path -Path $_currentPath.Path -ChildPath $_customMod -Resolve
-        Import-Module $_modToImport
-        Get-EnvironmentInstaller -Modules $ModulesToInstall - $OnlyPowerShell5 -Scope $Scope
-        Remove-Item -Path $_modToImport -Force
+        $psModuleExtension = "psm1"
+    
+        foreach ($module in $ModulesToInstall) {
+
+            $libraryUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/$($module)/$($module).$($psModuleExtension)"
+            $module = "$($module).$($psModuleExtension)"
+
+            $client = New-Object System.Net.WebClient
+            $currentPath = Get-Location
+            $downloadPath = Join-Path -Path $currentPath.Path -ChildPath $module
+            $client.DownloadFile($libraryUrl, $downloadPath)
+            
+            $modToImport = Join-Path -Path $currentPath.Path -ChildPath $module -Resolve -ErrorAction Stop
+            Import-Module $modToImport -Verbose
+            Remove-Item -Path $modToImport -Force
+        }
     }
 
 }
@@ -143,18 +130,18 @@ catch {
 }
 
 function AzureConnect {
-    process
-    {
+    process {
         if ([System.Environment]::OSVersion.Platform -ne "Win32NT") {
             Connect-AzAccount -SubscriptionId $AzureSub -UseDeviceAuthentication
-        } else {
+        }
+        else {
             Connect-AzAccount -SubscriptionId $AzureSub
         }
     }
     
 }
 
-PrepareEnvironment -ModulesToInstall "Az","Az.LabServices"
+Set-PsEvnironment -PsModulesToInstall  "Az", "Az.LabServices"
 
 AzureConnect
 
