@@ -151,299 +151,54 @@ function Set-TerraformBackend {
     )
 
     process {
+        Set-Terraform -ModulesToInstall
 
-        # Verify if customer resource prefix lenght
-        function Measure-CustomerPrefix {
-            param (
-                [Parameter(
-                    HelpMessage = "Resource Prefix.",
-                    Mandatory = $true)]
-                [string]
-                $ResourcePrefix,
+        $terraformOutput = Set-TerraformBackend
+            -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName
+            -ResourcePrefix $ResourcePrefix -AzSub $AzSub -AzRegion $AzRegion -AzTag $AzTag
+            -AzStgSku $AzStgSku -AzResGroup $AzResGroup -AzStorageAccount $AzStorageAccount
+            -TerraformContainer $TerraformContainer -AzKvSku $AzKvSku -AzKeyVault $AzKeyVault
 
-                [Parameter(
-                    HelpMessage = "Max lenght of resource prefix. Default: 10",
-                    Mandatory = $false)]
-                [int]
-                $MaxLenght,
+            Set-TerraformFolder -MainTerraformFileName $MainTerraformFileName -TerraformSnippet $terraformOutput -OutputFilePath $OutputFilePath -MainFilePath $MainFilePath
 
-                [Parameter(
-                    HelpMessage = "Min lenght of resource prefix. Default: 4",
-                    Mandatory = $false)]
-                [int]
-                $MinLenght = 4
-            )
-
-            process {
-                if (-not ($ResourcePrefix.Length -le $MaxLenght) -and ($ResourcePrefix.Length -ge $MinLenght)) {
-                    Write-Error "La lunghezza del prefisso deve essere compresa tra $($MinLenght) e $($MaxLenght) caratteri."
-                    exit
-                }
-            }
-        }
-
-        # This method manages the connection to Azure: it uses Device Authentication on WSL and Linux
-        function Set-AzureConnect {
-            process {
-                if ([System.Environment]::OSVersion.Platform -ne "Win32NT") {
-                    Connect-AzAccount -UseDeviceAuthentication -ErrorAction Stop
-                }
-                else {
-                    Connect-AzAccount -ErrorAction Stop
-                }
-            }
-        }
-
-        # This method manages the connection to Azure: verifies if has been specified a subscrption in wich deploy resources
-        function Set-AzureConnection {
-            process {
-                if ([string]::IsNullOrWhiteSpace($AzSub) -or [string]::IsNullOrEmpty($AzSub)) {
-                    Set-AzureConnect
-                    $actualAz = Get-AzContext
-                }
-                else {
-                    Set-AzureConnect
-                    $actualAz = Set-AzContext -Subscription $AzSub
-                }
-        
-                Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Sottoscrizione attualmente in uso:"
-                $temp = $actualAz | Select-Object Account, Subscription, Tenant
-                Write-Host -ForegroundColor Green -BackgroundColor Black -Object $temp
-            }
-        }
-
-        # Creates (if not exists) a Key Vault in the resource group on Azure
-        function Set-AzKeyVault {
-            param (
-                [Parameter(
-                    Mandatory = $false
-                )]
-                [ValidateSet("Standard", "Premium")]
-                [string]
-                $KeyVaultSku = "Standard",
-
-                [Parameter(
-                    Mandatory = $false
-                )]
-                [int]
-                $RetentionDays = 90
-            )
-
-            process {
-                if ([string]::IsNullOrEmpty($AzKeyVault) -or [string]::IsNullOrWhiteSpace($AzKeyVault)) {
-                    $keyVaultName = $ResourcePrefix.ToLowerInvariant() + $random.ToString() + "-kv"
-                }
-                else {
-                    # if key vault name is provided as script parameter
-                    $keyVaultName = $AzKeyVault.ToLowerInvariant()
-                }
-
-                $keyVault = Get-AzKeyVault -VaultName $keyVaultName -ResourceGroupName $ResourceGroup.ResourceGroupName -ErrorAction SilentlyContinue
-
-                if ($null -eq $keyVault) {
-                    Write-Warning "Il KeyVault $($keyVaultName) indicato non esiste nel gruppo di risorse $($ResourceGroup.ResourceGroupName), creazione in corso..."
-                    $keyVault = New-AzKeyVault -Name $keyVaultName -ResourceGroupName $ResourceGroup.ResourceGroupName -Location $ResourceGroup.Location -Sku $KeyVaultSku -EnablePurgeProtection -SoftDeleteRetentionInDays $RetentionDays -Tag $AzTag -ErrorAction Stop
-                }
-    
-                $temp = $keyVault | Select-Object VaultName, ResourceGroupName, Location, Sku, SoftDeleteRetentionInDays, VaultUri, TagsTable
-                Write-Host $temp
-    
-                return $keyVault
-            }
-        }
-
-        # Saves on Azure Key Vault as secrets all keys from storage account used to store terraform states
-        function Export-TerraformOnAzKeyVault {
-            [CmdletBinding()]
-            param (
-                [object[]]
-                $Keys,
-
-                [Parameter(
-                    Mandatory = $false
-                )]
-                [ValidateSet("Standard", "Premium")]
-                [string]
-                $KeyVaultSku = "Standard",
-        
-                [Parameter(
-                    Mandatory = $false
-                )]
-                [int]
-                $RetentionDays = 90
-            )
-    
-            process {
-
-                $keyVault = Set-AzKeyVault -KeyVaultSku $KeyVaultSku -RetentionDays $RetentionDays 
-
-                foreach ($key in $Keys) {
-                    $secureKey = ConvertTo-SecureString -String $key.Value -AsPlainText -Force
-                    $secretAdded = Set-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name $key.KeyName -SecretValue $secureKey -Expires "01/01/2099" -ContentType "Storage Account - $($key.KeyName)" -Tag $AzTag -ErrorAction Stop
-                    # Write-Output $secretAdded
-                }
-            }
-        }
-
-        # Populates the terraform output with the need information from Azure Blob Storage
-        function Get-TerraformOutput {
-            param (
-                [Parameter(
-                    Mandatory = $true
-                )]
-                $StorageAccount,
-        
-                [Parameter(
-                    Mandatory = $true
-                )]
-                $StorageContainer,
-
-                [Parameter(
-                    Mandatory = $false
-                )]
-                $Extension = "tfstate",
-
-                [Parameter(
-                    Mandatory = $false
-                )]
-                $FileName = "terraform"
-            )
-
-            process {
-                return "####################`n# Snippet generated by PowerShell to store Terraform states on Azure Storage`n####################`nterraform {`n`tbackend ""azurerm"" {`n`t`tresource_group_name = ""$($StorageAccount.ResourceGroupName)""`n`t`tstorage_account_name = ""$($StorageAccount.StorageAccountName)""`n`t`tcontainer_name = ""$($StorageContainer.Name)""`n`t`tkey = ""$($FileName).$($Extension)""`n`t}`n}`n"
-            }
-        }
-
-        # Creates (if not exists) an resource group on Azure
-        function Set-AzResourceGroup {
-            process {
-                if ([string]::IsNullOrEmpty($AzResGroup) -or [string]::IsNullOrWhiteSpace($AzResGroup)) {
-                    $rgName = $ResourcePrefix
-                }
-                else {
-                    # if resoruce group name is provided as script parameter
-                    $rgName = $AzResGroup.ToLowerInvariant()
-                }
-        
-                $rg = Get-AzResourceGroup -Name $rgName -ErrorAction SilentlyContinue
-        
-                if ($null -eq $rg) {
-                    Write-Warning "Il resource group $($rgName) indicato non esiste, creazione in corso..."
-                    $rg = New-AzResourceGroup -Name $rgName -Location $AzRegion -Tag $AzTag -ErrorAction Stop
-                }
-
-                $temp = $rg | Select-Object ResourceGroupName, Location, ProvisioningState, ResourceId, TagsTable
-                Write-Host $temp
-
-                return $rg
-            }
-        }
-
-        # Creates (if not exists) a storage account in the resource group on Azure
-        function Set-AzStorage {
-            param (
-                [Parameter(
-                    Mandatory = $true
-                )]
-                [object]
-                $ResourceGroup,
-
-                [Parameter(
-                    Mandatory = $true
-                )]
-                [string]
-                $StorageSku
-            )
-
-            process {
-                if ([string]::IsNullOrEmpty($AzStorageAccount) -or [string]::IsNullOrWhiteSpace($AzStorageAccount)) {
-                    $stgName = $ResourcePrefix.ToLowerInvariant() + $random.ToString() + "stg"
-                }
-                else {
-                    # if resoruce group name is provided as script parameter
-                    $stgName = $AzStorageAccount.ToLowerInvariant()
-                }
-
-                $stgNameAvailable = Get-AzStorageAccountNameAvailability -Name $stgName -ErrorAction Stop
-
-                if ($stgNameAvailable.NameAvailable -eq $true) {
-                    Write-Warning "Lo storage account $($stgName) indicato non esiste nel gruppo di risorse $($ResourceGroup.ResourceGroupName), creazione in corso..."
-                    $stgAcc = New-AzStorageAccount -Name $stgName -ResourceGroupName $ResourceGroup.ResourceGroupName -SkuName $StorageSku -Location $ResourceGroup.Location -AccessTier Hot -Kind BlobStorage -Tag $AzTag -ErrorAction Stop
-                }
-                elseif ($stgNameAvailable.NameAvailable -eq $false) {
-
-                    try {
-                        $stgAcc = Get-AzStorageAccount -ResourceGroupName $ResourceGroup.ResourceGroupName -Name $stgName
-                    }
-                    catch {
-                        Write-Error "Il nome per lo strage account non è disponibile: $($stgName)"
-                        exit
-                    }
-
-                }
-                else {
-                    Write-Error "Errore: $($stgNameAvailable.Message)"
-                }
-
-                $temp = $stgAcc | Select-Object StorageAccountName, Kind, AccessTier, EnableHttpsTrafficOnly, ProvisioningState, TagsTable
-                Write-Host $temp
-
-                return Set-AzStorageConfiguration -StorageAccount $stgAcc
-            }
-        }
-
-        # Configures the Azure Storage Account and creates in it the Storage Container to store terraform states
-        function Set-AzStorageConfiguration {
-            param (
-                [Parameter(
-                    Mandatory = $true
-                )]
-                [object]
-                $StorageAccount
-            )
-    
-            process {
-                $stgKeys = Get-AzStorageAccountKey -ResourceGroupName $StorageAccount.ResourceGroupName -Name $StorageAccount.StorageAccountName -ErrorAction Stop
-
-                Export-TerraformOnAzKeyVault -Keys $stgKeys -KeyVaultSku $AzKvSku
-
-                $stgKey = $stgKeys | Where-Object { $_.KeyName -Match "key1" }
-                $stgContext = New-AzStorageContext -StorageAccountName $StorageAccount.StorageAccountName -StorageAccountKey $stgKey.Value -Protocol Https -ErrorAction Stop
-
-                $stgContainer = Get-AzStorageContainer -Name $TerraformContainer -Context $stgContext -ErrorAction SilentlyContinue
-
-                if ($null -eq $stgContainer) {
-                    Write-Warning "Il container $($TerraformContainer) indicato non esiste nello storage account $($stgContext.StorageAccountName), creazione in corso..."
-                    $stgContainer = New-AzStorageContainer -Name $TerraformContainer -Context $stgContext -ErrorAction Stop
-                }
-
-                $temp = $stgContainer | Select-Object Name, CloudBlobContainer.Uri.AbsoluteUri, PublicAccess
-                Write-Host $temp
-
-                return $StorageAccount, $stgContainer
-            }
-        }
-        #endregion
-
-        #region script body
-
-        # generates a random value to use as postfix in resources' name
-        $random = Get-Random -Maximum 99999
-
-        Set-AzureConnection
-
-        $rg = Set-AzResourceGroup
-
-        $storageConfig = Set-AzStorage -ResourceGroup $rg -StorageSku $AzStgSku
-
-        $terraformOutput = Get-TerraformOutput -StorageAccount $storageConfig[0] -StorageContainer $storageConfig[-1]
-
-        # close PowerShell session on Azure
-        Disconnect-AzAccount -InformationAction SilentlyContinue
-        Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Account Azure disconnesso."
-
-        return $terraformOutput
     }
+
+    #region module manager
+
+    #endregion
 }
+
+function Set-Terraform {
+    param(
+        [Parameter(
+            HelpMessage = "Modules name to install from the GitHub tool repo.",
+            Mandatory = $true)]
+        [ValidateSet("ConfigureTerraformBackend", "ExportTerraformBackendConfig")]
+        [string[]]
+        $ModulesToInstall
+    )
+
+    process {
+        $psModuleExtension = "psm1"
+    
+        foreach ($module in $ModulesToInstall) {
+
+            $libraryUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/TerraformBackendOnAzure/$($module)/$($module).$($psModuleExtension)"
+
+            $module = "$($module).$($psModuleExtension)"
+
+            $client = New-Object System.Net.WebClient
+            $currentPath = Get-Location
+            $downloadPath = Join-Path -Path $currentPath.Path -ChildPath $module
+            $client.DownloadFile($libraryUrl, $downloadPath)
+            
+            $modToImport = Join-Path -Path $currentPath.Path -ChildPath $module -Resolve -ErrorAction Stop
+            Import-Module $modToImport
+            Remove-Item -Path $modToImport -Force
+        }
+    }
+
+}
+
 
 Export-ModuleMember -Function Set-TerraformBackend

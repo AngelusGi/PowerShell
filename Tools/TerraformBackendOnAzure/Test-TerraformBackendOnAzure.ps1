@@ -165,7 +165,7 @@ function Set-PsEvnironment {
             $client.DownloadFile($libraryUrl, $downloadPath)
             
             $modToImport = Join-Path -Path $currentPath.Path -ChildPath $module -Resolve -ErrorAction Stop
-            Import-Module $modToImport -Verbose
+            Import-Module $modToImport
             Remove-Item -Path $modToImport -Force
         }
     }
@@ -179,7 +179,13 @@ function Set-PsEvnironment {
 Set-PsEvnironment -ModulesToInstall "ModuleManager","TerraformBackendOnAzure"
 
 # exectues custom modules
-Set-EnvironmentInstaller -PsModulesToInstall "Az" -OnlyAbovePs6 $true
+Set-EnvironmentInstaller -Modules "Az" -OnlyAbovePs6 $true
+
 Set-TerraformBackend -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath
+# Set-TerraformBackend
+#     -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName
+#     -ResourcePrefix $ResourcePrefix -AzSub $AzSub -AzRegion $AzRegion -AzTag $AzTag
+#     -AzStgSku $AzStgSku -AzResGroup $AzResGroup -AzStorageAccount $AzStorageAccount
+#     -TerraformContainer $TerraformContainer -AzKvSku $AzKvSku -AzKeyVault $AzKeyVault
 
 #endregion
