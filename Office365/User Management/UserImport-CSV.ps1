@@ -2,46 +2,33 @@
 
 
 
-function PrepareEnvironment {
-
+function Set-PsEvnironment {
     param(
         [Parameter(
-            HelpMessage = "List of modules to be installed.",
-            Mandatory = $true)]
+            HelpMessage = "Modules name to install from the GitHub tool repo.",
+            Mandatory = $false)]
+        [ValidateSet("ModuleManager", "TerraformBackendOnAzure")]
         [string[]]
-        $ModulesToInstall,
-
-        [Parameter(
-            HelpMessage = "If true, this script has dependecies in order to be executed only on PowerShell 5.x.",
-            Mandatory = $false)]
-        [bool]
-        $OnlyPowerShell5 = $false,
-
-        [Parameter(
-            HelpMessage = "If true, this script has dependecies in order to be executed PowerShell >=6.x.",
-            Mandatory = $false)]
-        [bool]
-        $OnlyAbovePs6 = $false,
-
-        [Parameter(
-            HelpMessage = "Scope of the module installation (CurrentUser or AllUsers). Default: CurrentUser",
-            Mandatory = $false)]
-        [ValidateSet("CurrentUser", "AllUsers")]
-        [string]
-        $Scope = "CurrentUser"
+        $ModulesToInstall = "ModuleManager"
     )
 
     process {
-        $_customMod = "ModuleManager.psm1"
-        $_libraryUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/Module%20Manager/$($_customMod)"
-        $_client = New-Object System.Net.WebClient
-        $_currentPath = Get-Location
-        $_downloadPath = Join-Path -Path $_currentPath.Path -ChildPath $_customMod
-        $_client.DownloadFile($_libraryUrl, $_downloadPath)
-        $_modToImport = Join-Path -Path $_currentPath.Path -ChildPath $_customMod -Resolve
-        Import-Module $_modToImport
-        Get-EnvironmentInstaller -Modules $ModulesToInstall - $OnlyPowerShell5 -Scope $Scope
-        Remove-Item -Path $_modToImport -Force
+        $psModuleExtension = "psm1"
+    
+        foreach ($module in $ModulesToInstall) {
+
+            $libraryUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/$($module)/$($module).$($psModuleExtension)"
+            $module = "$($module).$($psModuleExtension)"
+
+            $client = New-Object System.Net.WebClient
+            $currentPath = Get-Location
+            $downloadPath = Join-Path -Path $currentPath.Path -ChildPath $module
+            $client.DownloadFile($libraryUrl, $downloadPath)
+            
+            $modToImport = Join-Path -Path $currentPath.Path -ChildPath $module -Resolve -ErrorAction Stop
+            Import-Module $modToImport -Verbose
+            Remove-Item -Path $modToImport -Force
+        }
     }
 
 }
@@ -70,10 +57,10 @@ $License = "MY LICENSE" # "MY LICENSE" # ex. "contoso:STANDARDWOFFPACK_STUDENT" 
 
 # *** OPTIONAL PARATMETRS ***
 $Role = "MY ROLE" # "MY ROLE" User role's in this CSV # ex. "Docente" or "Studente" - if you wont use it set as ""
-$Class  = "MY DEPARTMENT" # "MY DEPARTMENT" it can be used for identify student's class # ex. "1D" - if you wont use it set as ""
+$Class = "MY DEPARTMENT" # "MY DEPARTMENT" it can be used for identify student's class # ex. "1D" - if you wont use it set as ""
 # *** END USER DATA ***
 
-PrepareEnvironment -ModulesToInstall "MSOnline"
+Set-PsEvnironment -PsModulesToInstall  "MSOnline"
 
 Connect-MsolService -Credential $AdminCred
 
@@ -89,18 +76,18 @@ $users | ForEach-Object {
     # add the user
     # for details see this reference: https://docs.microsoft.com/en-us/powershell/module/msonline/new-msoluser?view=azureadps-1.0
     New-MsolUser
-        # *** IF YOU WANT TO ADD MORE PARAMETER ADD IT HERE *** 
-        -FirstName $_.Nome
-        -LastName $_.Cognome
-        # *** DO NOT MODIFY THE FOLLOWING PARAMETERS *** 
-        -UserPrincipalName $UserPrincipalName
-        -DisplayName $Displayname
-        -Title $Role    
-        -Department $Class
-        -PreferredDataLocation $DataPref
-        -UsageLocation $Country
-        -LicenseAssignment $License
-        -PasswordNeverExpires $ExpirePswd
+    # *** IF YOU WANT TO ADD MORE PARAMETER ADD IT HERE *** 
+    -FirstName $_.Nome
+    -LastName $_.Cognome
+    # *** DO NOT MODIFY THE FOLLOWING PARAMETERS *** 
+    -UserPrincipalName $UserPrincipalName
+    -DisplayName $Displayname
+    -Title $Role    
+    -Department $Class
+    -PreferredDataLocation $DataPref
+    -UsageLocation $Country
+    -LicenseAssignment $License
+    -PasswordNeverExpires $ExpirePswd
     
     # set the password for the current user - at the first access the user have to change the default password
     # for details see this reference: https://docs.microsoft.com/en-us/powershell/module/msonline/set-msoluserpassword?view=azureadps-1.0
