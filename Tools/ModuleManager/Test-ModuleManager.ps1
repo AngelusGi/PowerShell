@@ -23,14 +23,14 @@ function Set-PsEvnironment {
             $client.DownloadFile($libraryUrl, $downloadPath)
             
             $modToImport = Join-Path -Path $currentPath.Path -ChildPath $module -Resolve -ErrorAction Stop
-            Import-Module $modToImport -Verbose
+            Import-Module $modToImport
             Remove-Item -Path $modToImport -Force
         }
     }
 
 }
 
-Set-PsEvnironment -PsModulesToInstall "ModuleManager"
+Set-PsEvnironment -ModulesToInstall "ModuleManager"
 
 # exectues custom module
-Set-EnvironmentInstaller -PsModulesToInstall "Az" -OnlyAbovePs6 $true
+Set-EnvironmentInstaller -Modules "Az" -OnlyAbovePs6 $true
