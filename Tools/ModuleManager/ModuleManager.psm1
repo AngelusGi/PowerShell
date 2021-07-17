@@ -21,7 +21,7 @@
 
 #>
 
-function Get-EnvironmentInstaller {
+function Set-EnvironmentInstaller {
     #region mod manager
     param(
         # List of modules to install
@@ -184,4 +184,4 @@ function Get-EnvironmentInstaller {
 
 }
 
-Export-ModuleMember -Function Get-EnvironmentInstaller
+Export-ModuleMember -Function Set-EnvironmentInstaller
