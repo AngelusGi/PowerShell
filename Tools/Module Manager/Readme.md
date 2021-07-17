@@ -1,4 +1,4 @@
-# Module manager library on PowerShell
+# Module manager - PowerShell library
 
 ## Description
 
