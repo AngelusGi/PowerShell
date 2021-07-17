@@ -39,7 +39,7 @@ function Set-PsEvnironment {
     
         foreach ($module in $ModulesToInstall) {
 
-            $folder = ($ModulesToInstall -eq "ModuleManager") ? "Module%20Manager" : "Manage%20Terraform%20Backend%20on%20Azure" 
+            $folder = ($ModulesToInstall -eq "ModuleManager") ? "ModuleManager" : "TerraformBackendOnAzure" 
             $libraryUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/$($folder)/$($ModulesToInstall).$($psModuleExtension)"
 
             $client = New-Object System.Net.WebClient
