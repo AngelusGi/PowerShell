@@ -181,7 +181,8 @@ Set-PsEvnironment -ModulesToInstall "ModuleManager","TerraformBackendOnAzure"
 # exectues custom modules
 Set-EnvironmentInstaller -Modules "Az" -OnlyAbovePs6 $true
 
-Set-TerraformBackend -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath
+Set-TerraformBackend -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -ModulesToInstall "ConfigureTerraformBackend","ExportTerraformBackendConfig"
+
 # Set-TerraformBackend
 #     -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName
 #     -ResourcePrefix $ResourcePrefix -AzSub $AzSub -AzRegion $AzRegion -AzTag $AzTag

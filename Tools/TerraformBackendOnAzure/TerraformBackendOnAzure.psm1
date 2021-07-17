@@ -1,6 +1,6 @@
 #region custom functions
 
-function Set-TerraformBackend {
+function Set-TerraformBackendOnAzure {
     [CmdletBinding()]
     param (
 
@@ -151,9 +151,8 @@ function Set-TerraformBackend {
     )
 
     process {
-        Set-Terraform -ModulesToInstall
 
-        $terraformOutput = Set-TerraformBackend
+        $terraformOutput = Set-TerraformBackendConfiguration
             -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName
             -ResourcePrefix $ResourcePrefix -AzSub $AzSub -AzRegion $AzRegion -AzTag $AzTag
             -AzStgSku $AzStgSku -AzResGroup $AzResGroup -AzStorageAccount $AzStorageAccount
@@ -201,4 +200,4 @@ function Set-Terraform {
 }
 
 
-Export-ModuleMember -Function Set-TerraformBackend
+Export-ModuleMember -Function Set-TerraformBackendOnAzure

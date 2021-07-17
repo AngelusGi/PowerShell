@@ -1,6 +1,6 @@
 #region custom functions
 
-function Set-TerraformBackend {
+function Set-TerraformBackendConfiguration {
     [CmdletBinding()]
     param (
 
@@ -446,4 +446,4 @@ function Set-TerraformBackend {
     }
 }
 
-Export-ModuleMember -Function Set-TerraformBackend
+Export-ModuleMember -Function Set-TerraformBackendConfiguration
