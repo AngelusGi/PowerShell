@@ -1,3 +1,26 @@
+<#
+ .Synopsis
+  Module manager library on PowerShell
+
+ .Description
+  This custom module verify if the module is alredy installed, otherwise will install/update it.
+  It can manage GitHub hosted modules too, such as Azure Lab Services.
+
+ .Parameter Modules 
+  List of PowerShell modules to be installed.
+
+  .Parameter Scope 
+  Scope of the module installation (CurrentUser or AllUsers). Default: CurrentUser.
+  Accepts only those two values: CurrentUser, AllUsers
+
+  .Parameter OnlyPowerShell5 
+  If true, this script has dependecies in order to be executed only on PowerShell 5.x.
+
+  .Parameter OnlyAbovePs6 
+  If true, this script has dependecies in order to be executed PowerShell >=6.x.
+
+#>
+
 function Get-EnvironmentInstaller {
     #region mod manager
     param(
@@ -11,7 +34,7 @@ function Get-EnvironmentInstaller {
 
         # Install mod -scope
         [Parameter(
-            HelpMessage = "Scope of the module installation (CurrentUser or AllUsers). Default: CurrentUser",
+            HelpMessage = "Scope of the module installation (CurrentUser or AllUsers). Default: CurrentUser.",
             Mandatory = $false)]
         [ValidateSet("CurrentUser", "AllUsers")]
         [string]
@@ -31,15 +54,24 @@ function Get-EnvironmentInstaller {
         $OnlyAbovePs6 = $false
     )
 
-    function Run-CheckModules {
+    function Find-ModulesToInstall {
         param (
+            [Parameter(
+                HelpMessage = "List of PowerShell modules to be installed.",
+                Mandatory = $true
+            )]
             [string[]]
             $Modules,
 
+            [Parameter(
+                HelpMessage = "Scope of the module installation (CurrentUser or AllUsers). Default: CurrentUser",
+                Mandatory = $false)]
+            [ValidateSet("CurrentUser", "AllUsers")]
             [string]
-            $Scope
+            $Scope = "CurrentUser"
         )
-        process {
+
+        Get-Process {
 
             $Modules = $Modules | Select-Object -Unique
             $_installedModules = Get-InstalledModule
@@ -105,10 +137,8 @@ function Get-EnvironmentInstaller {
         }
     }
 
-    function Verify-PsVersion {
-    
-        process {
-
+    function Test-PsVersion {
+        Get-Process {
             Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Verifica dell'ambiente in corso, attendere..."
 
             if (($OnlyPowerShell5 -eq $true) -and ($PSVersionTable.PSVersion.Major -ne 5)) {
@@ -123,18 +153,25 @@ function Get-EnvironmentInstaller {
 
     function Install-LocalModules {
         param (
+            [Parameter(
+                HelpMessage = "List of PowerShell modules to be installed.",
+                Mandatory = $true
+            )]
             [string[]]
             $Modules,
 
+            [Parameter(
+                HelpMessage = "Scope of the module installation (CurrentUser or AllUsers). Default: CurrentUser",
+                Mandatory = $false)]
+            [ValidateSet("CurrentUser", "AllUsers")]
             [string]
-            $Scope
+            $Scope = "CurrentUser"
         )
 
-        process {
-            Verify-PsVersion
-            Run-CheckModules -Modules $Modules -Scope $Scope
+        Get-Process {
+            Test-PsVersion
+            Find-ModulesToInstall -Modules $Modules -Scope $Scope
         }
-    
     }
 
     #endregion
