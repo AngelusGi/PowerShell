@@ -53,6 +53,15 @@ function Set-TerraformBackendOnAzure {
         )]
         [string]
         $AzSub,
+
+        # Azure Tenant Name or Id
+        [Alias("AzureTenantName", "AzureTenantId", "AzureTenant")]
+        [Parameter(
+            HelpMessage = "Azure Tenant Name or Id.",
+            Mandatory = $false
+        )]
+        [string]
+        $AzTenant,
     
         # Azure region name
         [Parameter(
@@ -153,12 +162,12 @@ function Set-TerraformBackendOnAzure {
     process {
 
         $terraformOutput = Set-TerraformBackendConfiguration
-            -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName
-            -ResourcePrefix $ResourcePrefix -AzSub $AzSub -AzRegion $AzRegion -AzTag $AzTag
-            -AzStgSku $AzStgSku -AzResGroup $AzResGroup -AzStorageAccount $AzStorageAccount
-            -TerraformContainer $TerraformContainer -AzKvSku $AzKvSku -AzKeyVault $AzKeyVault
+        -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName
+        -ResourcePrefix $ResourcePrefix -AzSub $AzSub -AzRegion $AzRegion -AzTag $AzTag
+        -AzStgSku $AzStgSku -AzResGroup $AzResGroup -AzStorageAccount $AzStorageAccount
+        -TerraformContainer $TerraformContainer -AzKvSku $AzKvSku -AzKeyVault $AzKeyVault
 
-            Set-TerraformFolder -MainTerraformFileName $MainTerraformFileName -TerraformSnippet $terraformOutput -OutputFilePath $OutputFilePath -MainFilePath $MainFilePath
+        Set-TerraformFolder -MainTerraformFileName $MainTerraformFileName -TerraformSnippet $terraformOutput -OutputFilePath $OutputFilePath -MainFilePath $MainFilePath
 
     }
 

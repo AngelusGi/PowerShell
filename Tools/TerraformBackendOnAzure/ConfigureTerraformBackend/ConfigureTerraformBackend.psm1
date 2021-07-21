@@ -53,6 +53,15 @@ function Set-TerraformBackendConfiguration {
         )]
         [string]
         $AzSub,
+
+        # Azure Tenant Name or Id
+        [Alias("AzureTenantName", "AzureTenantId", "AzureTenant")]
+        [Parameter(
+            HelpMessage = "Azure Tenant Name or Id.",
+            Mandatory = $false
+        )]
+        [string]
+        $AzTenant,
     
         # Azure region name
         [Parameter(
@@ -197,13 +206,21 @@ function Set-TerraformBackendConfiguration {
         # This method manages the connection to Azure: verifies if has been specified a subscrption in wich deploy resources
         function Set-AzureConnection {
             process {
-                if ([string]::IsNullOrWhiteSpace($AzSub) -or [string]::IsNullOrEmpty($AzSub)) {
+
+                $AzSubIsNull = [string]::IsNullOrWhiteSpace($AzSub) -or [string]::IsNullOrEmpty($AzSub)
+                $AzTenantIsNull = [string]::IsNullOrWhiteSpace($AzTenant) -or [string]::IsNullOrEmpty($AzTenant)
+                
+                if ($AzSubIsNull -and $AzTenantIsNull) {
                     Set-AzureConnect
                     $actualAz = Get-AzContext
                 }
-                else {
+                elseif ($AzTenantIsNull) {
                     Set-AzureConnect
-                    $actualAz = Set-AzContext -Subscription $AzSub
+                    $actualAz = Get-AzContext -Subscription $AzSub
+                }
+                elseif ($AzSubIsNull) {
+                    Set-AzureConnect
+                    $actualAz = Get-AzContext -Tenant $AzTenant
                 }
         
                 Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Sottoscrizione attualmente in uso:"

@@ -42,6 +42,10 @@ TODO
 
 Azure Subscription Name or Id.
 
+#### Parameter AzTenant
+
+Azure Tenant Name or Id.
+
 #### Parameter AzRegion
 
 Azure region name.

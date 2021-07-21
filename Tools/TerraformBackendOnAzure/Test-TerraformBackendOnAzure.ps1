@@ -41,6 +41,15 @@ param (
     [string]
     $AzSub,
 
+    # Azure Tenant Name or Id
+    [Alias("AzureTenantName", "AzureTenantId", "AzureTenant")]
+    [Parameter(
+        HelpMessage = "Azure Tenant Name or Id.",
+        Mandatory = $false
+    )]
+    [string]
+    $AzTenant,
+
     # Azure region name
     [Parameter(
         HelpMessage = "Azure region name. Default: westeurope.",
@@ -176,12 +185,12 @@ function Set-PsEvnironment {
 
 #region script body
 
-Set-PsEvnironment -ModulesToInstall "ModuleManager","TerraformBackendOnAzure"
+Set-PsEvnironment -ModulesToInstall "ModuleManager", "TerraformBackendOnAzure"
 
 # exectues custom modules
 Set-EnvironmentInstaller -Modules "Az" -OnlyAbovePs6 $true
 
-Set-TerraformBackend -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -ModulesToInstall "ConfigureTerraformBackend","ExportTerraformBackendConfig"
+Set-TerraformBackend -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -ModulesToInstall "ConfigureTerraformBackend", "ExportTerraformBackendConfig"
 
 # Set-TerraformBackend
 #     -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName
