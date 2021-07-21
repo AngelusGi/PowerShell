@@ -161,12 +161,8 @@ function Set-TerraformBackendOnAzure {
 
     process {
 
-        $terraformOutput = Set-TerraformBackendConfiguration
-        -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName
-        -ResourcePrefix $ResourcePrefix -AzSub $AzSub -AzRegion $AzRegion -AzTag $AzTag
-        -AzStgSku $AzStgSku -AzResGroup $AzResGroup -AzStorageAccount $AzStorageAccount
-        -TerraformContainer $TerraformContainer -AzKvSku $AzKvSku -AzKeyVault $AzKeyVault
-
+        $terraformOutput = Set-TerraformBackendConfiguration -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName -ResourcePrefix $ResourcePrefix -AzSub $AzSub -AzTenant $AzTenant -AzRegion $AzRegion -AzTag $AzTag -AzStgSku $AzStgSku -AzResGroup $AzResGroup -AzStorageAccount $AzStorageAccount -TerraformContainer $TerraformContainer -AzKvSku $AzKvSku -AzKeyVault $AzKeyVault
+        
         Set-TerraformFolder -MainTerraformFileName $MainTerraformFileName -TerraformSnippet $terraformOutput -OutputFilePath $OutputFilePath -MainFilePath $MainFilePath
 
     }
