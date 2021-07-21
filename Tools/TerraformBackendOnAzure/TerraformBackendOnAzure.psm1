@@ -166,18 +166,13 @@ function Set-TerraformBackendOnAzure {
         if ($ModulesToInstall.Contains("ConfigureTerraformBackend") -and $ModulesToInstall.Contains("ExportTerraformBackendConfig")) {
             $terraformOutput = Set-AzConfig
             Set-TfConfig -TerraformSnippet $terraformOutput
-
         }
         elseif ($ModulesToInstall.Contains("ConfigureTerraformBackend")) {
             $terraformOutput = Set-AzConfig
-            
         }
         elseif ($ModulesToInstall.Contains("ExportTerraformBackendConfig")) {
             Set-TfConfig -TerraformSnippet $terraformOutput
         }
-
-       
-
     }
 
     #region module manager
@@ -352,37 +347,34 @@ function Set-Terraform {
     process {
         $psModuleExtension = "psm1"
     
-        # foreach ($module in $ModulesToInstall) {
-
-        #     $libraryUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/TerraformBackendOnAzure/$($module)/$($module).$($psModuleExtension)"
-
-        #     $module = "$($module).$($psModuleExtension)"
-
-        #     $client = New-Object System.Net.WebClient
-        #     $currentPath = Get-Location
-        #     $downloadPath = Join-Path -Path $currentPath.Path -ChildPath $module
-        #     $client.DownloadFile($libraryUrl, $downloadPath)
-            
-        #     $modToImport = Join-Path -Path $currentPath.Path -ChildPath $module -Resolve -ErrorAction Stop
-        #     Import-Module $modToImport
-        #     Remove-Item -Path $modToImport -Force
-        # }
-
-        #TODO TO REMOVE
-        $ModulesToInstall = "ConfigureTerraformBackend", "ExportTerraformBackendConfig"
         foreach ($module in $ModulesToInstall) {
 
-            $currentPath = Get-Location
-            
+            $libraryUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/TerraformBackendOnAzure/$($module)/$($module).$($psModuleExtension)"
+
             $module = "$($module).$($psModuleExtension)"
+
+            $client = New-Object System.Net.WebClient
+            $currentPath = Get-Location
+            $downloadPath = Join-Path -Path $currentPath.Path -ChildPath $module
+            $client.DownloadFile($libraryUrl, $downloadPath)
 
             $modToImport = Join-Path -Path $currentPath.Path -ChildPath $module -Resolve -ErrorAction Stop
             Import-Module $modToImport
-        
+            Remove-Item -Path $modToImport -Force
         }
+
+        # # Local import
+        # $ModulesToInstall = "ConfigureTerraformBackend", "ExportTerraformBackendConfig"
+        # foreach ($module in $ModulesToInstall) {
+
+        #     $currentPath = Get-Location
+            
+        #     $module = "$($module).$($psModuleExtension)"
+
+        #     $modToImport = Join-Path -Path $currentPath.Path -ChildPath $module -Resolve -ErrorAction Stop
+        #     Import-Module $modToImport
+        
     }
-
 }
-
 
 Export-ModuleMember -Function Set-TerraformBackendOnAzure
