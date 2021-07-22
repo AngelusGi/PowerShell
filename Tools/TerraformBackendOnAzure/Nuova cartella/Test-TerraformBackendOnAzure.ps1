@@ -168,9 +168,15 @@ Set-PsEvnironment
 # exectues custom modules
 Set-EnvironmentInstaller -Modules "Az" -OnlyAbovePs6 $true
 
+<<<<<<< HEAD:Tools/TerraformBackendOnAzure/Test/Test-TerraformBackendOnAzure.ps1
+Set-TerraformBackendOnAzure -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -ModulesToInstall "ConfigureTerraformBackend", "ExportTerraformBackendConfig"
+
+# Set-TerraformBackendOnAzure -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName -ResourcePrefix $ResourcePrefix -AzSub $AzSub -AzTenant $AzTenant -AzRegion $AzRegion -AzTag $AzTag -AzTenant $AzTenant -AzStgSku $AzStgSku -AzResGroup $AzResGroup -AzStorageAccount $AzStorageAccount -TerraformContainer $TerraformContainer -AzKvSku $AzKvSku -AzKeyVault $AzKeyVault
+=======
 # Set-TerraformBackendOnAzure -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -ModulesToInstall "ConfigureTerraformBackend","ExportTerraformBackendConfig"
 
 # Set-TerraformBackendOnAzure -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName -ResourcePrefix $ResourcePrefix -AzSub $AzSub -AzRegion $AzRegion -AzTag $AzTag -AzStgSku $AzStgSku -AzResGroup $AzResGroup -AzStorageAccount $AzStorageAccount -TerraformContainer $TerraformContainer -AzKvSku $AzKvSku -AzKeyVault $AzKeyVault -ModulesToInstall "ConfigureTerraformBackend","ExportTerraformBackendConfig"
 Set-TerraformBackendOnAzure -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName -ResourcePrefix $ResourcePrefix -AzSub "a5e3b8aa-0a63-44be-bacf-ad58200e1719" -AzRegion $AzRegion -AzTag $AzTag -AzStgSku $AzStgSku -AzResGroup $AzResGroup -AzStorageAccount $AzStorageAccount -TerraformContainer $TerraformContainer -AzKvSku $AzKvSku -AzKeyVault $AzKeyVault -ModulesToInstall "ConfigureTerraformBackend","ExportTerraformBackendConfig"
+>>>>>>> 388b1874718734a8b1957a0a4fe627e7b227148f:Tools/TerraformBackendOnAzure/Nuova cartella/Test-TerraformBackendOnAzure.ps1
 
 #endregion

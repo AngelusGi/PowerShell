@@ -53,15 +53,6 @@ function Set-TerraformBackendConfiguration {
         )]
         [string]
         $AzSub,
-
-        # Azure Tenant Name or Id
-        [Alias("AzureTenantName", "AzureTenantId", "AzureTenant")]
-        [Parameter(
-            HelpMessage = "Azure Tenant Name or Id.",
-            Mandatory = $false
-        )]
-        [string]
-        $AzTenant,
     
         # Azure region name
         [Parameter(
@@ -198,7 +189,8 @@ function Set-TerraformBackendConfiguration {
                     Connect-AzAccount -UseDeviceAuthentication -ErrorAction Stop
                 }
                 else {
-                    Connect-AzAccount -ErrorAction Stop
+                    #todo
+                    Connect-AzAccount -ErrorAction Stop -Tenant dce4349f-a302-4822-bb8d-a115cf5786a2
                 }
             }
         }
@@ -206,21 +198,13 @@ function Set-TerraformBackendConfiguration {
         # This method manages the connection to Azure: verifies if has been specified a subscrption in wich deploy resources
         function Set-AzureConnection {
             process {
-
-                $AzSubIsNull = [string]::IsNullOrWhiteSpace($AzSub) -or [string]::IsNullOrEmpty($AzSub)
-                $AzTenantIsNull = [string]::IsNullOrWhiteSpace($AzTenant) -or [string]::IsNullOrEmpty($AzTenant)
-                
-                if ($AzSubIsNull -and $AzTenantIsNull) {
+                if ([string]::IsNullOrWhiteSpace($AzSub) -or [string]::IsNullOrEmpty($AzSub)) {
                     Set-AzureConnect
                     $actualAz = Get-AzContext
                 }
-                elseif ($AzTenantIsNull) {
+                else {
                     Set-AzureConnect
-                    $actualAz = Get-AzContext -Subscription $AzSub
-                }
-                elseif ($AzSubIsNull) {
-                    Set-AzureConnect
-                    $actualAz = Get-AzContext -Tenant $AzTenant
+                    $actualAz = Set-AzContext -Subscription $AzSub
                 }
         
                 Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Sottoscrizione attualmente in uso:"
