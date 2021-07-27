@@ -1,2 +1,2 @@
-$m = "Ciao"
+$m = "test"
 Write-Host($m)
