@@ -2,13 +2,13 @@
 
 ## Table of contents
 
-* [Azure Lab Services](https://github.com/AngelusGi/PowerShell#Azure-Lab-Services)
-* [Azure ARM Template](https://github.com/AngelusGi/PowerShell#Azure-ARM-Template)
-* [Azure IaaS](https://github.com/AngelusGi/PowerShell#Azure-IaaS)
+* [Azure Lab Services](#Azure-Lab-Services)
+* [Azure ARM Template](#Azure-ARM-Template)
+* [Azure IaaS](#Azure-IaaS)
 * [Terraform](#Troubleshooting)
-* [Microsoft Teams](https://github.com/AngelusGi/PowerShell#Microsoft-Teams)
-* [Microsoft 365](https://github.com/AngelusGi/PowerShell#Office-365-Microsoft-365)
-* [Troubleshooting](https://github.com/AngelusGi/PowerShell#Troubleshooting)
+* [Microsoft Teams](#Microsoft-Teams)
+* [Microsoft 365](#Office-365-Microsoft-365)
+* [Troubleshooting](#Troubleshooting)
 
 ---
 
@@ -68,6 +68,10 @@
  [link](https://github.com/AngelusGi/PowerShell/tree/master/Office365/User%20Creation/Create%20users%20and%20export%20password)
 * Remove user details
  [link](https://github.com/AngelusGi/PowerShell/tree/master/Office365/User%20Management/Remove%20user%20details)
+
+---
+
+## Terraform
 
 ---
 
