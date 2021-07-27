@@ -5,7 +5,7 @@
 * [Azure Lab Services](#Azure-Lab-Services)
 * [Azure ARM Template](#Azure-ARM-Template)
 * [Azure IaaS](#Azure-IaaS)
-* [Terraform](#Troubleshooting)
+* [Terraform](#Terraform)
 * [Microsoft Teams](#Microsoft-Teams)
 * [Microsoft 365](#Office-365-Microsoft-365)
 * [Troubleshooting](#Troubleshooting)
@@ -72,6 +72,12 @@
 ---
 
 ## Terraform
+
+* Setup Terraform backend on Azure Blob Storage and update terraform's Main file to use it
+ [link](https://github.com/AngelusGi/PowerShell/tree/master/Tools/TerraformBackendOnAzure)
+
+* Clean Terraform states files from local folders
+ [link](https://github.com/AngelusGi/PowerShell/tree/master/Tools/CleanTerraformStates)
 
 ---
 
