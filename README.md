@@ -5,6 +5,7 @@
 * [Azure Lab Services](https://github.com/AngelusGi/PowerShell#Azure-Lab-Services)
 * [Azure ARM Template](https://github.com/AngelusGi/PowerShell#Azure-ARM-Template)
 * [Azure IaaS](https://github.com/AngelusGi/PowerShell#Azure-IaaS)
+* [Terraform](#Troubleshooting)
 * [Microsoft Teams](https://github.com/AngelusGi/PowerShell#Microsoft-Teams)
 * [Microsoft 365](https://github.com/AngelusGi/PowerShell#Office-365-Microsoft-365)
 * [Troubleshooting](https://github.com/AngelusGi/PowerShell#Troubleshooting)
