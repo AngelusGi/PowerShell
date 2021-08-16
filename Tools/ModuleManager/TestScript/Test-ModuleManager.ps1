@@ -12,6 +12,7 @@ function Set-PsEvnironment {
     process {
         $psModuleExtension = "psm1"
     
+        ## GitHub import
         foreach ($module in $ModulesToInstall) {
 
             $libraryUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/$($module)/$($module).$($psModuleExtension)"
@@ -28,6 +29,15 @@ function Set-PsEvnironment {
 
             Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Modulo $($module) importato correttamente."
         }
+
+        # # Local import
+        # foreach ($module in $ModulesToInstall) {
+        #     $currentPath = Get-Location
+        #     $module = "$($module).$($psModuleExtension)"
+        #     $modToImport = Join-Path -Path $currentPath.Path -ChildPath $module -Resolve -ErrorAction Stop
+        #     Import-Module $modToImport
+        # }
+        
     }
 
 }

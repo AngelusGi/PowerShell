@@ -165,7 +165,14 @@ function Set-TerraformBackendOnAzure {
 
         if ($ModulesToInstall.Contains("ConfigureTerraformBackend") -and $ModulesToInstall.Contains("ExportTerraformBackendConfig")) {
             $terraformOutput = Set-AzConfig
-            Set-TfConfig -TerraformSnippet $terraformOutput
+
+            if ($terraformOutput.Count -gt 1) {
+                Set-TfConfig -TerraformSnippet $terraformOutput[-1]
+            }
+            else {
+                Set-TfConfig -TerraformSnippet $terraformOutput
+            }
+
         }
         elseif ($ModulesToInstall.Contains("ConfigureTerraformBackend")) {
             $terraformOutput = Set-AzConfig
@@ -347,6 +354,7 @@ function Set-Terraform {
     process {
         $psModuleExtension = "psm1"
     
+        ## GitHub import
         foreach ($module in $ModulesToInstall) {
 
             $libraryUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/TerraformBackendOnAzure/$($module)/$($module).$($psModuleExtension)"
@@ -363,8 +371,7 @@ function Set-Terraform {
             Remove-Item -Path $modToImport -Force
         }
 
-        # # Local import
-        # $ModulesToInstall = "ConfigureTerraformBackend", "ExportTerraformBackendConfig"
+        # ## Local import
         # foreach ($module in $ModulesToInstall) {
 
         #     $currentPath = Get-Location
@@ -374,6 +381,7 @@ function Set-Terraform {
         #     $modToImport = Join-Path -Path $currentPath.Path -ChildPath $module -Resolve -ErrorAction Stop
         #     Import-Module $modToImport
         
+        # }
     }
 }
 

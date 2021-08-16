@@ -89,7 +89,7 @@ function Export-Terraform {
             $outputFolder = "Output"
             
             try {
-                New-Item -Path $currentPath -ItemType Directory -Name $outputFolder
+                New-Item -Path $currentPath -ItemType Directory -Name $outputFolder -Force
             }
             catch {
                 Write-Error "Verificare che la cartella $($outputFolder) non sia bloccata"
@@ -99,18 +99,17 @@ function Export-Terraform {
         }
 
         try {
-            $terraformFileOutput = Join-Path -Path $OutputFilePath -ChildPath $mainTfName -Resolve
+            $terraformFileOutput = New-Item -Path $OutputFilePath -Name $mainTfName -Force -ItemType File
         }
         catch {
-            $OutputFilePath = Join-Path -Path $OutputFilePath -ChildPath $mainTfName
-            $terraformFileOutput = New-Item -Path $OutputFilePath -ItemType File -Name $mainTfName
+            Write-Error "Verificare che il file e la cartella $($terraformFileOutput) non siano bloccatai"
         }
 
         # Adds terraform snippet to the main file
         Add-Content -Path $terraformFileOutput -Value $TerraformSnippet
 
         Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Il seguente snippet per configurare il backend di Terraform è stato salvato nel file $($MainTerraformFileName) al seguente percorso"
-        Write-Host -ForegroundColor Green -BackgroundColor Black -Object "$($customerPath)$($terraformFileOutput)"
+        Write-Host -ForegroundColor Green -BackgroundColor Black -Object "$($terraformFileOutput)"
         $TerraformSnippet
     }
     
