@@ -79,11 +79,11 @@ function Export-Terraform {
     process {
 
         if ([string]::IsNullOrEmpty($MainFilePath) -or [string]::IsNullOrWhiteSpace($MainFilePath) ) {
-            $currentPath = Get-Location
+            $currentPath = (Get-Location).Path
         }
 
         if ([string]::IsNullOrEmpty($OutputFilePath) -or [string]::IsNullOrWhiteSpace($OutputFilePath) ) {
-            $currentPath = Get-Location
+            $currentPath = (Get-Location).Path
             $outputFolder = "Output"
             New-Item -Path $currentPath -ItemType Directory -Value $outputFolder
 
