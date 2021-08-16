@@ -85,7 +85,7 @@ function Export-Terraform {
         if ([string]::IsNullOrEmpty($OutputFilePath) -or [string]::IsNullOrWhiteSpace($OutputFilePath) ) {
             $currentPath = (Get-Location).Path
             $outputFolder = "Output"
-            New-Item -Path $currentPath -ItemType Directory -Value $outputFolder
+            New-Item -Path $currentPath -ItemType Directory -Name $outputFolder
 
             $OutputFilePath = Join-Path -Path $currentPath -ChildPath $outputFolder -Resolve -ErrorAction Stop
         }
