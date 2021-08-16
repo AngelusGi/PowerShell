@@ -142,28 +142,47 @@ param (
 #region module manager
 
 function Set-PsEvnironment {
+
+    param(
+        [Parameter(
+            HelpMessage = "Modules name to install from the GitHub tool repo.",
+            Mandatory = $false)]
+        [ValidateSet("ModuleManager", "TerraformBackendOnAzure")]
+        [string[]]
+        $ModulesToInstall = "ModuleManager"
+    )
+
     process {
         $psModuleExtension = "psm1"
-
-        $ModulesToInstall = "ModuleManager","TerraformBackendOnAzure"
+    
         foreach ($module in $ModulesToInstall) {
 
-            $currentPath = Get-Location
+            # $libraryUrl = "https://raw.githubusercontent.com/AngelusGi/PowerShell/master/Tools/$($module)/$($module).$($psModuleExtension)"
             
             $module = "$($module).$($psModuleExtension)"
 
+            $currentPath = Get-Location
+            # $downloadPath = Join-Path -Path $currentPath.Path -ChildPath $module
+            
+            # $client = New-Object System.Net.WebClient
+            # $client.DownloadFile($libraryUrl, $downloadPath)
+            
             $modToImport = Join-Path -Path $currentPath.Path -ChildPath $module -Resolve -ErrorAction Stop
             # Import-Module $modToImport -Verbose
             Import-Module $modToImport
+            # Remove-Item -Path $modToImport -Force
+
+            Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Modulo $($module) importato correttamente."
         }
     }
+    
 }
 
 #endregion
 
 #region script body
 
-Set-PsEvnironment
+Set-PsEvnironment -ModulesToInstall ModuleManager, TerraformBackendOnAzure
 
 # exectues custom modules
 Set-EnvironmentInstaller -Modules "Az" -OnlyAbovePs6 $true
@@ -171,6 +190,6 @@ Set-EnvironmentInstaller -Modules "Az" -OnlyAbovePs6 $true
 # Set-TerraformBackendOnAzure -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -ModulesToInstall "ConfigureTerraformBackend","ExportTerraformBackendConfig"
 
 # Set-TerraformBackendOnAzure -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName -ResourcePrefix $ResourcePrefix -AzSub $AzSub -AzRegion $AzRegion -AzTag $AzTag -AzStgSku $AzStgSku -AzResGroup $AzResGroup -AzStorageAccount $AzStorageAccount -TerraformContainer $TerraformContainer -AzKvSku $AzKvSku -AzKeyVault $AzKeyVault -ModulesToInstall "ConfigureTerraformBackend","ExportTerraformBackendConfig"
-Set-TerraformBackendOnAzure -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName -ResourcePrefix $ResourcePrefix -AzSub $AzSub -AzRegion $AzRegion -AzTag $AzTag -AzStgSku $AzStgSku -AzResGroup $AzResGroup -AzStorageAccount $AzStorageAccount -TerraformContainer $TerraformContainer -AzKvSku $AzKvSku -AzKeyVault $AzKeyVault -ModulesToInstall "ConfigureTerraformBackend","ExportTerraformBackendConfig"
+Set-TerraformBackendOnAzure -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName -ResourcePrefix $ResourcePrefix -AzSub $AzSub -AzRegion $AzRegion -AzTag $AzTag -AzStgSku $AzStgSku -AzResGroup $AzResGroup -AzStorageAccount $AzStorageAccount -TerraformContainer $TerraformContainer -AzKvSku $AzKvSku -AzKeyVault $AzKeyVault -ModulesToInstall "ConfigureTerraformBackend", "ExportTerraformBackendConfig"
 
 #endregion
