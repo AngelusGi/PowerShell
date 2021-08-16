@@ -78,6 +78,8 @@ function Export-Terraform {
     
     process {
 
+        $mainTfName = "$($MainTerraformFileName).tf"
+
         if ([string]::IsNullOrEmpty($MainFilePath) -or [string]::IsNullOrWhiteSpace($MainFilePath) ) {
             $currentPath = (Get-Location).Path
         }
@@ -85,17 +87,23 @@ function Export-Terraform {
         if ([string]::IsNullOrEmpty($OutputFilePath) -or [string]::IsNullOrWhiteSpace($OutputFilePath) ) {
             $currentPath = (Get-Location).Path
             $outputFolder = "Output"
-            New-Item -Path $currentPath -ItemType Directory -Name $outputFolder
+            
+            try {
+                New-Item -Path $currentPath -ItemType Directory -Name $outputFolder
+            }
+            catch {
+                Write-Error "Verificare che la cartella $($outputFolder) non sia bloccata"
+            }
 
             $OutputFilePath = Join-Path -Path $currentPath -ChildPath $outputFolder -Resolve -ErrorAction Stop
         }
 
         try {
-            $terraformFileOutput = Join-Path -Path $OutputFilePath -ChildPath "$($MainTerraformFileName).tf" -Resolve
+            $terraformFileOutput = Join-Path -Path $OutputFilePath -ChildPath $mainTfName -Resolve
         }
         catch {
-            $OutputFilePath = Join-Path -Path $OutputFilePath -ChildPath "$($MainTerraformFileName).tf"
-            $terraformFileOutput = New-Item -Path $OutputFilePath -ItemType File
+            $OutputFilePath = Join-Path -Path $OutputFilePath -ChildPath $mainTfName
+            $terraformFileOutput = New-Item -Path $OutputFilePath -ItemType File -Name $mainTfName
         }
 
         # Adds terraform snippet to the main file
