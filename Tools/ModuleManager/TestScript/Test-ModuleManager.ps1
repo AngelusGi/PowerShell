@@ -25,6 +25,8 @@ function Set-PsEvnironment {
             $modToImport = Join-Path -Path $currentPath.Path -ChildPath $module -Resolve -ErrorAction Stop
             Import-Module $modToImport
             Remove-Item -Path $modToImport -Force
+
+            Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Modulo $($module) importato correttamente."
         }
     }
 
