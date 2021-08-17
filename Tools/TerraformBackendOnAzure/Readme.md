@@ -1,5 +1,11 @@
 # Script tool: TerraformBackendOnAzure
 
+## Table of contents
+
+* [Description](#Description)
+* [How to use it](#How-to-use-it)
+* [Parameters](#Parameters)
+
 ## Description
 
 This script will configure the ```main.tf``` file in order to store Terraform states on Azure blob storage.
