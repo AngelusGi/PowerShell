@@ -10,25 +10,27 @@ In this folder you can find the main module ```TerraformBackendOnAzure``` within
 
 * ```ExportTerraformBackendConfig```
 
+### ConfigureTerraformBackend
+
+This module (can be used autonomously) is accountamble of creating all Azure resources to store Terraform backend in the cloud.
+
+### ExportTerraformBackendConfig
+
+This module (can be used autonomously) is accountamble of taking as input all the output from Azure resource creation and creates the new main terraform file within the backend configuration on Azure.
+
 ## How to use it
 
 ```Test-TerraformBackendOnAzure.ps1``` in the folder ```TestScript``` is an example that shows how to use it.
 This script is tested to be executed both on Windows or Linux or WSL, the only requirement is to have installed PowerShell >= 6.x [how to do it](https://docs.microsoft.com/powershell/scripting/install/installing-powershell)
 
-To use it as is configured in this repo, please use at least this paramenter:
-
-```PowerShell
-prepareTerraformBackend.ps1 -MainFilePath ".\main.tf"
-```
-
 After script execution you will see an ```Output``` folder within a new ```main.tf``` file within the configuration to store Terraform backend on Azure.
 As shown in the next screenshot.
 
-![Output folder - screenshot example](.\Screenshot\output-screenshot.png)
+![Output folder - screenshot example](https://github.com/AngelusGi/PowerShell/blob/8f9ea12eeef4acb30d707bd5383a293476de61ca/Tools/TerraformBackendOnAzure/Screenshot/output-screenshot.png?raw=true)
 
 Whitin an output like this:
 
-![Main terraform within backend configuration - screenshot example](.\Screenshot\terraform-screenshot.png)
+![Main terraform within backend configuration - screenshot example](https://github.com/AngelusGi/PowerShell/blob/master/Tools/TerraformBackendOnAzure/Screenshot/terraform-screenshot.png?raw=true)
 
 ## Parameters
 
