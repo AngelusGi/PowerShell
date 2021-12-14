@@ -96,7 +96,7 @@ function Export-Terraform {
             Join-Path -Path $terraformFileOutput -ChildPath $mainTfName -Resolve            
         }
         catch {
-            
+            Write-Error "file $($mainTfName) or path $($terraformFileOutput) does not exists."
         }
 
         # Adds terraform snippet to the main file
