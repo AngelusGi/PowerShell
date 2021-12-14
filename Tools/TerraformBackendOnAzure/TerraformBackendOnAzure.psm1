@@ -71,10 +71,7 @@ function Set-TerraformBackendOnAzure {
             Mandatory = $false
         )]
         [hashtable]
-        $AzTag = @{
-            app = 'TerraformBackend'
-            iac = 'PowerShell'
-        },
+        $AzTag,
     
 
         ### Azure resource group parametes ###
@@ -153,6 +150,13 @@ function Set-TerraformBackendOnAzure {
 
     process {
 
+        if ($null -eq $AzTag) {
+            $AzTag = @{
+                app = 'TerraformBackend'
+                iac = 'PowerShell'
+            }
+        }
+
         Set-Terraform -ModulesToInstall $ModulesToInstall
 
         if ($ModulesToInstall.Contains("ConfigureTerraformBackend") -and $ModulesToInstall.Contains("ExportTerraformBackendConfig")) {
@@ -207,10 +211,7 @@ function Set-AzConfig {
             Mandatory = $false
         )]
         [hashtable]
-        $AzTag = @{
-            app = 'TerraformBackend'
-            iac = 'PowerShell'
-        },
+        $AzTag,
     
 
         ### Azure resource group parametes ###
