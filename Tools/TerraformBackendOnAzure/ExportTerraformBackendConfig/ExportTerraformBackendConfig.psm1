@@ -83,14 +83,14 @@ function Export-Terraform {
         Write-Host "OutputFilePath -> $OutputFilePath"
 
         try {
-            Join-Path -Path $terraformFileOutput -ChildPath $mainTfName -Resolve            
+            $terraformPath = Join-Path -Path $terraformFileOutput -ChildPath $mainTfName -Resolve
         }
         catch {
             Write-Error "file $($mainTfName) or path $($terraformFileOutput) does not exists."
         }
 
         # Adds terraform snippet to the main file
-        Add-Content -Path $terraformFileOutput -Value $TerraformSnippet
+        Add-Content -Path $terraformPath -Value $TerraformSnippet
 
         Write-Host -ForegroundColor Green -BackgroundColor Black -Object "Il seguente snippet per configurare il backend di Terraform è stato salvato nel file $($MainTerraformFileName) al seguente percorso"
         Write-Host -ForegroundColor Green -BackgroundColor Black -Object "$($terraformFileOutput)"
