@@ -47,11 +47,6 @@ Whitin an output like this:
 Resource prefix (e.g. project name).
 **Default**: TfBackend
 
-#### Parameter MainFilePath
-
-Path from wich will be imported the output ```main.tf``` without the backend configuration.
-**Default**: script execution folder.
-
 #### Parameter OutputFilePath
 
 Path where will be saved the output ```main.tf``` within the backend configuration.
