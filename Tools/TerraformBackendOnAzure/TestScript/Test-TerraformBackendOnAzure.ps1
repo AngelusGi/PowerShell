@@ -50,10 +50,7 @@ param (
         Mandatory = $false
     )]
     [hashtable]
-    $AzTag = @{
-        app = 'TerraformBackend'
-        iac = 'PowerShell'
-    },
+    $AzTag,
 
 
     ### Azure resource group parametes ###
@@ -179,6 +176,13 @@ function Set-PsEvnironment {
 #endregion
 
 #region script body
+
+if ($null -eq $AzTag) {
+    $AzTag = @{
+        app = 'TerraformBackend'
+        iac = 'PowerShell'
+    }
+}
 
 Set-PsEvnironment -ModulesToInstall ModuleManager, TerraformBackendOnAzure
 

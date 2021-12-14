@@ -186,7 +186,7 @@ function Set-TerraformBackendConfiguration {
                 }
                 else {
                     #todo
-                    Connect-AzAccount -ErrorAction Stop -Tenant dce4349f-a302-4822-bb8d-a115cf5786a2
+                    Connect-AzAccount -ErrorAction Stop -Tenant $AzTenant
                 }
             }
         }
