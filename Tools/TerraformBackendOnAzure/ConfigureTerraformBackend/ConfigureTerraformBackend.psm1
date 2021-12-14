@@ -14,14 +14,6 @@ function Set-TerraformBackendConfiguration {
         [string]
         $ResourcePrefix = "TfBackend",
             
-        # Parameter main.tf file path as input
-        [Parameter(
-            HelpMessage = "Path from wich will be imported the output Main.tf without the backend configuration. Default: script execution folder.",
-            Mandatory = $false
-        )]
-        [string]
-        $MainFilePath,
-
         # Parameter main.tf file path as output
         [Parameter(
             HelpMessage = "Path where will be saved the output Main.tf within the backend configuration. Default: script execution folder.",

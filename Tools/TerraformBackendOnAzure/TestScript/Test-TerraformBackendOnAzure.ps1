@@ -13,14 +13,6 @@ param (
     [string]
     $ResourcePrefix = "TfBackend",
         
-    # Parameter main.tf file path as input
-    [Parameter(
-        HelpMessage = "Path from wich will be imported the output Main.tf without the backend configuration. Default: script execution folder.",
-        Mandatory = $false
-    )]
-    [string]
-    $MainFilePath,
-
     # Parameter main.tf file path as output
     [Parameter(
         HelpMessage = "Path where will be saved the output Main.tf within the backend configuration. Default: script execution folder.",
@@ -193,6 +185,6 @@ Set-PsEvnironment -ModulesToInstall ModuleManager, TerraformBackendOnAzure
 # exectues custom modules
 Set-EnvironmentInstaller -Modules "Az" -OnlyAbovePs6 $true
 
-Set-TerraformBackendOnAzure -MainFilePath $MainFilePath -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName -ResourcePrefix $ResourcePrefix -AzSub $AzSub -AzRegion $AzRegion -AzTag $AzTag -AzStgSku $AzStgSku -AzResGroup $AzResGroup -AzStorageAccount $AzStorageAccount -TerraformContainer $TerraformContainer -AzKvSku $AzKvSku -AzKeyVault $AzKeyVault -ModulesToInstall "ConfigureTerraformBackend", "ExportTerraformBackendConfig"
+Set-TerraformBackendOnAzure -OutputFilePath $OutputFilePath -MainTerraformFileName $MainTerraformFileName -ResourcePrefix $ResourcePrefix -AzSub $AzSub -AzRegion $AzRegion -AzTag $AzTag -AzStgSku $AzStgSku -AzResGroup $AzResGroup -AzStorageAccount $AzStorageAccount -TerraformContainer $TerraformContainer -AzKvSku $AzKvSku -AzKeyVault $AzKeyVault -ModulesToInstall "ConfigureTerraformBackend", "ExportTerraformBackendConfig"
 
 #endregion

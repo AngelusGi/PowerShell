@@ -9,14 +9,6 @@ function Set-TerraformFolder {
         [string]
         $OutputFilePath,
         
-        # Parameter main.tf file path as input
-        [Parameter(
-            HelpMessage = "Path from wich will be imported the output Main.tf without the backend configuration. Default: script execution folder.",
-            Mandatory = $false
-        )]
-        [string]
-        $MainFilePath,
-
         # Name of the terraform main file
         [Parameter(
             HelpMessage = "Name of the main Terraform file (no extension required). Default: main",
@@ -34,7 +26,7 @@ function Set-TerraformFolder {
     )
 
     process {
-        Export-Terraform -MainTerraformFileName $MainTerraformFileName -TerraformSnippet $TerraformSnippet -OutputFilePath $OutputFilePath -MainFilePath $MainFilePath
+        Export-Terraform -MainTerraformFileName $MainTerraformFileName -TerraformSnippet $TerraformSnippet -OutputFilePath $OutputFilePath
 
     }
 
@@ -51,14 +43,6 @@ function Export-Terraform {
         )]
         [string]
         $OutputFilePath,
-        
-        # Parameter main.tf file path as input
-        [Parameter(
-            HelpMessage = "Path from wich will be imported the output Main.tf without the backend configuration. Default: script execution folder.",
-            Mandatory = $false
-        )]
-        [string]
-        $MainFilePath,
 
         # Name of the terraform main file
         [Parameter(
@@ -85,11 +69,11 @@ function Export-Terraform {
             $mainTfName = $MainTerraformFileName
         }
 
-        if ([string]::IsNullOrEmpty($MainFilePath) -or [string]::IsNullOrWhiteSpace($MainFilePath) ) {
+        if ([string]::IsNullOrEmpty($OutputFilePath) -or [string]::IsNullOrWhiteSpace($OutputFilePath) ) {
             $terraformFileOutput = (Get-Location).Path
         }
         else {
-            $terraformFileOutput = $MainFilePath 
+            $terraformFileOutput = $OutputFilePath 
         }
 
         try {
