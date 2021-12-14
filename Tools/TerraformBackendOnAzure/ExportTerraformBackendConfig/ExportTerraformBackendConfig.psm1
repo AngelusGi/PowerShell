@@ -62,12 +62,15 @@ function Export-Terraform {
     
     process {
 
-        if (-not $MainTerraformFileName -contains ".tf") {
-            $mainTfName = "$($MainTerraformFileName).tf"
-        }
-        else {
+        if ($MainTerraformFileName -contains ".tf") {
             $mainTfName = $MainTerraformFileName
         }
+        else {
+            $mainTfName = "$($MainTerraformFileName).tf"
+        }
+
+        Write-Host "mainTfName -> $mainTfName" 
+        Write-Host "MainTerraformFileName -> $MainTerraformFileName"
 
         if ([string]::IsNullOrEmpty($OutputFilePath) -or [string]::IsNullOrWhiteSpace($OutputFilePath) ) {
             $terraformFileOutput = (Get-Location).Path
@@ -75,6 +78,9 @@ function Export-Terraform {
         else {
             $terraformFileOutput = $OutputFilePath 
         }
+
+        Write-Host "terraformFileOutput -> $terraformFileOutput" 
+        Write-Host "OutputFilePath -> $OutputFilePath"
 
         try {
             Join-Path -Path $terraformFileOutput -ChildPath $mainTfName -Resolve            
