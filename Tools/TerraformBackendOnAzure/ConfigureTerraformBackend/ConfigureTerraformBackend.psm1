@@ -71,10 +71,7 @@ function Set-TerraformBackendConfiguration {
             Mandatory = $false
         )]
         [hashtable]
-        $AzTag = @{
-            app = 'TerraformBackend'
-            iac = 'PowerShell'
-        },
+        $AzTag,
     
 
         ### Azure resource group parametes ###
@@ -151,6 +148,13 @@ function Set-TerraformBackendConfiguration {
     )
 
     process {
+
+        if ($null -eq $AzTag) {
+            $AzTag = @{
+                app = 'TerraformBackend'
+                iac = 'PowerShell'
+            }   
+        }
 
         # Verify if customer resource prefix lenght
         function Measure-CustomerPrefix {
