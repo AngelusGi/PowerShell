@@ -186,7 +186,8 @@ function Set-TerraformBackendConfiguration {
                 }
                 else {
                     #todo
-                    Connect-AzAccount -ErrorAction Stop -Tenant $AzTenant
+                    # Connect-AzAccount -ErrorAction Stop -Tenant $AzTenant
+                    Connect-AzAccount -ErrorAction Stop
                 }
             }
         }
